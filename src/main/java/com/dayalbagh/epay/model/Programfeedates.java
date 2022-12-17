@@ -20,7 +20,7 @@ public class Programfeedates {
 	@Column(name = "id")
 	private int id;
 
-	private String programid;
+	
 	private String session;
 			
 	@Column(name = "duedate", columnDefinition = "Date")
@@ -43,10 +43,10 @@ public class Programfeedates {
 		
 	}
 
-	public Programfeedates(String programid, String session, Date duedate, Date lastdate, Date cutoffdate,
+	public Programfeedates( String session, Date duedate, Date lastdate, Date cutoffdate,
 			String mode) {
 	
-		this.programid = programid;
+		
 		this.session = session;
 		this.duedate = duedate;
 		this.lastdate = lastdate;
@@ -62,13 +62,7 @@ public class Programfeedates {
 		this.id = id;
 	}
 
-	public String getProgramid() {
-		return programid;
-	}
-
-	public void setProgramid(String programid) {
-		this.programid = programid;
-	}
+	
 
 	public String getSession() {
 		return session;
