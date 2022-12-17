@@ -1,0 +1,33 @@
+Take input as roll number
+Vaildate roll number.
+	if not valid 
+	return
+Check feedates available
+	if fee date not available
+		return
+if fee date available
+	check previous semesters pending fee
+	if fee pending 
+	Make payment
+	return
+End
+
+if fee not pending
+	check if regular semester or modular
+	if regular semester
+		get next semester
+		get semester fee.
+		Make payment
+		return
+		end
+		
+	if program id modular  
+		take modular number as input
+		get modular fee
+		make payment
+		return
+		end
+End 
+	
+
+   
