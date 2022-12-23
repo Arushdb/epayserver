@@ -34,7 +34,7 @@ public class Receipt {
 	private BigDecimal amount;
 	
 	private String type;
-	private int termno;
+	private String semester_code;
 	private String bankrefno;
 	
 	@OneToOne(mappedBy = "receipt")
@@ -43,6 +43,14 @@ public class Receipt {
 	@Column(name = "insert_time", columnDefinition = "Date")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date insert_time;
+	
+	
+	
+	
+
+	public Receipt() {
+		
+	}
 
 	public String getRefnumber() {
 		return refnumber;
@@ -92,13 +100,7 @@ public class Receipt {
 		this.type = type;
 	}
 
-	public int getTermno() {
-		return termno;
-	}
-
-	public void setTermno(int termno) {
-		this.termno = termno;
-	}
+	
 
 	public String getBankrefno() {
 		return bankrefno;
@@ -116,20 +118,7 @@ public class Receipt {
 		this.insert_time = insert_time;
 	}
 
-	public Receipt(String refnumber, String session, String payment_mode, Date transaction_date, BigDecimal amount,
-			String type, int termno, String bankrefno, Studentfeereceipt feereceipt, Date insert_time) {
-		
-		this.refnumber = refnumber;
-		this.session = session;
-		this.payment_mode = payment_mode;
-		this.transaction_date = transaction_date;
-		this.amount = amount;
-		this.type = type;
-		this.termno = termno;
-		this.bankrefno = bankrefno;
-		this.feereceipt = feereceipt;
-		this.insert_time = insert_time;
-	}
+	
 
 	public Studentfeereceipt getFeereceipt() {
 		return feereceipt;
@@ -137,6 +126,14 @@ public class Receipt {
 
 	public void setFeereceipt(Studentfeereceipt feereceipt) {
 		this.feereceipt = feereceipt;
+	}
+
+	public String getSemester_code() {
+		return semester_code;
+	}
+
+	public void setSemester_code(String semester_code) {
+		this.semester_code = semester_code;
 	}
 	
 	

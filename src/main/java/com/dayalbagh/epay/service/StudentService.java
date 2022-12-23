@@ -8,7 +8,13 @@ import com.dayalbagh.epay.model.Student;
 
 public interface StudentService {
 
-	List <Student> getstudentdetail(String rollno);
+	List <Student> getstudentdetail(String rollno) throws Exception;
 	
-	List<Programfeedates> getepaymentstatus() throws Exception;
+	List<Programfeedates> getepaymentstatus(Character type) throws Exception;
+
+	List<Student> getpendingfee(String rollno);
+
+	Boolean isfeealreadypaid(String rollno, String sem, String pgm, Integer id) throws Exception;
+
+	
 }

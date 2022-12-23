@@ -20,19 +20,38 @@ import com.dayalbagh.epay.service.StudentService;
 public class StudentController {
 
 	private StudentService studentservice;
-	
-	@Autowired
-	public StudentController (StudentService thestudentservice) {
-		studentservice=thestudentservice;
-	}
-	
-	@GetMapping("/student")
-	public List getstudent(@RequestParam String rollno) throws Exception {
-		
 
-		List <Student> thestudent =studentservice.getstudentdetail(rollno);
-		List<Programfeedates> epaymentstatus = studentservice.getepaymentstatus();
+	@Autowired
+	public StudentController(StudentService thestudentservice) {
+		studentservice = thestudentservice;
+	}
+
+	@GetMapping("/student")
+	public List getstudent(@RequestParam String rollno, @RequestParam String semester) throws Exception {
+
+		List<Student> thestudent = studentservice.getstudentdetail(rollno);
+
+		String program = thestudent.get(0).getProgramid();
+		Character type = thestudent.get(0).getType();
+		List<Programfeedates> epaymentstatus = studentservice.getepaymentstatus(type);
+		int feedateid = epaymentstatus.get(0).getId();
+		List<Student> thependingfee = studentservice.getpendingfee(rollno);
+
+		thependingfee.forEach(rec -> {
+			rec.setStudentname(thestudent.get(0).getStudentname());
+			rec.setFeepending("Y");
+
+		});
+
+		if (thependingfee.size() > 0)
+			return thependingfee;
+		else {
+			Boolean feepaid = studentservice.isfeealreadypaid(rollno, semester, program, feedateid);
+            if (feepaid)  
+            	throw new Exception("Fee Already Paid");
+		 
+		}
 		return thestudent;
 	}
-	
+
 }

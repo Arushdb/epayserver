@@ -6,6 +6,10 @@ Check feedates available
 	if fee date not available
 		return
 if fee date available
+	check defaulterlist 
+	if defaulter
+	make payment
+	return
 	check previous semesters pending fee
 	if fee pending 
 	Make payment
@@ -13,21 +17,13 @@ if fee date available
 End
 
 if fee not pending
-	check if regular semester or modular
-	if regular semester
-		get next semester
-		get semester fee.
-		Make payment
+	get semester input
+		check if fee already paid
 		return
-		end
 		
-	if program id modular  
-		take modular number as input
-		get modular fee
-		make payment
-		return
-		end
-End 
+		  
+
+	End 
 	
 
    
