@@ -15,78 +15,57 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = "fee_dates")
 public class Programfeedates {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private int id;
 
-	
 	private String session;
-			
-	@Column(name = "duedate", columnDefinition = "Date")
-	@Temporal(TemporalType.DATE)
-	private Date duedate;
+
+	private String duedate;
+	private String lastdate;
+	private String cutoffdate;
+	private Character semestertype;
+
+	@Column(name = "semester_start_date")
+	private String semesterstartdate;
+
+	@Column(name = "semester_end_date")
+	private String semesterenddate;
+
+	private int seqno;
+	private int status;
+
+//	@Column(name = "fee_period_to", columnDefinition = "Date")
+//	@Temporal(TemporalType.DATE)
+//	private Date feeperiodto;
+
 	
-	@Column(name = "lastdate", columnDefinition = "Date")
-	@Temporal(TemporalType.DATE)
-	private Date lastdate;
-	
-	
-	@Column(name = "cutoffdate", columnDefinition = "Date")
-	@Temporal(TemporalType.DATE)
-	private Date cutoffdate;
-	
-	
-	@Column(name = "fee_period_start", columnDefinition = "Date")
-	@Temporal(TemporalType.DATE)
-	private Date feeperiodstart;
-	
-	@Column(name = "fee_period_to", columnDefinition = "Date")
-	@Temporal(TemporalType.DATE)
-	private Date feeperiodto;
-	
-	
-	@OneToOne(mappedBy = "pgmfeedates")
-	private Studentfeereceipt studentfeereceipt ;
 
 	public Programfeedates() {
-		
+
 	}
 
 	
-	public Programfeedates(String session, Date duedate, Date lastdate, Date cutoffdate, Date fee_period_start,
-			Date fee_period_to, Studentfeereceipt studentfeereceipt) {
+	
+	
+	public Programfeedates(String duedate, String lastdate, String cutoffdate, Character semestertype,
+			String semesterstartdate, String semesterenddate, int seqno, int status) {
 		
-		this.session = session;
 		this.duedate = duedate;
 		this.lastdate = lastdate;
 		this.cutoffdate = cutoffdate;
-		this.feeperiodstart = fee_period_start;
-		this.feeperiodto = fee_period_to;
-		this.studentfeereceipt = studentfeereceipt;
-	}
-
-	
-	
-
-
-
-	public Programfeedates(int id, Date duedate, Date cutoffdate, Date feeperiodstart, Date feeperiodto) {
-		super();
-		this.id = id;
-		this.duedate = duedate;
-		this.cutoffdate = cutoffdate;
-		this.feeperiodstart = feeperiodstart;
-		this.feeperiodto = feeperiodto;
+		this.semestertype = semestertype;
+		this.semesterstartdate = semesterstartdate;
+		this.semesterenddate = semesterenddate;
+		this.seqno = seqno;
+		this.status = status;
 	}
 
 
-	public int getId() {
-		return id;
-	}
 
-	
+
 	
 
 	public String getSession() {
@@ -97,66 +76,69 @@ public class Programfeedates {
 		this.session = session;
 	}
 
-	public Date getDuedate() {
+	
+	public String getDuedate() {
 		return duedate;
 	}
 
-	public void setDuedate(Date duedate) {
-		this.duedate = duedate;
-	}
-
-	public Date getLastdate() {
+	public String getLastdate() {
 		return lastdate;
 	}
 
-	public void setLastdate(Date lastdate) {
-		this.lastdate = lastdate;
-	}
-
-	public Date getCutoffdate() {
+	public String getCutoffdate() {
 		return cutoffdate;
 	}
 
-	public void setCutoffdate(Date cutoffdate) {
+	public Character getSemestertype() {
+		return semestertype;
+	}
+
+	public String getSemesterstartdate() {
+		return semesterstartdate;
+	}
+
+	public String getSemesterenddate() {
+		return semesterenddate;
+	}
+
+	public int getSeqno() {
+		return seqno;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setDuedate(String duedate) {
+		this.duedate = duedate;
+	}
+
+	public void setLastdate(String lastdate) {
+		this.lastdate = lastdate;
+	}
+
+	public void setCutoffdate(String cutoffdate) {
 		this.cutoffdate = cutoffdate;
 	}
 
-
-	public Date getFee_period_start() {
-		return feeperiodstart;
+	public void setSemestertype(Character semestertype) {
+		this.semestertype = semestertype;
 	}
 
-
-	public void setFee_period_start(Date fee_period_start) {
-		this.feeperiodstart = fee_period_start;
+	public void setSemesterstartdate(String semesterstartdate) {
+		this.semesterstartdate = semesterstartdate;
 	}
 
-
-	public Date getFee_period_to() {
-		return feeperiodto;
+	public void setSemesterenddate(String semesterenddate) {
+		this.semesterenddate = semesterenddate;
 	}
 
-
-	public void setFee_period_to(Date fee_period_to) {
-		this.feeperiodto = fee_period_to;
+	public void setSeqno(int seqno) {
+		this.seqno = seqno;
 	}
 
-
-	public Studentfeereceipt getStudentfeereceipt() {
-		return studentfeereceipt;
+	public void setStatus(int status) {
+		this.status = status;
 	}
-
-
-	public void setStudentfeereceipt(Studentfeereceipt studentfeereceipt) {
-		this.studentfeereceipt = studentfeereceipt;
-	}
-
-	
-
-
-	
-	
-	
-	
 
 }

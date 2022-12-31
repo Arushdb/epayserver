@@ -1,29 +1,32 @@
 package com.dayalbagh.epay.service;
 
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+
 
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import com.dayalbagh.epay.exception.ResourceNotFoundException;
 import com.dayalbagh.epay.model.Defaulters;
+import com.dayalbagh.epay.model.ProgramFee;
 import com.dayalbagh.epay.model.Programfeedates;
 import com.dayalbagh.epay.model.Student;
 import com.dayalbagh.epay.model.Studentfeereceipt;
 import com.dayalbagh.epay.repository.DefaulterRepository;
 import com.dayalbagh.epay.repository.FeedatesRepository;
 import com.dayalbagh.epay.repository.FeereceiptRepository;
+import com.dayalbagh.epay.repository.ProgramFeeRepository;
 
 @PropertySource("classpath:message.properties" )
 @Service
@@ -34,18 +37,28 @@ public class StudentServiceImpl  implements StudentService{
 	
 	FeedatesRepository thefeedatesRepository;
 	FeereceiptRepository thefeereceiptRepository;
+	ProgramFeeRepository theprogramFeeRepository;
 	@Autowired
 	DefaulterRepository theDefaulterRepository ;
 	
 	@Value("${epaystartdate}")
 	private String epaystartdate ;
+	@Value("${delaycharges1}")
+	private int delaycharges1 ;
+	@Value("${delaycharges2}")
+	private int delaycharges2 ;
+	@Value("${labfee}")
+	private int labfee ;
 	
 	public StudentServiceImpl
 	(FeedatesRepository feedatesRepository,
-			FeereceiptRepository feereceiptRepository
+			FeereceiptRepository feereceiptRepository,
+			ProgramFeeRepository programFeeRepository
 			) {
 		this.thefeedatesRepository =feedatesRepository;
 		this.thefeereceiptRepository = feereceiptRepository;
+		this.theprogramFeeRepository = programFeeRepository;
+		
 		
 	}
 	
@@ -81,88 +94,174 @@ public class StudentServiceImpl  implements StudentService{
 				
 	
 	}
+	
 	@Override
-	public List<Student> getpendingfee(String rollno) {
-		List<Student> student=new ArrayList<>();
+	public Boolean getpaymentdelaystatus(Character type)  {
+		// TODO Auto-generated method stub
 		
-		
-		List<Defaulters> thedefaulter =null; 
-		thedefaulter = theDefaulterRepository.findAllByRollnumberAndDefaulter(rollno, 1);
-		
-		if(thedefaulter.size()>0) {
-			List<Student> defaulterlist=new ArrayList<>();
-			Student studentobj=new Student();
-			thedefaulter.forEach(rec->{
-				studentobj.setRoll_number(rec.getRollnumber());
-				studentobj.setSemester(rec.getSemestercode());
-				studentobj.setProgramid(rec.getProgramid());
-				studentobj.setProgramname(rec.getProgramname());
-				
-				defaulterlist.add(studentobj);
-				});
-			return defaulterlist;
+		Boolean delay=false;
+		java.sql.Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());	
+		List<Programfeedates> feedates =  thefeedatesRepository.getpaymentdelaytatus(date,type);
+			
+		if(feedates.size()>0) {
+			delay=true;
 		}
-		
+		return delay;
+						
+	
+	}
+	@Override
+	public List<Student> getpendingfee(String rollno,java.sql.Date semesterstartdate) {
+		List<Student> student=new ArrayList<>();
+				
 		student = (List<Student>) em.createNamedQuery("getpendingfee", Student.class)
 				.setParameter("rollno" , rollno)
 				.setParameter("epaystartdate",epaystartdate)
+				.setParameter("semesterstartdate", semesterstartdate)
 				.getResultList();
-				
+		
+		
 		return student;
 	}
 	@Override
-	public Boolean isfeealreadypaid(String rollno,String sem,String pgm,Integer id) throws Exception {
+	public Boolean isfeealreadypaid(String rollno,String sem,String pgm,java.sql.Date ssd ,java.sql.Date sed) throws Exception {
 		List<Studentfeereceipt> feereceipt1=null; 
 		List<Studentfeereceipt> feereceipt2=null; 
 		List<Student> student=new ArrayList<>();
+		
+		// check if student try to pay again in same period.
 		feereceipt1 =thefeereceiptRepository.
-				findAllByRollnumberAndSemesterAndProgramidAndId(rollno, sem, pgm,id);
-		feereceipt2 =thefeereceiptRepository.findAllByRollnumberAndSemesterAndProgramidAndIdNot(rollno, sem, pgm, id);
+				findAllByRollnumberAndSemesterAndProgramidAndSemesterstartdateAndSemesterenddate
+				(rollno, sem, pgm,ssd,sed);
+		
+		
+		// check if student try to pay again for previous passed semester .
+		//feereceipt2 =thefeereceiptRepository.findAllByRollnumberAndSemesterAndProgramidAndIdNot(rollno, sem, pgm, id);
 	    
 		
 		if(feereceipt1.size()>0)
 			throw new Exception("Fee Already Paid") ;
 		
-		if(feereceipt2.size()>0) {
-			student = (List<Student>) em.createNamedQuery("getsemesterstatus", Student.class)
-					.setParameter("semester",sem)
-					.setParameter("rollno" , rollno)
-					
-					.setParameter("pgmid",pgm)
-					.getResultList();
-			if (student.size()>0) 
-			throw new Exception("Fee Already Paid") ;	
-		}
-			
+//		if(feereceipt2.size()>0) {
+//			student = (List<Student>) em.createNamedQuery("getsemesterstatus", Student.class)
+//					.setParameter("semester",sem)
+//					.setParameter("rollno" , rollno)
+//					
+//					.setParameter("pgmid",pgm)
+//					.getResultList();
+//			if (student.size()>0) 
+//			throw new Exception("Fee Already Paid") ;	
+//		}
+//			
 		
 		
 			
 		return false;
 	}
+
 	
-//	@Override
-//	public List<Student> getpendingfee1(String rollno) {
-//		List<Student> student=null; 
-//		
-//		student = (List<Student>) em.createQuery("select srsh.roll_number,pch.semester_code \r\n"
-//				+ ",pch.program_id,pch.branch_id \r\n"
-//				+ "from cms21112022.student_registration_semester_header srsh\r\n"
-//				+ "left join student_fee_receipt sfr  on sfr.roll_number = srsh.roll_number \r\n"
-//				+ "and sfr.program_course_key= srsh.program_course_key \r\n"
-//				+ "and sfr.semester_start_date=srsh.session_start_date\r\n"
-//				+ "join cms21112022.program_course_header pch \r\n"
-//				+ "on pch.program_course_key= srsh.program_course_key\r\n"
-//				+ "\r\n"
-//				+ "where srsh.roll_number = :rollno\r\n"
-//				+ " and srsh.status in (\'PAS\',\'FAL\',\'REM\',\'REG\')\r\n"
-//				+ " and sfr.roll_number is null",Student.class)
-//				.setParameter("rollno" , rollno).
-//			
-//				getResultList();
-//		
-//		
-//		return student;
-//	}
-//	
+
+	
+	@Override
+	public List<Student> getvalidsemesters(String pgm, String ssd, String sed) throws Exception {
+		// TODO Auto-generated method stub
+				List<Student> validsemesters=new ArrayList<>();
+
+				validsemesters = (List<Student>) em.createNamedQuery("getsemesters", Student.class)
+						.setParameter("ssd",ssd)
+						.setParameter("sed" , sed)
+						
+						.setParameter("pgm",pgm)
+						.getResultList();
+				if (validsemesters.size()==0) 
+				throw new Exception("Semester not valid for "+pgm +"for  semester dates:"+ssd+" and "+sed) ;
+				else
+					return validsemesters;
+	}
+
+	@Override
+	public List<Student> getdefaulter(String rollno) {
+		
+		
+		
+		List<Defaulters> thedefaulter =null; 
+		List<Student> defaulterlist=new ArrayList<>();
+		thedefaulter = theDefaulterRepository.findAllByRollnumberAndDefaulter(rollno, 1);
+		
+		if(thedefaulter.size()>0) {
+			
+			Student studentobj=new Student();
+			thedefaulter.forEach(rec->{
+				studentobj.setRoll_number(rec.getRollnumber());
+				studentobj.setSemestercode(rec.getSemestercode());
+				
+				studentobj.setProgramid(rec.getProgramid());
+				studentobj.setProgramname(rec.getProgramname());
+				studentobj.setAmount(rec.getAmount()+rec.getFine());
+				
+				defaulterlist.add(studentobj);
+				});
+			
+		}
+		return defaulterlist;
+	}
+	
+	
+public Student getFeeAmount(String pgm ,String sem ,String branch,String spec,String learningmode,String latefee,String lab) throws Exception {
+	
+	Student studentfee = new Student();
+	float feeamount=0;
+	List<ProgramFee> programfee = new ArrayList<ProgramFee>();
+	programfee =theprogramFeeRepository.findByProgramidAndSemestercodeAndBranchidAndSpecializationidAndMode(pgm, sem, branch, spec, learningmode);
+	if(programfee.size()>0) {
+		
+	}else
+	{
+		programfee =theprogramFeeRepository.findByProgramidAndSemestercodeAndBranchidAndMode(pgm, sem, branch,  learningmode);
+		if (programfee.size()>0) {
+			
+		}else {
+			programfee =theprogramFeeRepository.findByProgramidAndSemestercodeAndMode(pgm, sem,  learningmode);
+			if (programfee.size()>0) {
+				
+			}else {
+				throw new Exception("Fee Set up not ready for Program :"+pgm+" Branch :"+branch+" Speclization :"+spec+" And :"+sem);
+			}
+		}
+	}
+	
+	feeamount=programfee.get(0).getAmount();
+	studentfee.setAmount(feeamount);
+	if (feeamount==0)
+		return studentfee;
+	
+		if (latefee.equalsIgnoreCase("S"))
+			studentfee.setLatefee(delaycharges2);
+		
+		if (latefee.equalsIgnoreCase("L"))
+			studentfee.setLatefee(delaycharges1);
+				
+		if (lab.equalsIgnoreCase("Y"))
+			studentfee.setLabfee(labfee);
+				
+		return studentfee;
+			}
+
+
+@Override
+public java.sql.Date stringToDate(String dt) throws ParseException {
+	
+	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	String today = df.format(new Date());
+	String year = today.substring(0, 4);
+	
+	  dt=year+'-'+dt;
+	  java.sql.Date date = java.sql.Date.valueOf(dt);
+	  
+	 return date;
+
+	
+}
+	
 
 }

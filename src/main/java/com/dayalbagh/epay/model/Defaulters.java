@@ -2,12 +2,13 @@ package com.dayalbagh.epay.model;
 
 import java.util.Date;
 
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -27,8 +28,11 @@ public class Defaulters {
 	@Column(name = "semester_code" ,columnDefinition = "char(4)")
 	private String semestercode;
 	
+	
 	@Column(name = "program_id")
 	private String programid;
+	
+	
 	
 	@Column(name = "programname")
 	private String programname;
@@ -49,6 +53,9 @@ public class Defaulters {
 	
 	@Column(name = "modifiedby")
 	private String modifiedby;
+	
+	private float fine ;
+	private float amount;
 
 	
 	public Defaulters() {
@@ -164,6 +171,26 @@ public class Defaulters {
 
 	public void setProgramname(String programname) {
 		this.programname = programname;
+	}
+
+
+	public float getFine() {
+		return fine;
+	}
+
+
+	public float getAmount() {
+		return amount;
+	}
+
+
+	public void setFine(float fine) {
+		this.fine = fine;
+	}
+
+
+	public void setAmount(float amount) {
+		this.amount = amount;
 	}
 
 	

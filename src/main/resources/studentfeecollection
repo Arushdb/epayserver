@@ -1,29 +1,84 @@
+
+
 Take input as roll number
+
+
+Display fee collection period   with start date ,last date and cut off date  
+with available modules/semester
+
 Vaildate roll number.
 	if not valid 
 	return
-Check feedates available
-	if fee date not available
-		return
+
+Check feedates available  
+ 	if fee date not available 
+ 	 		return
+	 		
+ 	 		
 if fee date available
-	check defaulterlist 
+    getfeeflag 
+	check defaulterlist
 	if defaulter
 	make payment
 	return
-	check previous semesters pending fee
-	if fee pending 
-	Make payment
-	return
-End
-
-if fee not pending
-	get semester input
-		check if fee already paid
-		return
-		
-		  
-
-	End 
 	
+	get previous semesters  for pending fee 
+	if prev fee pending
+	latefee = "S" 
+	feeamount =getFeeAmount(pgm ,sem ,branch,spec,learningmode,feeflag,latefee )
+	if (feeamount >0)
+	Make payment
+	else 
+	Send message "Fee Not allowed"
+	return
+	
+	
+	getValid Semester()
+	Take  semester input.
+	if fee already paid
+		Send message "Fee Already paid"
+		return
+	
+	if currentdate > lastdate and < cutoffdate 
+		Latefee = L;
+		if currentdate > duedate and < lastdate 
+		Latefee = N;
+	
+	amount =getFeeAmount(pgm ,sem ,branch,spec,learningmode,feeflag,latefee )
+	
+		if  amount =0
+	    Send message "Fee payment not allowed for this semester "
+	    return
+		
+		make payment
+	End
+
+	
+	{(learningmode=dis,reg)
+	(feeflag=P for program wise,B= program and Branch wise,
+	S= Program,Branch and Speclization wise)(latefee =L(after lastdate and before cutoff),S(pendingsemester)} 
+	
+	getFeeAmount(pgm ,sem ,branch,spec,learningmode,latefee ,lab){
+	
+	  get feebasedon pgm,sem,branch,spec,learningmode;
+	  if not available
+	  get feebasedon pgm,sem,branch,learningmode;
+	   if not available
+	  get feebasedon pgm,sem,learningmode;
+	  if not available 
+	  throw exception(Fee set up not ready)
+	
+	
+	
+ 
+ 	if latefee = L
+ 	Add 100 RS penality  -- pick up from message.property 
+ 	
+ 	If latefee = S
+ 	Add 200 Rs penality --pick up from message.property
+ 	
+ 	if lab based program.
+ 	add lab fee
+	}
 
    
