@@ -1,6 +1,10 @@
 package com.dayalbagh.epay.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 public class Student {
 	
@@ -37,15 +41,30 @@ public class Student {
 	private float latefee;
 	private float labfee;	
 	
+	@Temporal(TemporalType.DATE)
+	private Date semesterstartdate;
+	
+	@Temporal(TemporalType.DATE)
+	private Date semesterenddate;
+	
 	public Student() {
 		
 		// TODO Auto-generated constructor stub
 	}
 	
-	
-	
-	
-	
+		
+	public Date getSemesterstartdate() {
+		return semesterstartdate;
+	}
+	public Date getSemesterenddate() {
+		return semesterenddate;
+	}
+	public void setSemesterstartdate(Date semesterstartdate) {
+		this.semesterstartdate = semesterstartdate;
+	}
+	public void setSemesterenddate(Date semesterenddate) {
+		this.semesterenddate = semesterenddate;
+	}
 	
 	public Student(String roll_number, String studentname, String programid, Character type, String programname,
 			String mode, String branchid, String specializationid) {
@@ -64,11 +83,14 @@ public class Student {
 		this.roll_number = roll_number;
 		this.programname = programname;
 	}
-	public Student(String roll_number, String programname, String semester_code) {
+	public Student(String roll_number, String programname, String semester_code,
+			Date semesterstartdate,Date semesterenddate) {
 		
 		this.roll_number = roll_number;
 		this.programname = programname;
 		this.semestercode = semester_code;
+		this.semesterstartdate=semesterstartdate;
+		this.semesterenddate=semesterenddate;
 	}
 	public Student(String roll_number, String studentname, String programid, Character type, String programname) {
 		

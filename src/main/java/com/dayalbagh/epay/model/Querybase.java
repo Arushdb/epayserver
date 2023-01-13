@@ -58,7 +58,7 @@ import javax.persistence.SqlResultSetMappings;
 				+ "	 where roll_number =:rollno and program_status in ('ACT','PAS','FAL')", resultSetMapping = "getstudentdetailmap"),
 
 		@NamedNativeQuery(name = "getpendingfee", query = "select srsh.roll_number as roll_number,pm.program_name as \r\n"
-				+ "programname ,pch.semester_code as semestercode"
+				+ "programname ,pch.semester_code as semestercode,srsh.session_start_date as semesterstartdate,srsh.session_end_date as semesterenddate"
 				+ "						from cms21112022.student_registration_semester_header srsh\r\n"
 				+ "                        join cms21112022.program_course_header pch \r\n"
 				+ "						on pch.program_course_key= srsh.program_course_key\r\n"
@@ -88,7 +88,7 @@ import javax.persistence.SqlResultSetMappings;
 				+ "and substr(srsh.program_course_key,1,7)=:pgmid ", resultSetMapping = "pendingfee"),
 
 		@NamedNativeQuery(name = "getsemesters", query = "select '' as roll_number,'' as programname,"
-				+ "semester_code  as semestercode from cms21112022.program_term_details "
+				+ "semester_code  as semestercode, curdate()  as semesterstartdate,curdate() as semesterenddate from cms21112022.program_term_details "
 				+ " where semester_start_date = :ssd "
 				+ " and semester_end_date = :sed and program_id =:pgm ", resultSetMapping = "pendingfee") })
 
@@ -97,7 +97,8 @@ import javax.persistence.SqlResultSetMappings;
 		@SqlResultSetMapping(name = "pendingfee", classes = {
 				@ConstructorResult(targetClass = Student.class, columns = { @ColumnResult(name = "roll_number"),
 
-						@ColumnResult(name = "programname"), @ColumnResult(name = "semestercode")
+						@ColumnResult(name = "programname"), @ColumnResult(name = "semestercode"),
+						@ColumnResult(name = "semesterstartdate"), @ColumnResult(name = "semesterenddate")
 
 				}
 

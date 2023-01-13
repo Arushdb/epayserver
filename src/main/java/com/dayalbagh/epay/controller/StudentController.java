@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dayalbagh.epay.model.Programfeedates;
 import com.dayalbagh.epay.model.Student;
 import com.dayalbagh.epay.service.StudentService;
+import com.google.gson.Gson;
+
+import net.minidev.json.JSONArray;
 
 @RestController
 @RequestMapping("/api/test")
@@ -29,7 +33,7 @@ public class StudentController {
 	}
 
 	@GetMapping("/student")
-	public List<Student> getstudent(@RequestParam String rollno,@RequestParam String semestercode) throws Exception {
+	public String getstudent(@RequestParam String rollno,@RequestParam String semestercode) throws Exception {
 
 		List<Student> thestudent = studentservice.getstudentdetail(rollno);
 		Student studentfee = new Student();
@@ -58,10 +62,15 @@ public class StudentController {
 		if(defaulter.size()>0) {
 			defaulter.forEach(rec -> {
 				rec.setStudentname(thestudent.get(0).getStudentname());
-				rec.setFeepending("Y");
+				rec.setFeepending("D"); // D for  defaulter
 
 			});
-			 return defaulter;
+			
+			Gson gson = new Gson();
+			
+			return gson.toJson(defaulter);
+		
+			 //return defaulter;
 			
 		}
 		
@@ -79,6 +88,9 @@ public class StudentController {
 			thestudent.get(0).setLabfee(studentfee.getLabfee()); 
 			thestudent.get(0).setSemestercode(thependingfee.get(i).getSemestercode());
 			thestudent.get(0).setFeepending("Y");
+			thestudent.get(0).setMode(learningmode);
+			thestudent.get(0).setSemesterstartdate(thependingfee.get(i).getSemesterstartdate());
+			thestudent.get(0).setSemesterenddate(thependingfee.get(i).getSemesterenddate())	;		
 			break;
 			
 
@@ -87,7 +99,10 @@ public class StudentController {
 		
 		
 		if(thestudent.get(0).getAmount()>0) {
-			return thestudent;
+			Gson gson = new Gson();
+			
+			return gson.toJson(thestudent);
+		
 		}else {
 
 			
@@ -127,7 +142,11 @@ public class StudentController {
 				throw new Exception("Semester:"+semestercode+" is invalid for current period");
 			}
 				
-			return thestudent;
+				Gson gson = new Gson();
+			
+			return gson.toJson(thestudent);
+			
+			//return thestudent;
 		}
 
 	}
