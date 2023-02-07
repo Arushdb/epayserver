@@ -3,8 +3,10 @@ package com.dayalbagh.epay.model;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
 
 public class Student {
 	
@@ -36,10 +38,19 @@ public class Student {
 	@Column(name="specializationid",columnDefinition="char(2)")
 	private String specializationid;
 	
+	private String applicationnumber;
+	private String bypost;
+	private String certificatetype;
+	
 	
 	private float amount ;
 	private float latefee;
 	private float labfee;	
+	private java.math.BigDecimal  appfee ;
+	
+	
+	
+	
 	
 	@Temporal(TemporalType.DATE)
 	private Date semesterstartdate;
@@ -100,6 +111,18 @@ public class Student {
 		this.type = type;
 		this.programname = programname;
 	}
+	
+	
+	
+	public Student(String studentname, String applicationnumber, java.math.BigDecimal appfee) {
+		
+		this.studentname = studentname;
+		this.applicationnumber = applicationnumber;
+		this.appfee = appfee;
+		
+	}
+	
+	
 	public String getRoll_number() {
 		return roll_number;
 	}
@@ -173,7 +196,7 @@ public class Student {
 	public float getLatefee() {
 		return latefee;
 	}
-	public void setLatefee(float latefee) {
+	public void setLatefee(float latefee) { 
 		this.latefee = latefee;
 	}
 	public float getLabfee() {
@@ -182,6 +205,31 @@ public class Student {
 	public void setLabfee(float labfee) {
 		this.labfee = labfee;
 	}
+	public String getApplicationnumber() {
+		return applicationnumber;
+	}
+	public void setApplicationnumber(String applicationnumber) {
+		this.applicationnumber = applicationnumber;
+	}
+	public java.math.BigDecimal getAppfee() {
+		return appfee;
+	}
+	public void setAppfee(java.math.BigDecimal appfee) {
+		this.appfee = appfee;
+	}
+	public String getBypost() {
+		return bypost;
+	}
+	public void setBypost(String bypost) {
+		this.bypost = bypost;
+	}
+	public String getCertificatetype() {
+		return certificatetype;
+	}
+	public void setCertificatetype(String certificatetype) {
+		this.certificatetype = certificatetype;
+	}
+	
 	
 	
 	

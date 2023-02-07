@@ -32,6 +32,14 @@ public interface StudentService {
 	Boolean isfeealreadypaid(String rollno, String sem, String pgm, java.sql.Date ssd, java.sql.Date sed)
 			throws Exception;
 
+	List<Student> getapplicantdetail(String appno);
+
+	Student getadmissiondetail(String appno) throws Exception;
+
+	
+
+	
+	
 	
 	
 

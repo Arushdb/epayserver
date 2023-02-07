@@ -1,6 +1,7 @@
 package com.dayalbagh.epay.controller;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,12 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dayalbagh.epay.model.Certificate;
 import com.dayalbagh.epay.model.Programfeedates;
 import com.dayalbagh.epay.model.Student;
+import com.dayalbagh.epay.service.CertificateService;
 import com.dayalbagh.epay.service.StudentService;
 import com.google.gson.Gson;
 
@@ -26,6 +32,8 @@ import net.minidev.json.JSONArray;
 public class StudentController {
 
 	private StudentService studentservice;
+	@Autowired
+	private CertificateService certificateService;
 
 	@Autowired
 	public StudentController(StudentService thestudentservice) {
@@ -151,4 +159,55 @@ public class StudentController {
 
 	}
 
+	@GetMapping("/applicant")
+	public String getApplicant(@RequestParam String appno) throws Exception {
+		
+		List<Student> theapplicant  = new ArrayList<>();
+		
+		theapplicant = studentservice.getapplicantdetail(appno);
+		Gson gson = new Gson();
+		if(theapplicant.size()>0)  
+		return gson.toJson(theapplicant);
+		throw new Exception("E payment not available");
+		
+	}
+	
+	@GetMapping("/admission")
+	public String getadmissionfee(@RequestParam String appno) throws Exception {
+		
+		List<Student> theapplicant  = new ArrayList<>();
+		
+		theapplicant.add(studentservice.getadmissiondetail(appno));
+		Gson gson = new Gson();
+		if(theapplicant.size()>0)  
+		return gson.toJson(theapplicant);
+		throw new Exception("E payment not available");
+		
+	}
+	
+	@PostMapping("/certificate")
+	//public String getcertificate(@RequestParam String rollno ,@RequestParam String bypost,
+		//	@RequestParam String type) throws Exception {
+		
+	public String getcertificate( 
+			@RequestBody Certificate certificate,
+			@RequestParam String semesters,
+			@RequestParam String dob,
+			@RequestParam String enrolno
+			
+			 
+			) throws Exception {
+		
+	List<Student> thestudent  = new ArrayList<>();
+		String rollno = certificate.getRollno();
+		String mode = certificate.getMode();
+		String type = certificate.getType();
+	
+		thestudent =certificateService.getcertificatedetail(rollno,mode,type,dob,enrolno,semesters);
+		Gson gson = new Gson();
+		if(thestudent.size()>0)  
+		return gson.toJson(thestudent);
+		throw new Exception("E payment not available");
+		
+	}
 }
