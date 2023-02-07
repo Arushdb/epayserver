@@ -43,37 +43,37 @@ import javax.persistence.SqlResultSetMappings;
 @NamedNativeQueries({
 
 		@NamedNativeQuery(name = "getstudentdetail_old", query = "select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid ,"
-				+ "pm.program_type as type,program_name as programname" + " from cms21112022.student_program sp\r\n"
-				+ " join cms21112022.student_master sm on sm.enrollment_number = sp.enrollment_number \r\n"
-				+ " join cms21112022.program_master pm on pm.program_id = sp.program_id\r\n"
+				+ "pm.program_type as type,program_name as programname" + " from cms_live.student_program sp\r\n"
+				+ " join cms_live.student_master sm on sm.enrollment_number = sp.enrollment_number \r\n"
+				+ " join cms_live.program_master pm on pm.program_id = sp.program_id\r\n"
 				+ " where roll_number =:rollno and program_status in (\"ACT\",\"PAS\",\"FAL\")", resultSetMapping = "getstudentdetailmap"),
 
 		@NamedNativeQuery(name = "getstudentdetail", query = "select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid ,"
 
 				+ "	pm.program_type as type,program_name as programname,em.entity_type as mode,sp.branch_id as branchid ,sp.specialization_id as specializationid"
-				+ " from cms21112022.student_program sp "
-				+ " join cms21112022.student_master sm on sm.enrollment_number = sp.enrollment_number "
-				+ "	 join cms21112022.program_master pm on pm.program_id = sp.program_id "
-				+ "  join cms21112022.entity_master em on em.entity_id = sp.entity_id "
+				+ " from cms_live.student_program sp "
+				+ " join cms_live.student_master sm on sm.enrollment_number = sp.enrollment_number "
+				+ "	 join cms_live.program_master pm on pm.program_id = sp.program_id "
+				+ "  join cms_live.entity_master em on em.entity_id = sp.entity_id "
 				+ "	 where roll_number =:rollno and program_status in ('ACT','PAS','FAL')", resultSetMapping = "getstudentdetailmap"),
 		
 		@NamedNativeQuery(name = "valid_roll_enrol_dob", query = "select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid ,"
 
 				+ "	pm.program_type as type,program_name as programname,em.entity_type as mode,sp.branch_id as branchid ,sp.specialization_id as specializationid"
-				+ " from cms21112022.student_program sp "
-				+ " join cms21112022.student_master sm on sm.enrollment_number = sp.enrollment_number "
-				+ "	 join cms21112022.program_master pm on pm.program_id = sp.program_id "
-				+ "  join cms21112022.entity_master em on em.entity_id = sp.entity_id "
+				+ " from cms_live.student_program sp "
+				+ " join cms_live.student_master sm on sm.enrollment_number = sp.enrollment_number "
+				+ "	 join cms_live.program_master pm on pm.program_id = sp.program_id "
+				+ "  join cms_live.entity_master em on em.entity_id = sp.entity_id "
 				+ "	 where roll_number =:rollno and sm.date_of_birth=:dob and sp.enrollment_number=:enrolno and program_status in ('ACT','PAS','FAL')", resultSetMapping = "getstudentdetailmap"),
 
 		@NamedNativeQuery(name = "valid_enrol_dob", query =" select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid, "
 								  
-                + " pm.program_type as type,pm.program_name as programname,'mode' as mode,sp.branch_id as branchid ,sp.specialization_id as specializationid from cms21112022.student_program sp "
-                + " join cms21112022.student_master sm on sm.enrollment_number =:enrolno "
-                + " join cms21112022.program_master pm on pm.program_id = sp.program_id "
+                + " pm.program_type as type,pm.program_name as programname,'mode' as mode,sp.branch_id as branchid ,sp.specialization_id as specializationid from cms_live.student_program sp "
+                + " join cms_live.student_master sm on sm.enrollment_number =:enrolno "
+                + " join cms_live.program_master pm on pm.program_id = sp.program_id "
                 + " and sm.date_of_birth=:dob "
                 + " where registered_from_session= " 
-                + " (select max(registered_from_session) from cms21112022.student_program where enrollment_number=:enrolno) "
+                + " (select max(registered_from_session) from cms_live.student_program where enrollment_number=:enrolno) "
                 + " and sp.enrollment_number=:enrolno "
                 + " and program_status in ('ACT','PAS','FAL') " 
 				
@@ -83,14 +83,14 @@ import javax.persistence.SqlResultSetMappings;
 
 		@NamedNativeQuery(name = "getpendingfee", query = "select srsh.roll_number as roll_number,pm.program_name as \r\n"
 				+ "programname ,pch.semester_code as semestercode,srsh.session_start_date as semesterstartdate,srsh.session_end_date as semesterenddate"
-				+ "						from cms21112022.student_registration_semester_header srsh\r\n"
-				+ "                        join cms21112022.program_course_header pch \r\n"
+				+ "						from cms_live.student_registration_semester_header srsh\r\n"
+				+ "                        join cms_live.program_course_header pch \r\n"
 				+ "						on pch.program_course_key= srsh.program_course_key\r\n"
 				+ "						left join student_fee_receipt sfr  on sfr.roll_number = srsh.roll_number \r\n"
 				+ "						and sfr.program_id= pch.program_id \r\n"
 				+ "                        and sfr.semester_code=pch.semester_code\r\n"
 				+ "						and sfr.semester_start_date=srsh.session_start_date\r\n"
-				+ "                       join cms21112022.program_master pm on pm.program_id =pch.program_id\r\n"
+				+ "                       join cms_live.program_master pm on pm.program_id =pch.program_id\r\n"
 				+ "						where srsh.roll_number =:rollno\r\n"
 				+ "						and srsh.status in (\"PAS\",\"FAL\",\"REM\",\"REG\")\r\n"
 				+ "						and srsh.session_start_date >=:epaystartdate and srsh.session_start_date "
@@ -105,14 +105,14 @@ import javax.persistence.SqlResultSetMappings;
 				+ "  order by pch.semester_code", resultSetMapping = "pendingfee"),
 
 		@NamedNativeQuery(name = "getsemesterstatus", query = "select srsh.roll_number as roll_number,'' as programname"
-				+ ",pch.semester_code as semestercode from cms21112022.student_registration_semester_header srsh "
-				+ "join cms21112022.program_course_header pch on pch.program_course_key= "
+				+ ",pch.semester_code as semestercode from cms_live.student_registration_semester_header srsh "
+				+ "join cms_live.program_course_header pch on pch.program_course_key= "
 				+ "srsh.program_course_key and pch.semester_code =:semester "
 				+ "where roll_number=:rollno and srsh.status = 'PAS' "
 				+ "and substr(srsh.program_course_key,1,7)=:pgmid ", resultSetMapping = "pendingfee"),
 
 		@NamedNativeQuery(name = "getsemesters", query = "select '' as roll_number,'' as programname,"
-				+ "semester_code  as semestercode, curdate()  as semesterstartdate,curdate() as semesterenddate from cms21112022.program_term_details "
+				+ "semester_code  as semestercode, curdate()  as semesterstartdate,curdate() as semesterenddate from cms_live.program_term_details "
 				+ " where semester_start_date = :ssd "
 				+ " and semester_end_date = :sed and program_id =:pgm ", resultSetMapping = "pendingfee"),
 		
@@ -122,7 +122,7 @@ import javax.persistence.SqlResultSetMappings;
 				+ "from adm20221003.entity_student where application_number=:appno"),
 		
 		@NamedNativeQuery(name="getmigrationdetail",
-		query = "select max(sequence_no) from cms21112022.migration_record where roll_number= :rollno"
+		query = "select max(sequence_no) from cms_live.migration_record where roll_number= :rollno"
 				),
 
 		@NamedNativeQuery(name = "getapplicantdetail", query = " select  first_name as studentname ,apr.application_number as applicationnumber ,"
