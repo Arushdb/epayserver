@@ -119,22 +119,46 @@ import javax.persistence.SqlResultSetMappings;
 		
 		@NamedNativeQuery(name="getapplicantname",
 		query = "select first_name as studentname "
-				+ "from adm20221003.entity_student where application_number=:appno"),
+				+ "from admissionform_live.entity_student where application_number=:appno"),
 		
 		@NamedNativeQuery(name="getmigrationdetail",
 		query = "select max(sequence_no) from cms_live.migration_record where roll_number= :rollno"
 				),
+		
+		@NamedNativeQuery(name="getpostfee",
+		query = " select applicant_name as studentname,paa.application_number as applicationnumber ,cast(sum(post_fee)as decimal) as appfee from deipost.post_applicant_applied paa\r\n"
+				+ "join deipost.post_applicant_master  pam on  paa.application_number = pam.application_number\r\n"
+				+ "where paa.application_number=:appno group by paa.application_number" ,resultSetMapping ="applicantdetail"
+				),
 
 		@NamedNativeQuery(name = "getapplicantdetail", query = " select  first_name as studentname ,apr.application_number as applicationnumber ,"
-				+ " cast(expected_fee as decimal)  as appfee  from adm20221003.student_application_status sas "
-				+ " join adm20221003.applicant_program_registration apr "
+				+ " cast(expected_fee as decimal)  as appfee  from admissionform_live.student_application_status sas "
+				+ " join admissionform_live.applicant_program_registration apr "
 				+ " on apr.application_number= sas.application_number "
-				+ " join adm20221003.program_form pf on pf.program_id = apr.program_id "
-				+ " join adm20221003.entity_student es on es.application_number=apr.application_number "
+				+ " join admissionform_live.program_form pf on pf.program_id = apr.program_id "
+				+ " join admissionform_live.entity_student es on es.application_number=apr.application_number "
 
 				+ " where application_status='D' "
 				+ " and sas.application_number=:appno and available= 'Y'  and curdate()<= close_date  "
-				+ " group by form_number ", resultSetMapping = "applicantdetail") })
+				+ " group by form_number ", resultSetMapping = "applicantdetail"),
+		
+		@NamedNativeQuery(name = "getapplicantforhostel", query = " select  first_name as studentname ,apr.application_number as applicationnumber ,"
+				+ " cast(expected_fee as decimal)  as appfee  from admissionform_live.student_application_status sas "
+				+ " join admissionform_live.applicant_program_registration apr "
+				+ " on apr.application_number= sas.application_number "
+				+ " join admissionform_live.program_form pf on pf.program_id = apr.program_id "
+				+ " join admissionform_live.entity_student es on es.application_number=apr.application_number "
+				+ " and sas.application_number=:appno "
+				+ " where application_status='D' and curdate() <= date_add(close_date,interval 5 month)"
+				+ "  group by form_number " ,resultSetMapping = "applicantdetail")
+				
+}
+		
+		
+		
+		
+		)
+
 
 @SqlResultSetMappings({
   

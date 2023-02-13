@@ -8,11 +8,11 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
+import org.springframework.stereotype.Repository;
 
 import com.dayalbagh.epay.model.Programfeedates;
 
-
+@Repository
 public interface FeedatesRepository extends JpaRepository<Programfeedates, Integer> {
 
 	 @Query(value = "select new Programfeedates( a.duedate ,a.lastdate,a.cutoffdate,"

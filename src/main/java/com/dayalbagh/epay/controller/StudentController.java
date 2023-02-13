@@ -19,13 +19,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dayalbagh.epay.model.Certificate;
+import com.dayalbagh.epay.model.HostelFee;
 import com.dayalbagh.epay.model.Programfeedates;
 import com.dayalbagh.epay.model.Student;
 import com.dayalbagh.epay.service.CertificateService;
+import com.dayalbagh.epay.service.HostelService;
+import com.dayalbagh.epay.service.PostfeeService;
 import com.dayalbagh.epay.service.StudentService;
 import com.google.gson.Gson;
 
-import net.minidev.json.JSONArray;
+//import net.minidev.json.JSONArray;
 
 @RestController
 @RequestMapping("/api/test")
@@ -34,6 +37,12 @@ public class StudentController {
 	private StudentService studentservice;
 	@Autowired
 	private CertificateService certificateService;
+	
+	@Autowired
+	private HostelService hostelService;
+	
+	@Autowired
+	private PostfeeService postfeeService;
 
 	@Autowired
 	public StudentController(StudentService thestudentservice) {
@@ -186,10 +195,7 @@ public class StudentController {
 	}
 	
 	@PostMapping("/certificate")
-	//public String getcertificate(@RequestParam String rollno ,@RequestParam String bypost,
-		//	@RequestParam String type) throws Exception {
-		
-	public String getcertificate( 
+	 public String getcertificate( 
 			@RequestBody Certificate certificate,
 			@RequestParam String semesters,
 			@RequestParam String dob,
@@ -210,4 +216,58 @@ public class StudentController {
 		throw new Exception("E payment not available");
 		
 	}
+	
+	
+	@PostMapping("/hostel")
+	 public String gethostelfee( 
+				@RequestBody HostelFee hostelfee,
+				@RequestParam String applno,
+				@RequestParam String rollno,
+				@RequestParam String mode
+				
+				 
+				) throws Exception {
+			
+		List<Student> thestudent  = new ArrayList<>();
+		List<HostelFee> thehostelfee  = new ArrayList<>();
+		
+		List<Student> theapplicant  = new ArrayList<>();
+			
+		if (mode.equalsIgnoreCase("byrollno")){
+
+			 thestudent = studentservice.getstudentdetail(rollno);
+			 thehostelfee = hostelService.gethostelfee(hostelfee.getHostelid(),hostelfee.getYearmonth())    ;
+			 thestudent.get(0).setAmount(thehostelfee.get(0).getFee());
+		}
+		
+		if (mode.equalsIgnoreCase("byapplno")){
+		
+			
+			thestudent =hostelService.getapplicant(applno);
+			thehostelfee = hostelService.gethostelfee(hostelfee.getHostelid(),hostelfee.getYearmonth())    ;
+			thestudent.get(0).setAmount(thehostelfee.get(0).getFee());
+			System.out.println("Test message ");
+			
+		}
+			
+			Gson gson = new Gson();
+			if(thestudent.size()>0)  
+			return gson.toJson(thestudent);
+			throw new Exception("E payment not available");
+			
+		}
+		
+	@GetMapping("/post")
+	public String getpostfee(@RequestParam String appno) throws Exception {
+		
+		List<Student> theapplicant  = new ArrayList<>();
+		
+		theapplicant = postfeeService.getpostfee(appno);
+		Gson gson = new Gson();
+		if(theapplicant.size()>0)  
+		return gson.toJson(theapplicant);
+		throw new Exception("E payment not available");
+		
+	}
+	
 }

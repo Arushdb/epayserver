@@ -5,9 +5,10 @@ import java.sql.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.dayalbagh.epay.model.Studentfeereceipt;
-
+@Repository
 public interface FeereceiptRepository extends JpaRepository<Studentfeereceipt, Integer> {
 
 	List <Studentfeereceipt>findAllByRollnumberAndSemesterAndProgramidAndSemesterstartdateAndSemesterenddate
