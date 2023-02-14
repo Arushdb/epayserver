@@ -188,7 +188,7 @@ public class StudentController {
 		
 		theapplicant.add(studentservice.getadmissiondetail(appno));
 		Gson gson = new Gson();
-		if(theapplicant.size()>0)  
+		if(theapplicant.size()>0 && theapplicant.get(0).getAmount()>0)  
 		return gson.toJson(theapplicant);
 		throw new Exception("E payment not available");
 		
