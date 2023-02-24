@@ -95,13 +95,14 @@ public class Student {
 		this.programname = programname;
 	}
 	public Student(String roll_number, String programname, String semester_code,
-			Date semesterstartdate,Date semesterenddate) {
+			Date semesterstartdate,Date semesterenddate,String programid) {
 		
 		this.roll_number = roll_number;
 		this.programname = programname;
 		this.semestercode = semester_code;
 		this.semesterstartdate=semesterstartdate;
 		this.semesterenddate=semesterenddate;
+		this.programid=programid;
 	}
 	public Student(String roll_number, String studentname, String programid, Character type, String programname) {
 		
@@ -114,6 +115,9 @@ public class Student {
 	
 	
 	
+	
+	
+
 	public Student(String studentname, String applicationnumber, java.math.BigDecimal appfee) {
 		
 		this.studentname = studentname;

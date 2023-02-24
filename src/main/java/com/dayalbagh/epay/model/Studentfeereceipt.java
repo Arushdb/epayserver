@@ -23,7 +23,7 @@ public class Studentfeereceipt {
 	@Column(name = "id")
 	private int id;
 
-	@Column(name = "roll_number")
+	@Column(name = "referenceno")
 	private String rollnumber;
 
 	@Column(name = "semester_start_date", columnDefinition = "Date")
@@ -47,6 +47,8 @@ public class Studentfeereceipt {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date insert_time;
+	
+	private String reftype ;
 
 	public Studentfeereceipt() {
 
@@ -118,6 +120,14 @@ public class Studentfeereceipt {
 
 	public void setInsert_time(Date insert_time) {
 		this.insert_time = insert_time;
+	}
+
+	public String getReftype() {
+		return reftype;
+	}
+
+	public void setReftype(String reftype) {
+		this.reftype = reftype;
 	}
 
 }

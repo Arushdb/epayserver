@@ -82,11 +82,11 @@ import javax.persistence.SqlResultSetMappings;
 		
 
 		@NamedNativeQuery(name = "getpendingfee", query = "select srsh.roll_number as roll_number,pm.program_name as \r\n"
-				+ "programname ,pch.semester_code as semestercode,srsh.session_start_date as semesterstartdate,srsh.session_end_date as semesterenddate"
-				+ "						from cms_live.student_registration_semester_header srsh\r\n"
+				+ "programname ,pch.semester_code as semestercode,srsh.session_start_date as semesterstartdate,srsh.session_end_date as semesterenddate,"
+				+ "				pch.program_id as programid		from cms_live.student_registration_semester_header srsh\r\n"
 				+ "                        join cms_live.program_course_header pch \r\n"
 				+ "						on pch.program_course_key= srsh.program_course_key\r\n"
-				+ "						left join student_fee_receipt sfr  on sfr.roll_number = srsh.roll_number \r\n"
+				+ "						left join student_fee_receipt sfr  on sfr.referenceno = srsh.roll_number \r\n"
 				+ "						and sfr.program_id= pch.program_id \r\n"
 				+ "                        and sfr.semester_code=pch.semester_code\r\n"
 				+ "						and sfr.semester_start_date=srsh.session_start_date\r\n"
@@ -94,7 +94,7 @@ import javax.persistence.SqlResultSetMappings;
 				+ "						where srsh.roll_number =:rollno\r\n"
 				+ "						and srsh.status in (\"PAS\",\"FAL\",\"REM\",\"REG\")\r\n"
 				+ "						and srsh.session_start_date >=:epaystartdate and srsh.session_start_date "
-				+ "						<> :semesterstartdate and sfr.roll_number is null\r\n"
+				+ "						<> :semesterstartdate and sfr.referenceno is null\r\n"
 
 				+ "	 and pch.semester_code not in "
 
@@ -112,7 +112,7 @@ import javax.persistence.SqlResultSetMappings;
 				+ "and substr(srsh.program_course_key,1,7)=:pgmid ", resultSetMapping = "pendingfee"),
 
 		@NamedNativeQuery(name = "getsemesters", query = "select '' as roll_number,'' as programname,"
-				+ "semester_code  as semestercode, curdate()  as semesterstartdate,curdate() as semesterenddate from cms_live.program_term_details "
+				+ "semester_code  as semestercode, curdate()  as semesterstartdate,curdate() as semesterenddate,'' as programid from cms_live.program_term_details "
 				+ " where semester_start_date = :ssd "
 				+ " and semester_end_date = :sed and program_id =:pgm ", resultSetMapping = "pendingfee"),
 		
@@ -166,7 +166,8 @@ import javax.persistence.SqlResultSetMappings;
 				@ConstructorResult(targetClass = Student.class, columns = { @ColumnResult(name = "roll_number"),
 
 						@ColumnResult(name = "programname"), @ColumnResult(name = "semestercode"),
-						@ColumnResult(name = "semesterstartdate"), @ColumnResult(name = "semesterenddate")
+						@ColumnResult(name = "semesterstartdate"), @ColumnResult(name = "semesterenddate"),
+						@ColumnResult(name = "programid")
 
 				}
 

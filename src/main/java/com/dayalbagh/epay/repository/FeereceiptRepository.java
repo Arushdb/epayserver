@@ -14,4 +14,8 @@ public interface FeereceiptRepository extends JpaRepository<Studentfeereceipt, I
 	List <Studentfeereceipt>findAllByRollnumberAndSemesterAndProgramidAndSemesterstartdateAndSemesterenddate
 	(String roll_number,String sem,String pgm,Date ssd,Date sed );
 	
+	List <Studentfeereceipt>findAllByRollnumberAndSemesterAndProgramidAndSemesterstartdateAndSemesterenddateAndReftype
+	(String roll_number,String sem,String pgm,Date ssd,Date sed ,String reftype);
+	
+	
 }

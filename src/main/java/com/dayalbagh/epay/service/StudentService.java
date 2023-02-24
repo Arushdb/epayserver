@@ -13,7 +13,7 @@ public interface StudentService {
 	
 	List<Programfeedates> getepaymentstatus(Character type) throws Exception;
 
-	List<Student> getpendingfee(String rollno, java.sql.Date semesterstartdate);
+	
 
 	
 	public Student getFeeAmount(String pgm ,String sem ,String branch,String spec,String learningmode,String latefee,String lab)
@@ -29,12 +29,17 @@ public interface StudentService {
 
 	java.sql.Date stringToDate(String dt) throws ParseException;
 
-	Boolean isfeealreadypaid(String rollno, String sem, String pgm, java.sql.Date ssd, java.sql.Date sed)
-			throws Exception;
 
 	List<Student> getapplicantdetail(String appno);
 
 	Student getadmissiondetail(String appno) throws Exception;
+
+	List<Student> getpendingfee(String rollno, java.sql.Date semesterstartdate, java.sql.Date semesterenddate);
+
+	boolean isfeealreadypaid(String rollno, String sem, String pgm, java.sql.Date ssd, java.sql.Date sed,
+			String reftype) ;
+
+	java.sql.Date subYear(java.sql.Date date, int year);
 
 	
 

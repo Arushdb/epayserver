@@ -2,6 +2,7 @@ package com.dayalbagh.epay.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -124,47 +125,71 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public List<Student> getpendingfee(String rollno, java.sql.Date semesterstartdate) {
-		List<Student> student = new ArrayList<>();
+	public List<Student> getpendingfee(String rollno, java.sql.Date semesterstartdate,java.sql.Date semesterenddate) {
+		List<Student> student = new ArrayList<Student>();
+		List<String> app = new ArrayList<>();
+		String applno ="";
+		List<Student> pendingfee = new ArrayList<>();
+		boolean feepaid = false;
 
 		student = (List<Student>) em.createNamedQuery("getpendingfee", Student.class).setParameter("rollno", rollno)
 				.setParameter("epaystartdate", epaystartdate).setParameter("semesterstartdate", semesterstartdate)
 				.getResultList();
+		
+			
+		
+			
+		app = em.createNativeQuery("select a.appno as applicationnumber from cms_live.student_application_number a where a.roll_number=?1")
+					.setParameter(1, rollno)
+					.getResultList();
+					
+					
+			 
+			 if (app.size()>0) {
+				 
+				 applno = app.get(0);
+		// look for paid fee via application number .
+		for(int i=0;i<student.size();i++) {
+			
+			java.sql.Date ssd =(java.sql.Date)student.get(i).getSemesterstartdate();
+			java.sql.Date sed =(java.sql.Date)student.get(i).getSemesterenddate();
+			
+			feepaid =isfeealreadypaid(applno,student.get(i).getSemestercode(),student.get(i).getProgramid(),
+					ssd,sed,"A");
+			if(!feepaid) {
+				pendingfee.add(student.get(i));
+			}
+		}
+		
+		return pendingfee;
+			 }else {
+				 return student;		 
+			 }
+		
+		
+		
+		
 
-		return student;
+		
 	}
 
 	@Override
-	public Boolean isfeealreadypaid(String rollno, String sem, String pgm, java.sql.Date ssd, java.sql.Date sed)
-			throws Exception {
+	public boolean isfeealreadypaid(String rollno, String sem, String pgm, java.sql.Date ssd, java.sql.Date sed,String reftype)
+			{
 		List<Studentfeereceipt> feereceipt1 = null;
 		List<Studentfeereceipt> feereceipt2 = null;
 		List<Student> student = new ArrayList<>();
 
-		// check if student try to pay again in same period.
-		feereceipt1 = thefeereceiptRepository
-				.findAllByRollnumberAndSemesterAndProgramidAndSemesterstartdateAndSemesterenddate(rollno, sem, pgm, ssd,
-						sed);
 
-		// check if student try to pay again for previous passed semester .
-		// feereceipt2
-		// =thefeereceiptRepository.findAllByRollnumberAndSemesterAndProgramidAndIdNot(rollno,
-		// sem, pgm, id);
+		
+		feereceipt1=thefeereceiptRepository.findAllByRollnumberAndSemesterAndProgramidAndSemesterstartdateAndSemesterenddateAndReftype
+				(rollno, sem, pgm, ssd, sed, reftype);
 
+	
 		if (feereceipt1.size() > 0)
-			throw new Exception("Fee Already Paid");
+			return true;
 
-//		if(feereceipt2.size()>0) {
-//			student = (List<Student>) em.createNamedQuery("getsemesterstatus", Student.class)
-//					.setParameter("semester",sem)
-//					.setParameter("rollno" , rollno)
-//					
-//					.setParameter("pgmid",pgm)
-//					.getResultList();
-//			if (student.size()>0) 
-//			throw new Exception("Fee Already Paid") ;	
-//		}
-//			
+
 
 		return false;
 	}
@@ -265,6 +290,26 @@ public class StudentServiceImpl implements StudentService {
 		return date;
 
 	}
+	
+	
+	@Override
+	public java.sql.Date  subYear(java.sql.Date date, int noofyears) {
+		
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        
+       c.add(c.YEAR, -noofyears); 
+       return new java.sql.Date(c.getTime().getTime());
+//       Date date1= c.getTime();
+//       String dt=df.format(date1);
+  //     java.sql.Date date2 = java.sql.Date.valueOf(dt);
+       
+        //java.sql.Date date1= (java.sql.Date)c.getTime();
+               
+        //return date2;
+    }
 
 	@Override
 	public List<Student> getapplicantdetail(String appno) {

@@ -1,6 +1,7 @@
 package com.dayalbagh.epay.controller;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -72,6 +73,15 @@ public class StudentController {
 	    
 		java.sql.Date semesterstartdate = studentservice.stringToDate(ssd);
 		java.sql.Date semesterenddate = studentservice.stringToDate(sed);
+		
+		
+		
+		if (semesterstartdate.after(semesterenddate) ) {
+			
+			semesterstartdate=studentservice.subYear(semesterstartdate,1);
+			
+					
+		}
 				
 		
 		List<Student> defaulter = studentservice.getdefaulter(rollno);
@@ -91,8 +101,9 @@ public class StudentController {
 			
 		}
 		
-		List<Student> thependingfee = studentservice.getpendingfee(rollno,semesterstartdate);
+		List<Student> thependingfee = studentservice.getpendingfee(rollno,semesterstartdate,semesterenddate);
 		latefee="S";
+		
 		
 			
 			for(int i=0;i<thependingfee.size();i++) {
@@ -138,7 +149,10 @@ public class StudentController {
 			
 			if(semvalid) {
 				
-			Boolean feepaid =	studentservice.isfeealreadypaid(rollno, semestercode, pgm, semesterstartdate , semesterenddate);
+			Boolean feepaid =	studentservice.isfeealreadypaid(rollno, semestercode, pgm, semesterstartdate , semesterenddate,"R");// R is for roll number
+			
+			if(feepaid)
+				throw new Exception("Fee Already Paid");
 				
 				Boolean feeisdelayed = studentservice.getpaymentdelaystatus(type);
 				if(feeisdelayed)
