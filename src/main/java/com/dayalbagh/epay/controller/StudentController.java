@@ -108,7 +108,8 @@ public class StudentController {
 			
 			for(int i=0;i<thependingfee.size();i++) {
 									
-			studentfee =studentservice.getFeeAmount(pgm, thependingfee.get(i).getSemestercode(), branch, spec, learningmode, latefee, lab);
+			//studentfee =studentservice.getFeeAmount(pgm, thependingfee.get(i).getSemestercode(), branch, spec, learningmode, latefee, lab);
+				studentfee =studentservice.getFeeAmount(thependingfee.get(i).getProgramid(), thependingfee.get(i).getSemestercode(),thependingfee.get(i).getBranchid(), thependingfee.get(i).getSpecializationid(), learningmode, latefee, lab);
 			if (studentfee.getAmount()==0)
 			continue;
 			thestudent.get(0).setAmount(studentfee.getAmount());
@@ -118,7 +119,11 @@ public class StudentController {
 			thestudent.get(0).setFeepending("Y");
 			thestudent.get(0).setMode(learningmode);
 			thestudent.get(0).setSemesterstartdate(thependingfee.get(i).getSemesterstartdate());
-			thestudent.get(0).setSemesterenddate(thependingfee.get(i).getSemesterenddate())	;		
+			thestudent.get(0).setSemesterenddate(thependingfee.get(i).getSemesterenddate())	;
+			thestudent.get(0).setProgramid(thependingfee.get(i).getProgramid());
+			thestudent.get(0).setProgramname(thependingfee.get(0).getProgramname());
+			thestudent.get(0).setBranchid(thependingfee.get(0).getBranchid());
+			thestudent.get(0).setSpecializationid(thependingfee.get(0).getSpecializationid());
 			break;
 			
 

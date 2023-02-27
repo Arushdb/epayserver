@@ -95,7 +95,7 @@ public class Student {
 		this.programname = programname;
 	}
 	public Student(String roll_number, String programname, String semester_code,
-			Date semesterstartdate,Date semesterenddate,String programid) {
+			Date semesterstartdate,Date semesterenddate,String programid,String branchid ,String specializationid ) {
 		
 		this.roll_number = roll_number;
 		this.programname = programname;
@@ -103,6 +103,8 @@ public class Student {
 		this.semesterstartdate=semesterstartdate;
 		this.semesterenddate=semesterenddate;
 		this.programid=programid;
+		this.branchid = branchid;
+		this.specializationid = specializationid;
 	}
 	public Student(String roll_number, String studentname, String programid, Character type, String programname) {
 		

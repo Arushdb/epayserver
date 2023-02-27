@@ -83,7 +83,7 @@ import javax.persistence.SqlResultSetMappings;
 
 		@NamedNativeQuery(name = "getpendingfee", query = "select srsh.roll_number as roll_number,pm.program_name as \r\n"
 				+ "programname ,pch.semester_code as semestercode,srsh.session_start_date as semesterstartdate,srsh.session_end_date as semesterenddate,"
-				+ "				pch.program_id as programid		from cms_live.student_registration_semester_header srsh\r\n"
+				+ "				pch.program_id as programid	,pch.branch_id as branchid,pch.specialization_id as specializationid	from cms_live.student_registration_semester_header srsh\r\n"
 				+ "                        join cms_live.program_course_header pch \r\n"
 				+ "						on pch.program_course_key= srsh.program_course_key\r\n"
 				+ "						left join student_fee_receipt sfr  on sfr.referenceno = srsh.roll_number \r\n"
@@ -167,7 +167,7 @@ import javax.persistence.SqlResultSetMappings;
 
 						@ColumnResult(name = "programname"), @ColumnResult(name = "semestercode"),
 						@ColumnResult(name = "semesterstartdate"), @ColumnResult(name = "semesterenddate"),
-						@ColumnResult(name = "programid")
+						@ColumnResult(name = "programid"),@ColumnResult(name = "branchid"),@ColumnResult(name = "specializationid")
 
 				}
 
