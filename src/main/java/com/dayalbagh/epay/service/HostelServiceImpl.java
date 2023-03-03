@@ -69,9 +69,10 @@ public class HostelServiceImpl implements HostelService {
 	@Override
 	public List<Student> getapplicant(String appno) throws Exception {
 		
+		String aplno = appno.substring(2,8);
 		List<Student> theapplicant = new ArrayList<>();
 		theapplicant = (List<Student>) em.createNamedQuery("getapplicantforhostel", Student.class)
-				.setParameter("appno", appno).getResultList();
+				.setParameter("appno", aplno).getResultList();
 		
 		if (theapplicant.size()>0) {
 			

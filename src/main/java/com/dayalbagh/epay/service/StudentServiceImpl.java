@@ -328,7 +328,8 @@ public class StudentServiceImpl implements StudentService {
 	public Student getadmissiondetail(String appno) throws Exception {
 		// TODO Auto-generated method stub
 
-		String aplno = appno.substring(2);
+		String aplno = appno.substring(2,8);
+		//String aplno = appno;
 		List<Student> studentlist = new ArrayList<Student>();
 
 		Student theapplicant = new Student();
