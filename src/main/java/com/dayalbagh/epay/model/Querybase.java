@@ -112,7 +112,7 @@ import javax.persistence.SqlResultSetMappings;
 				+ "and substr(srsh.program_course_key,1,7)=:pgmid ", resultSetMapping = "pendingfee"),
 
 		@NamedNativeQuery(name = "getsemesters", query = "select '' as roll_number,'' as programname,"
-				+ "semester_code  as semestercode, curdate()  as semesterstartdate,curdate() as semesterenddate,'' as programid from cms_live.program_term_details "
+				+ "semester_code  as semestercode, curdate()  as semesterstartdate,curdate() as semesterenddate,'' as programid, '' as branchid ,'' as specializationid  from cms_live.program_term_details "
 				+ " where semester_start_date = :ssd "
 				+ " and semester_end_date = :sed and program_id =:pgm ", resultSetMapping = "pendingfee"),
 		

@@ -3,11 +3,15 @@ package com.dayalbagh.epay.security;
 
 import java.util.Arrays;
 
-
+import javax.servlet.Filter;
+import javax.servlet.ServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -20,9 +24,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AnyRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
+import com.dayalbagh.epay.DisableEtagFilter;
 import com.dayalbagh.epay.security.jwt.AuthEntryPointJwt;
 import com.dayalbagh.epay.security.jwt.AuthTokenFilter;
 import com.dayalbagh.epay.service.UserDetailsServiceImpl;
@@ -51,18 +58,36 @@ public class WebSecurityConfig  {
 		return new AuthTokenFilter();
 	}
 	
+
+	
 	@Bean
 	public AuthenticationManager authenticationManager(
 	        AuthenticationConfiguration authConfig) throws Exception {
 	    return authConfig.getAuthenticationManager();
 	}
 	
-	
+
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+	
+	
+
+	@Bean
+	public FilterRegistrationBean<DisableEtagFilter> eTagFilter(){
+	    FilterRegistrationBean<DisableEtagFilter> registrationBean 
+	      = new FilterRegistrationBean<>();
+	        
+	    registrationBean.setFilter(new DisableEtagFilter());
+	    registrationBean.addUrlPatterns("/*");
+	    registrationBean.setOrder(1);
+	        
+	    return registrationBean;    
+	}
+
+	
 	
 	
 	
@@ -92,7 +117,11 @@ public class WebSecurityConfig  {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
  
 		
+		
 		http.cors().and().csrf().disable()
+		
+		
+		
 		//http.cors().and()
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 			//.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and()
@@ -150,7 +179,14 @@ public class WebSecurityConfig  {
 //			})
 //			.permitAll();
 		
-		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore( authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		 http.headers().cacheControl();
+		http.headers().xssProtection().and().contentSecurityPolicy("form-action 'self'");
+		http.headers().httpStrictTransportSecurity()
+		.includeSubDomains(true)
+		.preload(false)
+		.maxAgeInSeconds(31536000)
+		.requestMatcher(AnyRequestMatcher.INSTANCE);
 		
 	
 	return http.build();
