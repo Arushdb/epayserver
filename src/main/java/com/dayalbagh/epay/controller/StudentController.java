@@ -26,6 +26,7 @@ import com.dayalbagh.epay.model.Student;
 import com.dayalbagh.epay.service.CertificateService;
 import com.dayalbagh.epay.service.HostelService;
 import com.dayalbagh.epay.service.PostfeeService;
+import com.dayalbagh.epay.service.SBIService;
 import com.dayalbagh.epay.service.StudentService;
 import com.google.gson.Gson;
 
@@ -44,6 +45,9 @@ public class StudentController {
 	
 	@Autowired
 	private PostfeeService postfeeService;
+	
+	@Autowired
+	private SBIService sbiservice;
 
 	@Autowired
 	public StudentController(StudentService thestudentservice) {
@@ -124,6 +128,8 @@ public class StudentController {
 			thestudent.get(0).setProgramname(thependingfee.get(0).getProgramname());
 			thestudent.get(0).setBranchid(thependingfee.get(0).getBranchid());
 			thestudent.get(0).setSpecializationid(thependingfee.get(0).getSpecializationid());
+			Student std = sbiservice.encrypt(thestudent.get(0));
+			thestudent.get(0).setSbistr(std.getSbistr());
 			break;
 			
 

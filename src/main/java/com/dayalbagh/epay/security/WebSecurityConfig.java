@@ -75,17 +75,18 @@ public class WebSecurityConfig  {
 	
 	
 
-	@Bean
-	public FilterRegistrationBean<DisableEtagFilter> eTagFilter(){
-	    FilterRegistrationBean<DisableEtagFilter> registrationBean 
-	      = new FilterRegistrationBean<>();
-	        
-	    registrationBean.setFilter(new DisableEtagFilter());
-	    registrationBean.addUrlPatterns("/*");
-	    registrationBean.setOrder(1);
-	        
-	    return registrationBean;    
-	}
+//	@Bean
+//	public FilterRegistrationBean<DisableEtagFilter> eTagFilter(){
+//	    FilterRegistrationBean<DisableEtagFilter> registrationBean 
+//	      = new FilterRegistrationBean<>();
+//	        
+//	    registrationBean.setFilter(new DisableEtagFilter());
+//
+//	    registrationBean.addUrlPatterns("/*");
+//	    registrationBean.setOrder(1);
+//	        
+//	    return registrationBean;    
+//	}
 
 	
 	
@@ -96,7 +97,9 @@ public class WebSecurityConfig  {
 		
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		corsConfiguration.setAllowCredentials(true);
-		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://test.sbiepay.sbi"));
+		
+		
 		
 		corsConfiguration.setAllowedHeaders(Arrays.asList("Origin","Access-Control-Allow-Origin","Content-Type",
 				"Accept","Authorization","Origin","Accept","X-Requested-With"));
@@ -125,7 +128,8 @@ public class WebSecurityConfig  {
 		//http.cors().and()
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 			//.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and()
-			.authorizeRequests()
+			.authorizeRequests() 
+			.antMatchers("/*").permitAll()
 			.antMatchers("/api/auth/**").permitAll()
 			.antMatchers("/api/test/**").permitAll() 
 			

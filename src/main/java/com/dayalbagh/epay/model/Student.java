@@ -58,6 +58,8 @@ public class Student {
 	@Temporal(TemporalType.DATE)
 	private Date semesterenddate;
 	
+	private String sbistr;
+	
 	public Student() {
 		
 		// TODO Auto-generated constructor stub
@@ -234,6 +236,12 @@ public class Student {
 	}
 	public void setCertificatetype(String certificatetype) {
 		this.certificatetype = certificatetype;
+	}
+	public String getSbistr() {
+		return sbistr;
+	}
+	public void setSbistr(String sbistr) {
+		this.sbistr = sbistr;
 	}
 	
 	
