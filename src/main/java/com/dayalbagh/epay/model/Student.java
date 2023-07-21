@@ -60,6 +60,8 @@ public class Student {
 	
 	private String sbistr;
 	
+	private String EncryptTrans;
+	
 	public Student() {
 		
 		// TODO Auto-generated constructor stub
@@ -242,6 +244,12 @@ public class Student {
 	}
 	public void setSbistr(String sbistr) {
 		this.sbistr = sbistr;
+	}
+	public String getEncryptTrans() {
+		return EncryptTrans;
+	}
+	public void setEncryptTrans(String encryptTrans) {
+		EncryptTrans = encryptTrans;
 	}
 	
 	

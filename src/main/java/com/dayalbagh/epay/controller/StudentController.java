@@ -1,15 +1,21 @@
 package com.dayalbagh.epay.controller;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,11 +24,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.dayalbagh.epay.model.Certificate;
 import com.dayalbagh.epay.model.HostelFee;
 import com.dayalbagh.epay.model.Programfeedates;
 import com.dayalbagh.epay.model.Student;
+import com.dayalbagh.epay.model.User;
 import com.dayalbagh.epay.service.CertificateService;
 import com.dayalbagh.epay.service.HostelService;
 import com.dayalbagh.epay.service.PostfeeService;
@@ -46,13 +55,23 @@ public class StudentController {
 	@Autowired
 	private PostfeeService postfeeService;
 	
-	@Autowired
-	private SBIService sbiservice;
+	
 
 	@Autowired
 	public StudentController(StudentService thestudentservice) {
 		studentservice = thestudentservice;
 	}
+	
+//	@GetMapping("/register")
+//	 public RedirectView redirectWithUsingRedirectView(
+//		      RedirectAttributes attributes) {
+//		       // attributes.addFlashAttribute("flashAttribute", "redirectWithRedirectView");
+//		       // attributes.addAttribute("attribute", "redirectWithRedirectView");
+//		        return new RedirectView("register_form");
+//		    }
+	
+	
+	
 
 	@GetMapping("/student")
 	public String getstudent(@RequestParam String rollno,@RequestParam String semestercode) throws Exception {
@@ -128,8 +147,11 @@ public class StudentController {
 			thestudent.get(0).setProgramname(thependingfee.get(0).getProgramname());
 			thestudent.get(0).setBranchid(thependingfee.get(0).getBranchid());
 			thestudent.get(0).setSpecializationid(thependingfee.get(0).getSpecializationid());
-			Student std = sbiservice.encrypt(thestudent.get(0));
-			thestudent.get(0).setSbistr(std.getSbistr());
+			//Student std = sbiservice.encrypt(thestudent.get(0));
+			//thestudent.get(0).setSbistr(std.getSbistr());
+			
+			//System.out.println("encrypted String in student Controller: "+std.getSbistr());
+			//System.out.println("Decrypted String in student Controller: "+sbiservice.decrypt(std.getSbistr()));
 			break;
 			
 

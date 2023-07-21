@@ -9,7 +9,7 @@ public interface SBIService {
 	
 	// Encrypt String
 	
-	Student encrypt(Student student);
+	String encrypt(String amount,String otherdetail);
 	
 	// Decrypt String
 	
