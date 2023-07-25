@@ -39,9 +39,11 @@
     <div align="center">
         <h2>Make Payment</h2>
         <form:form action="https://test.sbiepay.sbi/secure/AggregatorHostedListener" method="post" modelAttribute="student">
-           
+             
             <form:input type="hidden"  path="EncryptTrans"/><br/>
+          
          
+        
            <input type="hidden" name="merchIdVal" value ="1000112"/>
              
            

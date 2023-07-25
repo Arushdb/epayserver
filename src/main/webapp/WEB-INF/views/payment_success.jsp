@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>   
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -35,12 +36,15 @@
 
 
 </head>
+
+<
 <body>
     <div align="center">
         <h2>Payment Succeeded!</h2>
-        <span>Data:</span><span>${encData}</span><br/>
+        <span>Data:</span><span>${message}</span><br/>
          <span>Merchant ID:</span><span>${merchIdVal}</span><br/>
           <span>Bank Code:</span><span>${Bank_Code}</span><br/>
+          
        
     </div>
 </body>

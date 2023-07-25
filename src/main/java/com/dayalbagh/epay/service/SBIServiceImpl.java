@@ -20,49 +20,29 @@ public class SBIServiceImpl implements SBIService {
 		
 		String MerchantId = "1000112";
         String AggregatorId = "SBIEPAY";
-        String SuccessURL = "https://admission.dei.ac.in:8443/epay/payment_success";
+        String SuccessURL = "https://admission.dei.ac.in:8443/epay/paymentsuccess";
         
-        
-        
-        
-        //String FailURL = "https://admission.dei.ac.in:8443/epay80/";
-        
-        String FailURL = "https://admission.dei.ac.in:8443/epay/payment_failure";
+        String FailURL = "https://admission.dei.ac.in:8443/epay/paymentfailure";
         String  OperatingMode = "DOM";
         String  MerchantCountry = "IN";
         String  MerchantCurrency = "INR";
        
-        //float feeamount =0;
-        //feeamount = detail.getAmount()+detail.getLatefee()+detail.getLabfee();
-        //feeamount = detail.getAmount()+detail.getLatefee()+detail.getLabfee();
         String TotalDueAmount =amount;
         	
         //String  MerchantOrderNo = "TXN202105061303111539"; //Order no shoud be unique every time
         String MerchantOrderNo = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new java.util.Date());
-              // MerchantOrderNo=detail.getRoll_number()+MerchantOrderNo;
+            
         
         String  MerchantCustomerID = "2";
         String  Paymode = "NB";
         String Accesmedium = "ONLINE";
         String  TransactionSource = "ONLINE";
         String studentdetail ="arush";
-//        if (!(detail.getRoll_number().equalsIgnoreCase("")))
-//        	studentdetail=detail.getRoll_number();
-//        else
-//        	studentdetail=detail.getApplicationnumber();
-//        
-//        if (!(detail.getProgramid().equalsIgnoreCase("")))
-//        	studentdetail=studentdetail+detail.getProgramid();
-//        
-//        if (!(detail.getSemestercode().equalsIgnoreCase("")))
-//        	studentdetail=studentdetail+detail.getSemestercode();
-        
-    
-        		//"Arush;212099;SM1;";
+
         
         
         
-        String timeStamp = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new java.util.Date());
+        
 
    		String Single_Request = MerchantId + "|" + OperatingMode + "|" + MerchantCountry + "|" + MerchantCurrency + "|" + TotalDueAmount + "|" + Otherdetail + "|" + SuccessURL + "|" + FailURL + "|" + AggregatorId + "|" + MerchantOrderNo 
    				+ "|" + MerchantCustomerID + "|" + Paymode + "|" + Accesmedium + "|" + TransactionSource;

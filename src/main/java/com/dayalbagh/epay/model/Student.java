@@ -58,7 +58,7 @@ public class Student {
 	@Temporal(TemporalType.DATE)
 	private Date semesterenddate;
 	
-	private String sbistr;
+	private String message;
 	
 	private String EncryptTrans;
 	
@@ -239,11 +239,12 @@ public class Student {
 	public void setCertificatetype(String certificatetype) {
 		this.certificatetype = certificatetype;
 	}
-	public String getSbistr() {
-		return sbistr;
+	public String getMessage() {
+		return message;
 	}
-	public void setSbistr(String sbistr) {
-		this.sbistr = sbistr;
+	
+	public void setMessage(String message) {
+		this.message = message;
 	}
 	public String getEncryptTrans() {
 		return EncryptTrans;
@@ -251,6 +252,7 @@ public class Student {
 	public void setEncryptTrans(String encryptTrans) {
 		EncryptTrans = encryptTrans;
 	}
+	
 	
 	
 	
