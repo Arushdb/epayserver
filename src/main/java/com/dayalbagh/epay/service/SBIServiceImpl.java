@@ -20,9 +20,9 @@ public class SBIServiceImpl implements SBIService {
 		
 		String MerchantId = "1000112";
         String AggregatorId = "SBIEPAY";
-        String SuccessURL = "https://admission.dei.ac.in:8443/epay/paymentsuccess";
+        String SuccessURL = "https://admission.dei.ac.in/epay/paymentsuccess";
         
-        String FailURL = "https://admission.dei.ac.in:8443/epay/paymentfailure";
+        String FailURL = "https://admission.dei.ac.in/epay/paymentfailure";
         String  OperatingMode = "DOM";
         String  MerchantCountry = "IN";
         String  MerchantCurrency = "INR";
