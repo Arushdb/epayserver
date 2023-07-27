@@ -17,6 +17,8 @@ public interface SBIService {
 	
 	// Double Verify payment received
 	
-	String verifyPayment();
+	
+
+	String verifyPayment(String[] resdata);
 
 }

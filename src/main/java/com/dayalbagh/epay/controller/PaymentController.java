@@ -73,7 +73,7 @@ public class PaymentController {
 	 
 	 {
 		 
-		
+		System.out.println("encData :"+encData);
 		 
 		 //String str1 = request.getAttribute("encData").toString();
 	
@@ -86,10 +86,16 @@ public class PaymentController {
 		 
 		 
 		 String resdata[]= str.split("\\|");
-		 
+		 System.out.println(resdata);
 		  
 	      String message = resdata[2];  
 	      model.addAttribute("message", message);
+	      
+	      if( message.equalsIgnoreCase("Success")) {
+	    	  // Do double verification
+	    	  	    	
+	    	  sbiservice.verifyPayment(resdata);
+	      }
 	   
 	     System.out.println("encrypted Data:"+encData);
 	     System.out.println("Decrypted String:"+resdata);
@@ -112,8 +118,8 @@ public class PaymentController {
 		 
 		 
 	      
-		 System.out.println("encrypted Data:"+encData);
-	     System.out.println("Decrypted String:"+sbiservice.decrypt(encData));
+		 System.out.println("Push encrypted Data:"+encData);
+	     System.out.println("Push Decrypted String:"+sbiservice.decrypt(encData));
 	     System.out.println(merchIdVal);
 	     System.out.println(Bank_Code);
 	      
