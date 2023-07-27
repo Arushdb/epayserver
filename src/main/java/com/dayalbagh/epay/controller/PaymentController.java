@@ -108,13 +108,14 @@ public class PaymentController {
 	 @PostMapping("/pushpayment")
 	 public String pushpayment(@ModelAttribute("pushRespData") String encData,
 			 @ModelAttribute("merchIdVal") String merchIdVal,
-			 @ModelAttribute("Bank_Code") String Bank_Code) {
+			 @ModelAttribute("Bank_Code") String Bank_Code,Model model) {
 		 
 		 
 		 encData = encData.replaceAll(" ", "+");
 		 String str = sbiservice.decrypt(encData);
 		 String resdata[]= str.split("\\|");
 		 String message = resdata[2];  
+		 model.addAttribute("message", message);
 		 
 		 
 	      
@@ -123,7 +124,7 @@ public class PaymentController {
 	     System.out.println(merchIdVal);
 	     System.out.println(Bank_Code);
 	      
-	     return "payment_success";
+	     return "pushpayment_success";
 	 }
 	 
 	 
