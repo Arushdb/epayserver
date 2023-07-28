@@ -92,6 +92,8 @@ public class PaymentController {
 	      model.addAttribute("message", message);
 	      
 	      if( message.equalsIgnoreCase("Success")) {
+	    	  
+	    	  System.out.println("in side verify payment");
 	    	  // Do double verification
 	    	  	    	
 	    	  sbiservice.verifyPayment(resdata);

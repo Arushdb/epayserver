@@ -137,6 +137,8 @@ public class SBIServiceImpl implements SBIService {
 
 
                      // sends POST data
+                     
+                     System.out.println("requestParams"+requestParams);
 
                      OutputStreamWriter writer = new OutputStreamWriter(httpConn.getOutputStream());
 
@@ -149,6 +151,8 @@ public class SBIServiceImpl implements SBIService {
                      //Response Code
 
                      int responseMsg = httpConn.getResponseCode();
+                     
+                     System.out.println("double verification response message"+responseMsg);
 
                      //GenericExceptionLog.log("Response Message"+responseMsg, "AggGatewayURLConnection");
 
@@ -179,7 +183,7 @@ public class SBIServiceImpl implements SBIService {
                      responseCode = sb.toString() ;
 
                      responseCode = responseCode.trim();
-                     System.out.println(responseCode);
+                     System.out.println("double verification response"+responseCode);
                }
 
         } catch (MalformedURLException e) {
