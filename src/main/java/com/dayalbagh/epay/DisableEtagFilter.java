@@ -17,18 +17,26 @@ import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
-@Component 
-@Order(1)
+
+//@WebFilter(filterName = "DisableEtagFilter" ,urlPatterns = "/*" )
+//@Component
 public class DisableEtagFilter  implements Filter  {
 
 	
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		
 	
+		HttpServletRequest req = (HttpServletRequest)request;
 		
-		chain.doFilter(request, new HttpServletResponseWrapper((HttpServletResponse) response) {
+		HttpServletResponse httpResponse = (HttpServletResponse) response;
+        httpResponse.setHeader("Content-Security-Policy", "default-src 'unsafe-inline' 'self';style-src "
+        		+ "  'unsafe-inline'  http://localhost:8080/   https://admission.dei.ac.in;img-src http://* 'self' data: ;connect-src 'self' https://test.sbiepay.sbi https://sbiepay.sbi"
+        		+ "font-src 'self' data:");
+		
+	 System.out.println(req.getHeader("User-Agent"));
+		
+		chain.doFilter(request, new HttpServletResponseWrapper((HttpServletResponse) httpResponse) {
 			 public void setHeader(String name, String value) {
 		          if (!"etag".equalsIgnoreCase(name)) {
 		              super.setHeader(name, value);
