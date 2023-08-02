@@ -1,8 +1,7 @@
 package com.dayalbagh.epay.service;
 
-import java.util.List;
+import java.text.ParseException;
 
-import com.dayalbagh.epay.model.Student;
 
 public interface SBIService {
 	
@@ -20,5 +19,8 @@ public interface SBIService {
 	
 
 	String verifyPayment(String[] resdata);
+	 String getMerchantId();
+	 
+	 void savePayment(String[] data) throws ParseException;
 
 }

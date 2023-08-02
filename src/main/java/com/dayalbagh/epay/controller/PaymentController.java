@@ -1,6 +1,8 @@
 package com.dayalbagh.epay.controller;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -21,9 +23,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.dayalbagh.epay.AES256Bit;
+import com.dayalbagh.epay.model.Payment;
 import com.dayalbagh.epay.model.Student;
-
+import com.dayalbagh.epay.model.Studentfeereceipt;
 import com.dayalbagh.epay.service.SBIService;
+import com.dayalbagh.epay.service.StudentService;
 
 @Controller
 
@@ -31,6 +35,9 @@ public class PaymentController {
 	
 	@Autowired
 	private SBIService sbiservice;
+	
+	@Autowired
+	private StudentService studentservice;
 
 	 @GetMapping("/makepayment")
 	    public String showForm(Model model ,HttpServletRequest request,HttpServletResponse response) throws ServletException, IOException {
@@ -38,9 +45,11 @@ public class PaymentController {
 	      
 	     String totalfee = request.getParameter("totalfee");
 	     String Otherdetail=request.getParameter("Otherdetail");
+	     
+
 	     //for testing
 	    
-	     
+	     String merchantid = sbiservice.getMerchantId();
 	     
 	     String encryptdata = sbiservice.encrypt(totalfee,Otherdetail);
 	     
@@ -54,6 +63,7 @@ public class PaymentController {
 	     //String decryptdata =sbiservice.decrypt(encryptdata);
 	     
 	     student.setEncryptTrans(encryptdata);
+	     student.setMerchantid(merchantid);
 	   
 	     
 	     
@@ -69,11 +79,16 @@ public class PaymentController {
 	 @PostMapping("/paymentsuccess")
 	 public String Paymentsuccess(@ModelAttribute("encData") String encData,
 			 @ModelAttribute("merchIdVal") String merchIdVal,
-			 @ModelAttribute("Bank_Code") String Bank_Code,Model model)
+			 @ModelAttribute("Bank_Code") String Bank_Code,Model model) throws ParseException
 	 
 	 {
 		 
-		System.out.println("encData :"+encData);
+		 String dvdata[];
+		 Studentfeereceipt feereceipt =new Studentfeereceipt();
+		 
+		 System.out.println("encData :"+encData);
+		
+		
 		 
 		 //String str1 = request.getAttribute("encData").toString();
 	
@@ -89,22 +104,37 @@ public class PaymentController {
 		 System.out.println(resdata);
 		  
 	      String message = resdata[2];  
-	      model.addAttribute("message", message);
+	      
+	      sbiservice.savePayment(resdata);
+	     
 	      
 	      if( message.equalsIgnoreCase("Success")) {
 	    	  
 	    	  System.out.println("in side verify payment");
 	    	  // Do double verification
 	    	  	    	
-	    	  sbiservice.verifyPayment(resdata);
+	    	  String dvstatus =sbiservice.verifyPayment(resdata);
+	    	  
+	    	 
+	    	  dvdata= dvstatus.split("\\|");
+	 
+	    	  
+	    	  model.addAttribute("message", dvdata[2]);
+	    	  if (dvdata[2].equalsIgnoreCase("Success"))
+	    		  
+	    		  
+	    		  studentservice.savestudentfee(dvdata);
+	    		  
+	    		  
+	    		  return "payment_success";
 	      }
 	   
 	     System.out.println("encrypted Data:"+encData);
 	     System.out.println("Decrypted String:"+resdata);
 	     System.out.println(merchIdVal);
 	     System.out.println(Bank_Code);
-	      
-	     return "payment_success";
+	    
+	     return "payment_failure";
 	 }
 	 
 	 @PostMapping("/pushpayment")

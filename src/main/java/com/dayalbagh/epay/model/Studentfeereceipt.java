@@ -35,8 +35,8 @@ public class Studentfeereceipt {
 	private Date semesterenddate;
 
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "receipt_id", referencedColumnName = "id")
-	private Receipt receipt;
+	@JoinColumn(name = "payment_id", referencedColumnName = "id")
+	private Payment payment;
 
 	private String remarks;
 	@Column(name = "program_id")
@@ -80,12 +80,14 @@ public class Studentfeereceipt {
 		this.semesterenddate = semesterenddate;
 	}
 
-	public Receipt getReceipt() {
-		return receipt;
+	
+	
+	public Payment getPayment() {
+		return payment;
 	}
 
-	public void setReceipt(Receipt receipt) {
-		this.receipt = receipt;
+	public void setPayment(Payment payment) {
+		this.payment = payment;
 	}
 
 	public String getRemarks() {

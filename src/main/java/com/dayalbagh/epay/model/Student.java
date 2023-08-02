@@ -46,6 +46,9 @@ public class Student {
 	private float amount ;
 	private float latefee;
 	private float labfee;	
+	private String merchantid ; 
+	
+	
 	private java.math.BigDecimal  appfee ;
 	
 	
@@ -59,6 +62,7 @@ public class Student {
 	private Date semesterenddate;
 	
 	private String message;
+	private String entityid;
 	
 	private String EncryptTrans;
 	
@@ -99,7 +103,9 @@ public class Student {
 		this.programname = programname;
 	}
 	public Student(String roll_number, String programname, String semester_code,
-			Date semesterstartdate,Date semesterenddate,String programid,String branchid ,String specializationid ) {
+			Date semesterstartdate,Date semesterenddate,String programid,String branchid ,String specializationid 
+			,String entityid
+			) {
 		
 		this.roll_number = roll_number;
 		this.programname = programname;
@@ -109,6 +115,7 @@ public class Student {
 		this.programid=programid;
 		this.branchid = branchid;
 		this.specializationid = specializationid;
+		this.entityid =entityid;
 	}
 	public Student(String roll_number, String studentname, String programid, Character type, String programname) {
 		
@@ -117,6 +124,7 @@ public class Student {
 		this.programid = programid;
 		this.type = type;
 		this.programname = programname;
+		
 	}
 	
 	
@@ -253,7 +261,18 @@ public class Student {
 		EncryptTrans = encryptTrans;
 	}
 	
-	
+	public String getMerchantid() {
+		return merchantid;
+	}
+	public void setMerchantid(String merchantid) {
+		this.merchantid = merchantid;
+	}
+	public String getEntityid() {
+		return entityid;
+	}
+	public void setEntityid(String entityid) {
+		this.entityid = entityid;
+	}
 	
 	
 	

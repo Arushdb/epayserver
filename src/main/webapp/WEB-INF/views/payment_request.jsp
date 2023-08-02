@@ -7,7 +7,7 @@
 <meta charset="ISO-8859-1">
 <title>Payment Form</title>
 
-
+<!--  
 <style type="text/css">
     label {
         display: inline-block;
@@ -26,30 +26,56 @@
         display: inline-block;
         margin-right: 190px;
     }  
+    
+    .myheader {
+    
+     margin-left: 5px;
+     height:100px;
+     background-color: #00FFFF;
+         
+    }
+    img {
+    margin:40px 
+    }
      
     button {
         padding: 10px;
         margin: 10px;
     }
-</style>
+    
+    .grid-container {
+  display: grid;
+  grid-template-columns: auto auto ;
+  height:150px;
+  background-color: #00FFFF;
+  padding: 1px;
+}
 
+.grid-container > div {
+ 
+  text-align: center;
+  padding: 5px 0;
+  font-size: 15px;
+}
+
+.item1 {
+  grid-row: 1 / span 2;
+}
+</style>
+-->
+<link href="bootstrap-grid.css" rel="stylesheet" type="text/css">
 
 </head>
 <body>
-    <div align="center">
+<%@ include file = "header.html" %>
+    <div >
         <h2>Make Payment</h2>
         <form:form action="https://test.sbiepay.sbi/secure/AggregatorHostedListener" method="post" modelAttribute="student">
              
             <form:input type="hidden"  path="EncryptTrans"/><br/>
           
+          	<form:input type="hidden"  path="merchantid"/><br/>
          
-        
-           <input type="hidden" name="merchIdVal" value ="1000112"/>
-             
-           
-             
-            
-                 
             <form:button>Confirm</form:button>
         </form:form>
     </div>

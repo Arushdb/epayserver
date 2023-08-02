@@ -58,6 +58,11 @@ public class WebSecurityConfig  {
 		return new AuthTokenFilter();
 	}
 	
+	
+	@Bean
+	public DisableEtagFilter disableEtagFilter() {
+		return new DisableEtagFilter();
+	}
 
 	
 	@Bean

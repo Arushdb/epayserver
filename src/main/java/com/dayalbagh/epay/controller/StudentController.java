@@ -38,6 +38,7 @@ import com.dayalbagh.epay.service.PostfeeService;
 import com.dayalbagh.epay.service.SBIService;
 import com.dayalbagh.epay.service.StudentService;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 //import net.minidev.json.JSONArray;
 
@@ -147,6 +148,7 @@ public class StudentController {
 			thestudent.get(0).setProgramname(thependingfee.get(0).getProgramname());
 			thestudent.get(0).setBranchid(thependingfee.get(0).getBranchid());
 			thestudent.get(0).setSpecializationid(thependingfee.get(0).getSpecializationid());
+			thestudent.get(0).setEntityid(thependingfee.get(0).getEntityid());
 			//Student std = sbiservice.encrypt(thestudent.get(0));
 			//thestudent.get(0).setSbistr(std.getSbistr());
 			
@@ -160,8 +162,8 @@ public class StudentController {
 		
 		
 		if(thestudent.get(0).getAmount()>0) {
-			Gson gson = new Gson();
-			
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+			String str=gson.toJson(thestudent);
 			return gson.toJson(thestudent);
 		
 		}else {

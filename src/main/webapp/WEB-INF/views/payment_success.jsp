@@ -40,7 +40,7 @@
 <
 <body>
     <div align="center">
-        <h2>Payment Succeeded!</h2>
+        <h2>Payment <span>${message}</span></h2>
         <span>Data:</span><span>${message}</span><br/>
          <span>Merchant ID:</span><span>${merchIdVal}</span><br/>
           <span>Bank Code:</span><span>${Bank_Code}</span><br/>

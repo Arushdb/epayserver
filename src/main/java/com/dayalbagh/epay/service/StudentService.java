@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.dayalbagh.epay.model.Programfeedates;
 import com.dayalbagh.epay.model.Student;
+import com.dayalbagh.epay.model.Studentfeereceipt;
 
 public interface StudentService {
 
@@ -40,6 +41,10 @@ public interface StudentService {
 			String reftype) ;
 
 	java.sql.Date subYear(java.sql.Date date, int year);
+	
+	String savestudentfee(String[] str);
+		
+	
 
 	
 
