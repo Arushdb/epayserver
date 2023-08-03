@@ -36,8 +36,7 @@ public class PaymentController {
 	@Autowired
 	private SBIService sbiservice;
 	
-	@Autowired
-	private StudentService studentservice;
+	
 
 	 @GetMapping("/makepayment")
 	    public String showForm(Model model ,HttpServletRequest request,HttpServletResponse response) throws ServletException, IOException {
@@ -79,7 +78,7 @@ public class PaymentController {
 	 @PostMapping("/paymentsuccess")
 	 public String Paymentsuccess(@ModelAttribute("encData") String encData,
 			 @ModelAttribute("merchIdVal") String merchIdVal,
-			 @ModelAttribute("Bank_Code") String Bank_Code,Model model) throws ParseException
+			 @ModelAttribute("Bank_Code") String Bank_Code,Model model) throws Exception
 	 
 	 {
 		 
@@ -101,40 +100,21 @@ public class PaymentController {
 		 
 		 
 		 String resdata[]= str.split("\\|");
-		 System.out.println(resdata);
 		  
-	      String message = resdata[2];  
 	      
 	      sbiservice.savePayment(resdata);
-	     
-	      
-	      if( message.equalsIgnoreCase("Success")) {
-	    	  
-	    	  System.out.println("in side verify payment");
-	    	  // Do double verification
-	    	  	    	
-	    	  String dvstatus =sbiservice.verifyPayment(resdata);
-	    	  
-	    	 
-	    	  dvdata= dvstatus.split("\\|");
-	 
-	    	  
+	      String dvstatus =sbiservice.verifyPayment(resdata);
+	      dvdata= dvstatus.split("\\|");
+	      System.out.println("DV Data:"+dvdata);
+	      if (dvdata[2].equalsIgnoreCase("Success"))
+	    	  sbiservice.savestudentfee(dvdata);
+	         	  
 	    	  model.addAttribute("message", dvdata[2]);
-	    	  if (dvdata[2].equalsIgnoreCase("Success"))
-	    		  
-	    		  
-	    		  studentservice.savestudentfee(dvdata);
-	    		  
-	    		  
-	    		  return "payment_success";
-	      }
-	   
+	    
 	     System.out.println("encrypted Data:"+encData);
 	     System.out.println("Decrypted String:"+resdata);
-	     System.out.println(merchIdVal);
-	     System.out.println(Bank_Code);
-	    
-	     return "payment_failure";
+	     
+	     return "payment_success";
 	 }
 	 
 	 @PostMapping("/pushpayment")

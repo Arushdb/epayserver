@@ -43,7 +43,9 @@ public class Payment {
 	
 	private String otherdetail;
 	private String bank_code;
-	private String merchant_orderno;
+	@Column(name="merchant_orderno")
+	private String merchantorderno;
+	
 	private String ATRN;
 	
 	private String dv_status;
@@ -152,9 +154,7 @@ public class Payment {
 		return bank_code;
 	}
 
-	public String getMerchant_orderno() {
-		return merchant_orderno;
-	}
+	
 
 	public String getATRN() {
 		return ATRN;
@@ -192,9 +192,7 @@ public class Payment {
 		this.bank_code = bank_code;
 	}
 
-	public void setMerchant_orderno(String merchant_orderno) {
-		this.merchant_orderno = merchant_orderno;
-	}
+	
 
 	public void setATRN(String aTRN) {
 		ATRN = aTRN;
@@ -274,6 +272,18 @@ public class Payment {
 
 	public void setTotal_Fee_GST(BigDecimal total_Fee_GST) {
 		Total_Fee_GST = total_Fee_GST;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getMerchantorderno() {
+		return merchantorderno;
+	}
+
+	public void setMerchantorderno(String merchantorderno) {
+		this.merchantorderno = merchantorderno;
 	}
 	
 	

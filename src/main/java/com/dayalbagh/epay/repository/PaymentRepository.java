@@ -12,6 +12,7 @@ import com.dayalbagh.epay.model.Studentfeereceipt;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
-
+     Payment findByMerchantorderno(String str);
+     Payment findByATRN(String str);
 	
 }

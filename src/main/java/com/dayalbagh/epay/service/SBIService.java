@@ -23,4 +23,6 @@ public interface SBIService {
 	 
 	 void savePayment(String[] data) throws ParseException;
 
+	void savestudentfee(String[] dvdata) throws Exception;
+
 }

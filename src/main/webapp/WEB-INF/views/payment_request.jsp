@@ -67,7 +67,8 @@
 
 </head>
 <body>
-<%@ include file = "header.html" %>
+
+
     <div >
         <h2>Make Payment</h2>
         <form:form action="https://test.sbiepay.sbi/secure/AggregatorHostedListener" method="post" modelAttribute="student">

@@ -25,6 +25,7 @@ import java.util.Random;
 import javax.annotation.PostConstruct;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpRequest;
@@ -33,6 +34,8 @@ import org.springframework.stereotype.Service;
 import com.dayalbagh.epay.AES256Bit;
 import com.dayalbagh.epay.model.Payment;
 import com.dayalbagh.epay.model.Student;
+import com.dayalbagh.epay.model.Studentfeereceipt;
+import com.dayalbagh.epay.repository.FeereceiptRepository;
 import com.dayalbagh.epay.repository.PaymentRepository;
 
 
@@ -98,14 +101,16 @@ public class SBIServiceImpl implements SBIService {
 	static String gatewayUrl;
 	static String key_Array;
 	
-	
+	@Autowired
 	PaymentRepository thepaymentrepository ;
+	@Autowired
+	FeereceiptRepository theFeereceiptRepository ;
 	
 		
-	public SBIServiceImpl(PaymentRepository paymentrepository) {
-		
-		this.thepaymentrepository = paymentrepository;
-	}
+//	public SBIServiceImpl(PaymentRepository paymentrepository) {
+//		
+//		this.thepaymentrepository = paymentrepository;
+//	}
 
 
 
@@ -362,6 +367,7 @@ public class SBIServiceImpl implements SBIService {
 		String ATRN = resdata[1];
 		
 		String Amount =resdata[3];
+		System.out.println("in side verify payment");
 		
 		
 		String queryRequest = ATRN+"|"+MerchantId+"|"+Merchant_Order_Number+"|"+Amount;
@@ -428,7 +434,7 @@ public class SBIServiceImpl implements SBIService {
 	   		Total_Fee_GST=data[14];
 	   		   	  
 	   	  
-	   	  payment.setMerchant_orderno(MerchantOrderNumber);
+	   	  payment.setMerchantorderno(MerchantOrderNumber);
     	  payment.setATRN(ATRN);
     	  payment.setTransaction_status(Transaction_Status);
     	  
@@ -438,10 +444,7 @@ public class SBIServiceImpl implements SBIService {
     	  }else {
     		  
     	  }
-    	 
-    	  
-    	  
-    	 
+    	     	 
     	  payment.setCurrency(Currency);
     	  payment.setPayment_mode(Pay_Mode);
     	  payment.setOtherdetail(Other_Details);
@@ -502,6 +505,92 @@ public class SBIServiceImpl implements SBIService {
 	    }
 	    return true;
 	}
+
+
+
+	  //** DV response structure 
+//	  Merchant ID|SBIePayRefID/ATRN|Transaction Status|Country|
+//  Currency|Other Details|MerchantOrderNumber|Amount|Status Description|
+//	  BankCode|Bank Reference Number|Transaction Date|Pay Mode|CIN|
+//	  Merchant ID|Total Fee GST|Ref1|Ref2|Ref3|Ref4|Ref5|Ref6|Ref7|Ref8|Ref9| Ref10
+
+//* otherdetail structure for Student FEE
+
+// category[0]-rollnumber[1]-studentname[2]-programname[3]-reftype[4]-semesterstartdate[5]-semesterenddate[6]
+//-latefee[7]-entityid[8]-programid[9]-pendingsemester[10]-feepending[11]
+
+
+
+
+@Override
+public void savestudentfee(String[] data) throws Exception {
+	// TODO Auto-generated method stub
+	
+	Studentfeereceipt sfr = new Studentfeereceipt();
+	String OtherDetails = data[5];
+	
+	String resdata[]= OtherDetails.split("\\-");
+	String refno ="";
+	String reftype ="";
+	int paymentid;
+	String Semester_code="";
+	String entityid ="";
+	String Programid = "";
+	String ssd="";
+	String sed="";
+	String amt="";
+	String latefee="";
+	String ATRN="";
+	String merchantorder="";
+	
+	// extract data from dv data
+	amt=data[7];
+	ATRN=data[1];
+	merchantorder=data[6];
+	
+	// extract student details from  other details of dv data
+	
+	refno = resdata[1];
+	reftype = resdata[4];
+	Semester_code=resdata[10];
+	entityid=resdata[10];
+	Programid=resdata[9];
+	ssd=resdata[5];
+	sed=resdata[6];
+	latefee=resdata[7];
+	
+	Payment payment = thepaymentrepository.findByATRN(Semester_code);
+	if (payment!=null)
+		paymentid=payment.getId();
+	else {
+		payment = thepaymentrepository.findByMerchantorderno(merchantorder);
+		
+		if (payment!=null)
+			paymentid=payment.getId();
+		else
+			throw new Exception("Record not found in Payment table for student"+OtherDetails);
+	}
+	
+	sfr.setProgramid(Programid);
+	sfr.setRollnumber(refno);
+	sfr.setReftype(reftype);
+	sfr.setSemester(Semester_code);
+	sfr.setPayment(payment);
+	
+	Date  now =  new Date();
+	Timestamp timestamp = new Timestamp(now.getTime());
+
+	sfr.setInsert_time(timestamp);
+	
+	
+	theFeereceiptRepository.save(sfr);
+	
+		
+		
+	 
+		
+	
+}
 
 }
 
