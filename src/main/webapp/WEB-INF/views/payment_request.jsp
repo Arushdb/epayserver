@@ -7,7 +7,7 @@
 <meta charset="ISO-8859-1">
 <title>Payment Form</title>
 
-<!--  
+
 <style type="text/css">
     label {
         display: inline-block;
@@ -51,6 +51,12 @@
   padding: 1px;
 }
 
+div {
+text-align: center;
+padding: 5px 0;
+  font-size: 15px;
+}
+
 .grid-container > div {
  
   text-align: center;
@@ -62,8 +68,8 @@
   grid-row: 1 / span 2;
 }
 </style>
--->
-<link href="bootstrap-grid.css" rel="stylesheet" type="text/css">
+
+
 
 </head>
 <body>
