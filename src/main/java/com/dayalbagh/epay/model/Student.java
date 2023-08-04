@@ -46,7 +46,7 @@ public class Student {
 	private float amount ;
 	private float latefee;
 	private float labfee;	
-	private String merchantid ; 
+	private String merchIdVal ; 
 	
 	
 	private java.math.BigDecimal  appfee ;
@@ -261,17 +261,18 @@ public class Student {
 		EncryptTrans = encryptTrans;
 	}
 	
-	public String getMerchantid() {
-		return merchantid;
-	}
-	public void setMerchantid(String merchantid) {
-		this.merchantid = merchantid;
-	}
+
 	public String getEntityid() {
 		return entityid;
 	}
 	public void setEntityid(String entityid) {
 		this.entityid = entityid;
+	}
+	public String getMerchIdVal() {
+		return merchIdVal;
+	}
+	public void setMerchIdVal(String merchIdVal) {
+		this.merchIdVal = merchIdVal;
 	}
 	
 	

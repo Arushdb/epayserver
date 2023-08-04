@@ -62,7 +62,7 @@ public class PaymentController {
 	     //String decryptdata =sbiservice.decrypt(encryptdata);
 	     
 	     student.setEncryptTrans(encryptdata);
-	     student.setMerchantid(merchantid);
+	     student.setMerchIdVal(merchantid);
 	   
 	     
 	     

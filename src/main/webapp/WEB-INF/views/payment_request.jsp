@@ -81,7 +81,7 @@ padding: 5px 0;
              
             <form:input type="hidden"  path="EncryptTrans"/><br/>
           
-          	<form:input type="hidden"  path="merchantid"/><br/>
+          	<form:input type="hidden"  path="merchIdVal"/><br/>
          
             <form:button>Confirm</form:button>
         </form:form>

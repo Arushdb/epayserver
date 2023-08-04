@@ -32,7 +32,7 @@ public class DisableEtagFilter  implements Filter  {
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
         httpResponse.setHeader("Content-Security-Policy", "default-src 'unsafe-inline' 'self';style-src "
         		+ "  'unsafe-inline'  http://localhost:8080/   https://admission.dei.ac.in;img-src http://* 'self' data: ;connect-src 'self' https://test.sbiepay.sbi https://sbiepay.sbi"
-        		+ "font-src 'self' data:");
+        		+ ";font-src 'self' data:");
 		
 	 System.out.println(req.getHeader("User-Agent"));
 		
