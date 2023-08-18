@@ -16,6 +16,12 @@ public interface CertificateService {
 			String semesters) throws Exception;
 
 	
+
+	String savecertificateDetail(Student student);
+
+	
+
+	
 	
 
 	

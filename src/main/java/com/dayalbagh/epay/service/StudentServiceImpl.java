@@ -1,8 +1,13 @@
 package com.dayalbagh.epay.service;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.Year;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,6 +27,7 @@ import org.springframework.stereotype.Service;
 import com.dayalbagh.epay.exception.ResourceNotFoundException;
 import com.dayalbagh.epay.model.Admfeedates;
 import com.dayalbagh.epay.model.Defaulters;
+import com.dayalbagh.epay.model.Payment;
 import com.dayalbagh.epay.model.ProgramFee;
 import com.dayalbagh.epay.model.Programfeedates;
 import com.dayalbagh.epay.model.Student;
@@ -46,6 +52,10 @@ public class StudentServiceImpl implements StudentService {
 	DefaulterRepository theDefaulterRepository;
 	@Autowired
 	AdmfeedatesRepository theadmfeedatesRepository;
+	
+	
+	
+	
 
 	@Value("${epaystartdate}")
 	private String epaystartdate;
@@ -71,6 +81,9 @@ public class StudentServiceImpl implements StudentService {
 	private int provisional;
 	@Value("${resultcard}")
 	private int resultcard;
+	
+	@Autowired
+	SBIService sbiservice;
 
 	public StudentServiceImpl(FeedatesRepository feedatesRepository, FeereceiptRepository feereceiptRepository,
 			ProgramFeeRepository programFeeRepository) {
@@ -160,11 +173,12 @@ public class StudentServiceImpl implements StudentService {
 				pendingfee.add(student.get(i));
 			}
 		}
-		
-		return pendingfee;
+		return pendingfee; 
 			 }else {
-				 return student;		 
+				 return student;
 			 }
+		
+		
 		
 		
 		
@@ -262,6 +276,7 @@ public class StudentServiceImpl implements StudentService {
 
 		feeamount = programfee.get(0).getAmount();
 		studentfee.setAmount(feeamount);
+		studentfee.setFeetype(programfee.get(0).getFeetype());
 		if (feeamount == 0)
 			return studentfee;
 
@@ -316,11 +331,35 @@ public class StudentServiceImpl implements StudentService {
 		// TODO Auto-generated method stub
 
 		List<Student> theapplicant = new ArrayList<>();
-		theapplicant = (List<Student>) em.createNamedQuery("getapplicantdetail", Student.class)
-				.setParameter("appno", appno).getResultList();
-		;
-
-		return theapplicant;
+		Year thisYear = Year.now();
+		System.out.println(String.valueOf(thisYear));
+		
+		
+		
+		
+		
+		try {
+			SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+			DateTimeFormatter format =DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			String str = String.valueOf(thisYear)+"-07-01";
+			//Date sessionstartdate = format.parse(str,format);
+			
+			 LocalDate date = LocalDate.parse(str, format);
+			
+			theapplicant = (List<Student>) em.createNamedQuery("getapplicantdetail", Student.class)
+					.setParameter("appno", appno)
+					.setParameter("sessionstartdate", date)
+					.getResultList();
+			Date date1 = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			
+			theapplicant.get(0).setSemesterstartdate(date1);
+			return theapplicant;
+			
+		} catch (Exception e) {
+			return null;
+		}
+		
+	
 
 	}
 
@@ -349,6 +388,15 @@ public class StudentServiceImpl implements StudentService {
 			String studentname = em.createNamedQuery("getapplicantname").setParameter("appno", aplno).getSingleResult()
 					.toString();
 			theapplicant.setStudentname(studentname);
+			theapplicant.setApplicationnumber(appno);
+			theapplicant.setBranchid(theadmfeedates.get(0).getBranchid());
+			theapplicant.setProgramid(theadmfeedates.get(0).getProgramid());
+			theapplicant.setSemestercode(theadmfeedates.get(0).getSemester());
+			theapplicant.setMode(theadmfeedates.get(0).getLearningmode());
+			theapplicant.setSemesterstartdate(theadmfeedates.get(0).getSemesterstartdate());
+			theapplicant.setSemesterenddate(theadmfeedates.get(0).getSemesterenddate());
+			theapplicant.setEntityid(theadmfeedates.get(0).getEntityid());
+			theapplicant.setLatefee(0);
 
 		}
 
@@ -356,7 +404,177 @@ public class StudentServiceImpl implements StudentService {
 
 	}
 
+
+
+	@Override
+	public String savestudentfee(Student student)  {
+		
+				
+		try {
+
+		Studentfeereceipt sfr = new Studentfeereceipt();	
+		
+		
+		sfr.setProgramid(student.getProgramid());
+		sfr.setRollnumber(student.getRoll_number());
+		sfr.setReftype(student.getReftype());
+		sfr.setSemester(student.getSemestercode());
+		sfr.setPayment(student.getPayment());
+		sfr.setSemesterstartdate(student.getSemesterstartdate());
+		sfr.setSemesterenddate(student.getSemesterenddate());
+		sfr.setEntityid(student.getEntityid());
+		sfr.setLatefee(BigDecimal.valueOf(student.getLatefee()));
+		sfr.setAmount( BigDecimal.valueOf(student.getAmount())  );
+		sfr.setFeetype(student.getFeetype());
+		
+		
+		Date  now =  new Date();
+		Timestamp timestamp = new Timestamp(now.getTime());
+
+		sfr.setInsert_time(timestamp);
+		
+		
+		thefeereceiptRepository.save(sfr);
+
+				
+		}
+		catch(Exception e) {
+			sbiservice.logerror(student.getATRN(), student.getMerchantorderno(), String.valueOf(student.getAmount()),  e.getMessage(),"savestudentfee");
+  			return "error";
+		}
+		
+				 
+		return "success";	
+		
+	}
 	
+	
+	public String savestudentfeeCopy(String[] data)  {
+		
+		
+		 //* otherdetail structure 
+
+   	// category[0]-rollnumber[1]-studentname[2]-programname[3]-reftype[4]-semesterstartdate[5]-semesterenddate[6]
+   	//-latefee[7]-entityid[8]-programid[9]-pendingsemester[10]-feepending[11]-feetype[12]
+
+			
+		
+		Studentfeereceipt sfr = new Studentfeereceipt();
+		
+		BigDecimal latefeebig =BigDecimal.ZERO;
+		BigDecimal amountbig=BigDecimal.ZERO;
+		
+		
+		String refno ="";
+		String reftype ="";
+		int paymentid;
+		String Semester_code="";
+		String entityid ="";
+		String Programid = "";
+		String ssd="";
+		String sed="";
+		String amt="";
+		String latefee="";
+		String ATRN="";
+		String merchantorder="";
+		String category="";
+		String feetype="";
+		try {
+			String OtherDetails = data[5];
+			String resdata[]= OtherDetails.split("\\,");
+		// extract data from dv data
+		amt=data[7];
+		ATRN=data[1];
+		merchantorder=data[6];
+		
+		// extract student details from  other details of dv data
+		category=resdata[0];
+		refno = resdata[1];
+		reftype = resdata[4];
+		Semester_code=resdata[10];
+		entityid=resdata[8];
+		Programid=resdata[9];
+		ssd=resdata[5];
+		sed=resdata[6];
+		latefee=resdata[7];
+		feetype=resdata[12];
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		
+		Date semstartdate=dateFormat.parse(ssd);
+		Date semenddate=dateFormat.parse(sed);
+		
+		 if ( sbiservice.isNumeric(latefee)) {
+			 	Double latefeedouble=      Double.parseDouble(latefee);
+				 latefeebig =     BigDecimal.valueOf(latefeedouble);	 
+		 }
+		 
+		 if ( sbiservice.isNumeric(amt)) {
+			 	Double amtdouble=      Double.parseDouble(amt);
+				 amountbig =     BigDecimal.valueOf(amtdouble);	 
+		 }
+		
+
+		Payment payment = sbiservice.findPaymentByATRN(ATRN);
+		if (payment==null)
+			payment = sbiservice.findPaymentByMerchantorderno(merchantorder);
+		if (payment==null) {
+			sbiservice.logerror(ATRN, merchantorder, String.valueOf(amountbig) ,"Record not found in Payment table","savestudentfee");
+ 			return "error";
+		}
+				
+				
+		sfr.setProgramid(Programid);
+		sfr.setRollnumber(refno);
+		sfr.setReftype(reftype);
+		sfr.setSemester(Semester_code);
+		sfr.setPayment(payment);
+		sfr.setSemesterstartdate(semstartdate);
+		sfr.setSemesterenddate(semenddate);
+		sfr.setEntityid(entityid);
+		sfr.setLatefee(latefeebig);
+		sfr.setAmount(amountbig);
+		sfr.setFeetype(feetype);
+		
+		
+		Date  now =  new Date();
+		Timestamp timestamp = new Timestamp(now.getTime());
+
+		sfr.setInsert_time(timestamp);
+		
+		
+		thefeereceiptRepository.save(sfr);
+		
+		
+		}
+		catch(Exception e) {
+			sbiservice.logerror(ATRN, merchantorder, String.valueOf(amt) , e.getMessage(),"savestudentfee");
+ 			return "error";
+		}
+		 
+		return "success";	
+		
+	}
+	
+		
+
+	@Override
+	public String saveStudentAppfee(String[] dvdata_ary) {
+		
+	Student student=	sbiservice.ParseDVResponse(dvdata_ary);
+		
+		String studentname = em.createNamedQuery("updatestudentappfee")
+				.setParameter("appno", student.getApplicationnumber())
+				.setParameter("method", "saveStudentAppfee")
+				.setParameter("amount", student.getAmount())
+				.setParameter("ssd", student.getSemesterstartdate())
+				.getSingleResult()
+				.toString();
+		
+		return null;
+	}
+
+
 
 
 	

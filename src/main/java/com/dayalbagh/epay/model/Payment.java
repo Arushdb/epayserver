@@ -24,7 +24,7 @@ public class Payment {
 	private int id;
 	
 	private String refnumber;
-	private String financial_year;
+	
 	private String payment_mode;
 		
 	@Column(name = "transaction_date", columnDefinition = "Date")
@@ -58,14 +58,21 @@ public class Payment {
 	private String Merchant_ID ;
 	private String transaction_status;
 	private String currency;
+	private String Category;
+	
+	@Column(name="status_description")
+	private String statusdescription;
 	
 	
 	@OneToOne(mappedBy = "payment")
 	private Studentfeereceipt feereceipt;
 	
+	@OneToOne(mappedBy = "payment")
+	private Certificate certificate;
+	
 	@Column(name = "insert_time" ,columnDefinition = "insert_time")
 	
-	private LocalDateTime insert_time ;
+	private Date insert_time ;
 	
 	@Column(name = "modification_time")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -124,11 +131,21 @@ public class Payment {
 	
 	
 
-	public LocalDateTime getInsert_time() {
+	
+
+	public Certificate getCertificate() {
+		return certificate;
+	}
+
+	public Date getInsert_time() {
 		return insert_time;
 	}
 
-	public void setInsert_time(LocalDateTime insert_time) {
+	public void setCertificate(Certificate certificate) {
+		this.certificate = certificate;
+	}
+
+	public void setInsert_time(Date insert_time) {
 		this.insert_time = insert_time;
 	}
 
@@ -142,9 +159,7 @@ public class Payment {
 
 	
 
-	public String getFinancial_year() {
-		return financial_year;
-	}
+	
 
 	public String getOtherdetail() {
 		return otherdetail;
@@ -180,9 +195,7 @@ public class Payment {
 		return modification_time;
 	}
 
-	public void setFinancial_year(String financial_year) {
-		this.financial_year = financial_year;
-	}
+	
 
 	public void setOtherdetail(String otherdetail) {
 		this.otherdetail = otherdetail;
@@ -284,6 +297,22 @@ public class Payment {
 
 	public void setMerchantorderno(String merchantorderno) {
 		this.merchantorderno = merchantorderno;
+	}
+
+	public String getStatusdescription() {
+		return statusdescription;
+	}
+
+	public void setStatusdescription(String statusdescription) {
+		this.statusdescription = statusdescription;
+	}
+
+	public String getCategory() {
+		return Category;
+	}
+
+	public void setCategory(String category) {
+		Category = category;
 	}
 	
 	

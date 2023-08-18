@@ -47,6 +47,10 @@ public class Student {
 	private float latefee;
 	private float labfee;	
 	private String merchIdVal ; 
+	private String category ; 
+	private String merchantorderno;
+	private String ATRN;
+	private Payment payment;
 	
 	
 	private java.math.BigDecimal  appfee ;
@@ -65,6 +69,13 @@ public class Student {
 	private String entityid;
 	
 	private String EncryptTrans;
+	
+	private String feetype;
+	private String reftype;
+	private String enrolno ;
+	private String address;
+	private String pincode;
+	private String phone;
 	
 	public Student() {
 		
@@ -86,7 +97,7 @@ public class Student {
 	}
 	
 	public Student(String roll_number, String studentname, String programid, Character type, String programname,
-			String mode, String branchid, String specializationid) {
+			String mode, String branchid, String specializationid,String entityid) {
 		
 		this.roll_number = roll_number;
 		this.studentname = studentname;
@@ -96,6 +107,7 @@ public class Student {
 		this.mode = mode;
 		this.branchid = branchid;
 		this.specializationid = specializationid;
+		this.entityid=entityid ;
 	}
 	public Student(String roll_number, String programname) {
 		
@@ -273,6 +285,66 @@ public class Student {
 	}
 	public void setMerchIdVal(String merchIdVal) {
 		this.merchIdVal = merchIdVal;
+	}
+	public String getFeetype() {
+		return feetype;
+	}
+	public void setFeetype(String feetype) {
+		this.feetype = feetype;
+	}
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
+	}
+	public String getMerchantorderno() {
+		return merchantorderno;
+	}
+	public String getATRN() {
+		return ATRN;
+	}
+	public void setMerchantorderno(String merchantorderno) {
+		this.merchantorderno = merchantorderno;
+	}
+	public void setATRN(String aTRN) {
+		ATRN = aTRN;
+	}
+	public String getReftype() {
+		return reftype;
+	}
+	public void setReftype(String reftype) {
+		this.reftype = reftype;
+	}
+	public Payment getPayment() {
+		return payment;
+	}
+	public void setPayment(Payment payment) {
+		this.payment = payment;
+	}
+	public String getEnrolno() {
+		return enrolno;
+	}
+	public void setEnrolno(String enrolno) {
+		this.enrolno = enrolno;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public String getPincode() {
+		return pincode;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public void setPincode(String pincode) {
+		this.pincode = pincode;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 	
 	

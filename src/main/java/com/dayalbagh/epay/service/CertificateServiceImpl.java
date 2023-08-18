@@ -1,5 +1,7 @@
 package com.dayalbagh.epay.service;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,12 +22,17 @@ import org.springframework.stereotype.Service;
 
 import com.dayalbagh.epay.exception.ResourceNotFoundException;
 import com.dayalbagh.epay.model.Admfeedates;
+import com.dayalbagh.epay.model.Certificate;
+import com.dayalbagh.epay.model.Certificatesemester;
 import com.dayalbagh.epay.model.Defaulters;
+import com.dayalbagh.epay.model.Payment;
 import com.dayalbagh.epay.model.ProgramFee;
 import com.dayalbagh.epay.model.Programfeedates;
 import com.dayalbagh.epay.model.Student;
 import com.dayalbagh.epay.model.Studentfeereceipt;
 import com.dayalbagh.epay.repository.AdmfeedatesRepository;
+import com.dayalbagh.epay.repository.CertificateRepository;
+import com.dayalbagh.epay.repository.CertificateSemesterRepository;
 import com.dayalbagh.epay.repository.DefaulterRepository;
 import com.dayalbagh.epay.repository.FeedatesRepository;
 import com.dayalbagh.epay.repository.FeereceiptRepository;
@@ -37,9 +44,13 @@ public class CertificateServiceImpl implements CertificateService {
 
 	@Autowired
 	EntityManager em;
-
-
-	FeereceiptRepository thefeereceiptRepository;
+	@Autowired
+	SBIService  sbiservice;
+	
+	 @Autowired
+	 CertificateRepository   theCertificateRepository;
+	 @Autowired
+	 CertificateSemesterRepository theCertificateSemesterRepository;
 	
 	@Value("${migrationcertificatefee}")
 	private int migrationcertificatefee;
@@ -57,12 +68,7 @@ public class CertificateServiceImpl implements CertificateService {
 	@Value("${resultcard}")
 	private int resultcard;
 
-	public CertificateServiceImpl(FeereceiptRepository feereceiptRepository) {
 	
-		this.thefeereceiptRepository = feereceiptRepository;
-	
-
-	}
 
 	
 	
@@ -100,6 +106,7 @@ public class CertificateServiceImpl implements CertificateService {
 		case "res":
 			feeamount = resultcard;
 			String [] ary =semesters.split(",");
+			
 			feeamount=feeamount*ary.length;
 			if (mode.equalsIgnoreCase("bypost"))
 				feeamount = feeamount + postalcharges;
@@ -108,6 +115,7 @@ public class CertificateServiceImpl implements CertificateService {
 		}
 
 		student.get(0).setAmount(feeamount);
+		student.get(0).setSemestercode(semesters.replace(",", ":"));
 		return student;
 
 		// TODO Auto-generated method stub
@@ -175,5 +183,66 @@ public class CertificateServiceImpl implements CertificateService {
 		return student;
 		
 	}
+
+
+
+	@Override
+	public String savecertificateDetail(Student student) {
+		String writestatus = "success";
+		List <Certificate> cersemList = new ArrayList<>();
+		Certificatesemester cerobj=null;
+		Certificate cresem = null;
+		try {
+			
+			  Certificate certificate = new Certificate();
+			  certificate.setAddress(student.getAddress());
+			  certificate.setMode(student.getMode());
+			  certificate.setPhone(student.getPhone());
+			  certificate.setPincode(student.getPincode());
+			  certificate.setRollno(student.getRoll_number());
+			  certificate.setEnrolmentnumber(student.getEnrolno());
+			  
+			  certificate.setInserttime(new Timestamp(System.currentTimeMillis()));
+			  certificate.setType(student.getCertificatetype());
+			  
+//			  Payment payobj = sbiservice.findPaymentByATRN(student.getATRN());
+//				 
+//				if (payobj==null)
+//					payobj = sbiservice.findPaymentByMerchantorderno(student.getMerchantorderno());
+//				if (payobj==null) {
+//					
+//					sbiservice.logerror(student.getATRN(), student.getMerchantorderno(), String.valueOf(student.getAmount()) , "Record not found in Payment table","savecertificateDetail");
+//					writestatus="error";
+//				}
+			  certificate.setPayment(student.getPayment());
+			  
+			  theCertificateRepository.save(certificate); 
+			  
+			  
+			  if (!(student.getSemestercode().isEmpty())) {
+				 String str = student.getSemestercode();
+				 String resdata[]= str.split("\\:");
+				 
+				  for(String sem:resdata) {
+					  cerobj = new Certificatesemester();
+					  cerobj.setSemester(sem);
+					  cerobj.setCertificate(certificate);
+					  theCertificateSemesterRepository.save(cerobj);
+				  }
+				 
+				 
+			  }
+			  
+			
+			  
+		}catch(Exception e) {
+			sbiservice.logerror(student.getATRN(), student.getMerchantorderno(), String.valueOf(student.getAmount()) , e.getMessage(),"savecertificateDetail");
+		}
+		  
+		  return writestatus;
+	}
+
+
+	
 
 }

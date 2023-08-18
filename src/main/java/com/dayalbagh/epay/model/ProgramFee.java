@@ -30,7 +30,8 @@ public class ProgramFee {
 	private String specializationid;
 	private String mode;
 	private int lab;
-	
+	@Column(name = "fee_type")
+	private String feetype ;
 	
 	
 	public ProgramFee() {
@@ -79,6 +80,13 @@ public class ProgramFee {
 	}
 	public void setSpecializationid(String specializationid) {
 		this.specializationid = specializationid;
+	}
+	
+	public String getFeetype() {
+		return feetype;
+	}
+	public void setFeetype(String feetype) {
+		this.feetype = feetype;
 	}
 	
 	

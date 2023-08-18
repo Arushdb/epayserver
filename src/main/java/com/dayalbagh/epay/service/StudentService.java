@@ -41,6 +41,12 @@ public interface StudentService {
 			String reftype) ;
 
 	java.sql.Date subYear(java.sql.Date date, int year);
+
+	
+
+	String saveStudentAppfee(String[] dvdata_ary);
+
+	String savestudentfee(Student student);
 	
 	
 		

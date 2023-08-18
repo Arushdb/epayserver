@@ -23,7 +23,7 @@ public class Certificatesemester {
 	@Column(name = "id")
 	private int id;
 			
-	private int semester;
+	private String semester;
 	
 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
 	@JoinColumn(name ="certificateid" ,nullable =false )
@@ -32,14 +32,23 @@ public class Certificatesemester {
 	public Certificatesemester() {
 	
 	}
-		
-	public int getSemester() {
+
+	public String getSemester() {
 		return semester;
 	}
-	
-	public void setSemester(int semester) {
+
+	public Certificate getCertificate() {
+		return certificate;
+	}
+
+	public void setSemester(String semester) {
 		this.semester = semester;
 	}
+
+	public void setCertificate(Certificate certificate) {
+		this.certificate = certificate;
+	}
+		
 	
 	
 	

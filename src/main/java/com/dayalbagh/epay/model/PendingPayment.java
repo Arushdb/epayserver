@@ -48,7 +48,31 @@ public class PendingPayment {
 	private Date modification_time;
 	
 	
+	private String created_by ;
 	
+	
+	
+
+	public String getCreated_by() {
+		return created_by;
+	}
+
+
+
+
+	public void setInsert_time(Date insert_time) {
+		this.insert_time = insert_time;
+	}
+
+
+
+
+	public void setCreated_by(String created_by) {
+		this.created_by = created_by;
+	}
+
+
+
 
 	public PendingPayment() {
 		

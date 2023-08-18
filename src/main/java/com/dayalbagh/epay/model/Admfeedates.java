@@ -49,9 +49,17 @@ public class Admfeedates {
 	private Date modifiedtime;
 	
 	@Temporal(TemporalType.DATE)
+	private Date semesterstartdate; 
+	
+	@Temporal(TemporalType.DATE)
+	private Date semesterenddate; 
+	
+	@Temporal(TemporalType.DATE)
 	private Date lastdate; 
 	
 	private String learningmode;
+	
+	private String entityid;
 
 	
 	public Admfeedates() {
@@ -188,6 +196,42 @@ public class Admfeedates {
 
 	public void setSemester(String semester) {
 		this.semester = semester;
+	}
+
+
+
+	public Date getSemesterstartdate() {
+		return semesterstartdate;
+	}
+
+
+
+	public Date getSemesterenddate() {
+		return semesterenddate;
+	}
+
+
+
+	public void setSemesterstartdate(Date semesterstartdate) {
+		this.semesterstartdate = semesterstartdate;
+	}
+
+
+
+	public void setSemesterenddate(Date semesterenddate) {
+		this.semesterenddate = semesterenddate;
+	}
+
+
+
+	public String getEntityid() {
+		return entityid;
+	}
+
+
+
+	public void setEntityid(String entityid) {
+		this.entityid = entityid;
 	}
 
 

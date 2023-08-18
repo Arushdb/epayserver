@@ -3,12 +3,15 @@ package com.dayalbagh.epay.model;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -21,9 +24,14 @@ public class Certificate {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private int id;
+
+	
 	
 	@Column(name = "roll_number")
 	private String rollno;
+	
+	@Column(name = "enrolment_number")
+	private String enrolmentnumber;
 	
 
 	private String address;
@@ -33,6 +41,8 @@ public class Certificate {
 	private String type;
 	private String phone;
 	
+
+	
 	@Column(name = "insert_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date inserttime;
@@ -40,8 +50,10 @@ public class Certificate {
 	
 	@OneToMany(mappedBy = "certificate")
 	private List<Certificatesemester> certificatesemester;
-
 	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "payment_id", referencedColumnName = "id")
+	private Payment payment;
 
 	
 
@@ -130,6 +142,58 @@ public class Certificate {
 
 	public void setRollno(String rollno) {
 		this.rollno = rollno;
+	}
+
+
+
+
+	public String getEnrolmentnumber() {
+		return enrolmentnumber;
+	}
+
+
+
+
+	
+
+
+
+
+	public Payment getPayment() {
+		return payment;
+	}
+
+
+
+
+	public void setEnrolmentnumber(String enrolmentnumber) {
+		this.enrolmentnumber = enrolmentnumber;
+	}
+
+
+
+
+	
+
+
+
+
+	public void setPayment(Payment payment) {
+		this.payment = payment;
+	}
+
+
+
+
+	public List<Certificatesemester> getCertificatesemester() {
+		return certificatesemester;
+	}
+
+
+
+
+	public void setCertificatesemester(List<Certificatesemester> certificatesemester) {
+		this.certificatesemester = certificatesemester;
 	}
 	
 	

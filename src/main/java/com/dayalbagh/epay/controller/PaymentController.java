@@ -26,6 +26,7 @@ import com.dayalbagh.epay.AES256Bit;
 import com.dayalbagh.epay.model.Payment;
 import com.dayalbagh.epay.model.Student;
 import com.dayalbagh.epay.model.Studentfeereceipt;
+import com.dayalbagh.epay.service.CertificateService;
 import com.dayalbagh.epay.service.SBIService;
 import com.dayalbagh.epay.service.StudentService;
 
@@ -35,6 +36,12 @@ public class PaymentController {
 	
 	@Autowired
 	private SBIService sbiservice;
+	
+	@Autowired
+	private StudentService studentservice;
+	
+	@Autowired
+	private CertificateService certificateService;
 	
 	
 
@@ -51,10 +58,7 @@ public class PaymentController {
 	     String merchantid = sbiservice.getMerchantId();
 	     
 	     String encryptdata = sbiservice.encrypt(totalfee,Otherdetail);
-	     
-	    
-	     
-	     
+	       
 	     System.out.println("encrypted String:"+encryptdata);
 	     
 	     System.out.println("Decrypted String:"+sbiservice.decrypt(encryptdata));
@@ -78,38 +82,98 @@ public class PaymentController {
 	 @PostMapping("/paymentsuccess")
 	 public String Paymentsuccess(@ModelAttribute("encData") String encData,
 			 @ModelAttribute("merchIdVal") String merchIdVal,
-			 @ModelAttribute("Bank_Code") String Bank_Code,Model model) throws Exception
+			 @ModelAttribute("Bank_Code") String Bank_Code,Model model) 
 	 
 	 {
 		 
-		 String dvdata[];
+		
 		 Studentfeereceipt feereceipt =new Studentfeereceipt();
 		 
 		 System.out.println("encData :"+encData);
 		
-		
-		 
+				 
 		 //String str1 = request.getAttribute("encData").toString();
 	
 		 
-		  encData = encData.replaceAll(" ", "+");
-		 
-		 
-		 
+		 encData = encData.replaceAll(" ", "+");
+				 
 		 String str = sbiservice.decrypt(encData);
 		 
 		 
 		 String resdata[]= str.split("\\|");
-		  
-	      
-	      sbiservice.savePayment(resdata);
-	      String dvstatus =sbiservice.verifyPayment(resdata);
-	      dvdata= dvstatus.split("\\|");
+		 System.out.println("encData :"+resdata[0]+"data:"+encData);
+	         
+	   // Verify via Double verification 
+	      String dvdata =sbiservice.verifyPayment(resdata);
 	      System.out.println("DV Data:"+dvdata);
-	      if (dvdata[2].equalsIgnoreCase("Success"))
-	    	  sbiservice.savestudentfee(dvdata);
+	      
+	      String [] dvdata_ary= dvdata.split("\\|");
+	      
+	      String trxstatus = dvdata_ary[2];
+	      String statusdesc=dvdata_ary[8];
+	      
+	      // Save Browser response and dvstatus 
+	     
+		Student student=	sbiservice.savePayment(resdata,trxstatus,statusdesc);
+		// check if writing into  payment table is error	     
+		if (student.getMessage().equalsIgnoreCase("error")) {
+			   return "payment_failure";
+	    	  
+	      }
+	        
+	   
+	      
+	      //** DV response structure 
+//		  Merchant ID|SBIePayRefID/ATRN|Transaction Status|Country|
+	//  Currency|Other Details|MerchantOrderNumber|Amount|Status Description|
+//		  BankCode|Bank Reference Number|Transaction Date|Pay Mode|CIN|
+//		  Merchant ID|Total Fee GST|Ref1|Ref2|Ref3|Ref4|Ref5|Ref6|Ref7|Ref8|Ref9| Ref10
+	      
+//	      String OtherDetails = dvdata_ary[5];
+//	      
+//	      String OtherDetails_data[]= OtherDetails.split("\\,");
+	      
+	      // if data is verified  store in relevent table
+	      if (student.getMessage().equalsIgnoreCase("Success")) {
+	    	  
+	    	//* otherdetail structure for Student FEE
+
+	    	// category[0]-rollnumber[1]-studentname[2]-programname[3]-reftype[4]-semesterstartdate[5]-semesterenddate[6]
+	    	//-latefee[7]-entityid[8]-programid[9]-pendingsemester[10]-feepending[11]
+  
+	    	  String category = student.getCategory();
+	    	  if (category.equalsIgnoreCase("CON") ||category.equalsIgnoreCase("newadm") ) {
+	    		  String studentfeestatus = studentservice.savestudentfee(student); 
+	    		  if (studentfeestatus.equalsIgnoreCase("error"))
+	    			  return "payment_failure";
+	    	  }
+			
+	    	  // For Application Fee
+	    	  
+	    	  if (category.equalsIgnoreCase("appfee")  ) {
+	    		  String studentfeestatus = studentservice.saveStudentAppfee(dvdata_ary); 
+	    		  if (studentfeestatus.equalsIgnoreCase("error"))
+	    			  return "payment_failure";
+	    	  } 
+				
+	    	  
+	    	  if (category.equalsIgnoreCase("CER")  ) {
+	    		  String studentfeestatus = certificateService.savecertificateDetail(student); 
+	    		  if (studentfeestatus.equalsIgnoreCase("error"))
+	    			  return "payment_failure";
+	    	  } 
+	      
+	      
+	      
+	      
+	      }else {
+	    	
+	    	  
+	      }
+	    	  
+	    	  
 	         	  
-	    	  model.addAttribute("message", dvdata[2]);
+	    	  model.addAttribute("message", trxstatus);
 	    
 	     System.out.println("encrypted Data:"+encData);
 	     System.out.println("Decrypted String:"+resdata);

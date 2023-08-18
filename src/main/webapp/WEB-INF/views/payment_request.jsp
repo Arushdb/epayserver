@@ -9,82 +9,76 @@
 
 
 <style type="text/css">
-    label {
-        display: inline-block;
-        width: 200px;
-        margin: 5px;
-        text-align: left;
-    }
-    input[type=text], input[type=password], select {
-        width: 200px;  
-    }
-    input[type=radio] {
-        display: inline-block;
-        margin-left: 45px;
-    }
-    input[type=checkbox] {
-        display: inline-block;
-        margin-right: 190px;
-    }  
-    
-    .myheader {
-    
-     margin-left: 5px;
-     height:100px;
-     background-color: #00FFFF;
-         
-    }
-    img {
-    margin:40px 
-    }
-     
-    button {
-        padding: 10px;
-        margin: 10px;
-    }
-    
-    .grid-container {
-  display: grid;
-  grid-template-columns: auto auto ;
-  height:150px;
-  background-color: #00FFFF;
-  padding: 1px;
-}
 
-div {
-text-align: center;
-padding: 5px 0;
-  font-size: 15px;
-}
+  .flex-container {
+   background-color:aqua;
+   height:auto;
+   display: flex;
+   margin: 10px;
+   padding: 10px;
+  }
 
-.grid-container > div {
- 
+
+
+  .flex-item:nth-of-type(1) {flex-grow: 1;}
+  .flex-item:nth-of-type(2) {flex-grow: 6;
   text-align: center;
-  padding: 5px 0;
-  font-size: 15px;
+   margin: 10px;
+   padding:10px;
 }
+    
 
-.item1 {
-  grid-row: 1 / span 2;
-}
+  
+  
+    
 </style>
 
 
 
 </head>
-<body>
+<body onload="submitform()">
+
+<!--  
+<div class="flex-container">
+<div class="flex-item"  >
+  
+  <span style="padding-right:3px; padding-top: 3px; display:inline-block;">
+
+    <img width="90px" height=auto src="logo.png"></img>
+    
+    </span>
 
 
-    <div >
-        <h2>Make Payment</h2>
-        <form:form action="https://test.sbiepay.sbi/secure/AggregatorHostedListener" method="post" modelAttribute="student">
+  </div>
+<div  class="flex-item" >
+  <h1>DEI EPAY System</h1>
+   <h2>Dayalbagh Educational Institute</h2>
+   <h2>Make Payment</h2>
+    
+
+  </div>
+</div>
+-->
+    <div  style="text-align: center;">
+        
+        <form:form id="form1"  action="https://test.sbiepay.sbi/secure/AggregatorHostedListener" method="post" modelAttribute="student">
              
             <form:input type="hidden"  path="EncryptTrans"/><br/>
           
           	<form:input type="hidden"  path="merchIdVal"/><br/>
-         
-            <form:button>Confirm</form:button>
-        </form:form>
+         <!--   
+            <form:button type="hidden" style="width:300px ;height:50px;background-color:dodgerblue;font-size:40px " >Continue</form:button>
+        -->
+</form:form>
     </div>
+    
+    <script>
+    
+    function submitform(){
+    	
+    	form1.submit();
+    	
+    }
+    </script>
 </body>
 </html>

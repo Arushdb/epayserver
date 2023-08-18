@@ -51,7 +51,7 @@ import javax.persistence.SqlResultSetMappings;
 		@NamedNativeQuery(name = "getstudentdetail", query = "select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid ,"
 
 				+ "	pm.program_type as type,program_name as programname,em.entity_type as mode,sp.branch_id as branchid ,sp.specialization_id as specializationid"
-				+ " from cms_live.student_program sp "
+				+ " , sp.entity_id as entityid from cms_live.student_program sp "
 				+ " join cms_live.student_master sm on sm.enrollment_number = sp.enrollment_number "
 				+ "	 join cms_live.program_master pm on pm.program_id = sp.program_id "
 				+ "  join cms_live.entity_master em on em.entity_id = sp.entity_id "
@@ -60,7 +60,7 @@ import javax.persistence.SqlResultSetMappings;
 		@NamedNativeQuery(name = "valid_roll_enrol_dob", query = "select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid ,"
 
 				+ "	pm.program_type as type,program_name as programname,em.entity_type as mode,sp.branch_id as branchid ,sp.specialization_id as specializationid"
-				+ " from cms_live.student_program sp "
+				+ " , sp.entity_id as entityid from cms_live.student_program sp "
 				+ " join cms_live.student_master sm on sm.enrollment_number = sp.enrollment_number "
 				+ "	 join cms_live.program_master pm on pm.program_id = sp.program_id "
 				+ "  join cms_live.entity_master em on em.entity_id = sp.entity_id "
@@ -68,7 +68,8 @@ import javax.persistence.SqlResultSetMappings;
 
 		@NamedNativeQuery(name = "valid_enrol_dob", query =" select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid, "
 								  
-                + " pm.program_type as type,pm.program_name as programname,'mode' as mode,sp.branch_id as branchid ,sp.specialization_id as specializationid from cms_live.student_program sp "
+                + " pm.program_type as type,pm.program_name as programname,'mode' as mode,sp.branch_id as branchid ,"
+                + " sp.specialization_id as specializationid ,sp.entity_id as entityid from cms_live.student_program sp "
                 + " join cms_live.student_master sm on sm.enrollment_number =:enrolno "
                 + " join cms_live.program_master pm on pm.program_id = sp.program_id "
                 + " and sm.date_of_birth=:dob "
@@ -112,7 +113,8 @@ import javax.persistence.SqlResultSetMappings;
 				+ "and substr(srsh.program_course_key,1,7)=:pgmid ", resultSetMapping = "pendingfee"),
 
 		@NamedNativeQuery(name = "getsemesters", query = "select '' as roll_number,'' as programname,"
-				+ "semester_code  as semestercode, curdate()  as semesterstartdate,curdate() as semesterenddate,'' as programid, '' as branchid ,'' as specializationid  from cms_live.program_term_details "
+				+ "semester_code  as semestercode, curdate()  as semesterstartdate,curdate() as semesterenddate,'' as programid, '' as branchid ,'' as specializationid "
+				+ " ,'' as entityid from cms_live.program_term_details "
 				+ " where semester_start_date = :ssd "
 				+ " and semester_end_date = :sed and program_id =:pgm ", resultSetMapping = "pendingfee"),
 		
@@ -139,7 +141,7 @@ import javax.persistence.SqlResultSetMappings;
 				+ " join admissionform_live.entity_student es on es.application_number=apr.application_number "
 
 				+ " where application_status='D' "
-				+ " and sas.application_number=:appno and available= 'Y'  and curdate()<= close_date  "
+				+ " and sas.application_number=:appno and available= 'Y'  and curdate()<= close_date  and sas.session_start_date =:sessionstartdate "
 				+ " group by form_number ", resultSetMapping = "applicantdetail"),
 		
 		@NamedNativeQuery(name = "getapplicantforhostel", query = " select  first_name as studentname ,apr.application_number as applicationnumber ,"
@@ -150,7 +152,13 @@ import javax.persistence.SqlResultSetMappings;
 				+ " join admissionform_live.entity_student es on es.application_number=apr.application_number "
 				+ " and sas.application_number=:appno "
 				+ " where application_status='D' and curdate() <= date_add(close_date,interval 5 month)"
-				+ "  group by form_number " ,resultSetMapping = "applicantdetail")
+				+ "  group by form_number " ,resultSetMapping = "applicantdetail"),
+		@NamedNativeQuery(name="updatestudentappfee",
+		query = " 	update student_application_status set  actual_deposited_fee=:amount,"
+				+ "	fee_verification_time=now(),fee_verified_by=:method ,verification_status='rec "
+				+ "      where application_number=:appno "
+				+ "      and session_start_date =:ssd  "
+				)
 				
 }
 		
@@ -177,7 +185,8 @@ import javax.persistence.SqlResultSetMappings;
 				@ConstructorResult(targetClass = Student.class, columns = { @ColumnResult(name = "roll_number"),
 						@ColumnResult(name = "studentname"), @ColumnResult(name = "programid"),
 						@ColumnResult(name = "type"), @ColumnResult(name = "programname"), @ColumnResult(name = "mode"),
-						@ColumnResult(name = "branchid"), @ColumnResult(name = "specializationid")
+						@ColumnResult(name = "branchid"), @ColumnResult(name = "specializationid"),
+						@ColumnResult(name = "entityid")
 
 				}
 

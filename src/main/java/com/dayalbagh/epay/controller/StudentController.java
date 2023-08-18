@@ -149,6 +149,7 @@ public class StudentController {
 			thestudent.get(0).setBranchid(thependingfee.get(0).getBranchid());
 			thestudent.get(0).setSpecializationid(thependingfee.get(0).getSpecializationid());
 			thestudent.get(0).setEntityid(thependingfee.get(0).getEntityid());
+			thestudent.get(0).setFeetype(studentfee.getFeetype());
 			//Student std = sbiservice.encrypt(thestudent.get(0));
 			//thestudent.get(0).setSbistr(std.getSbistr());
 			
@@ -203,12 +204,19 @@ public class StudentController {
 				thestudent.get(0).setSemestercode(semestercode);
 				thestudent.get(0).setFeepending("N");
 				thestudent.get(0).setStatus(latefee);
+				
+				thestudent.get(0).setMode(learningmode);
+				thestudent.get(0).setSemesterstartdate(semesterstartdate);
+				thestudent.get(0).setSemesterenddate(semesterenddate)	;
+				thestudent.get(0).setSemestercode(semestercode);
+				thestudent.get(0).setFeetype(studentfee.getFeetype());
 			
 			}else {
 				throw new Exception("Semester:"+semestercode+" is invalid for current period");
 			}
 				
-				Gson gson = new Gson();
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+			
 			
 			return gson.toJson(thestudent);
 			
@@ -223,7 +231,7 @@ public class StudentController {
 		List<Student> theapplicant  = new ArrayList<>();
 		
 		theapplicant = studentservice.getapplicantdetail(appno);
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		if(theapplicant.size()>0)  
 		return gson.toJson(theapplicant);
 		throw new Exception("E payment not available");
@@ -236,9 +244,11 @@ public class StudentController {
 		List<Student> theapplicant  = new ArrayList<>();
 		
 		theapplicant.add(studentservice.getadmissiondetail(appno));
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		if(theapplicant.size()>0 && theapplicant.get(0).getAmount()>0)  
 		return gson.toJson(theapplicant);
+		
+		
 		throw new Exception("E payment not available");
 		
 	}
@@ -259,7 +269,7 @@ public class StudentController {
 		String type = certificate.getType();
 	
 		thestudent =certificateService.getcertificatedetail(rollno,mode,type,dob,enrolno,semesters);
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		if(thestudent.size()>0)  
 		return gson.toJson(thestudent);
 		throw new Exception("E payment not available");
@@ -299,7 +309,7 @@ public class StudentController {
 			
 		}
 			
-			Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 			if(thestudent.size()>0)  
 			return gson.toJson(thestudent);
 			throw new Exception("E payment not available");
@@ -312,7 +322,7 @@ public class StudentController {
 		List<Student> theapplicant  = new ArrayList<>();
 		
 		theapplicant = postfeeService.getpostfee(appno);
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		if(theapplicant.size()>0)  
 		return gson.toJson(theapplicant);
 		throw new Exception("E payment not available");

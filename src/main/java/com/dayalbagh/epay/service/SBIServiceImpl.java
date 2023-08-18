@@ -12,6 +12,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ import java.util.Random;
 import javax.annotation.PostConstruct;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.hibernate.exception.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -32,11 +34,17 @@ import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Service;
 
 import com.dayalbagh.epay.AES256Bit;
+import com.dayalbagh.epay.model.Certificate;
+import com.dayalbagh.epay.model.Epayerrorlog;
 import com.dayalbagh.epay.model.Payment;
+import com.dayalbagh.epay.model.PendingPayment;
 import com.dayalbagh.epay.model.Student;
 import com.dayalbagh.epay.model.Studentfeereceipt;
+import com.dayalbagh.epay.repository.CertificateRepository;
+import com.dayalbagh.epay.repository.EpayExceptionRepository;
 import com.dayalbagh.epay.repository.FeereceiptRepository;
 import com.dayalbagh.epay.repository.PaymentRepository;
+import com.dayalbagh.epay.repository.PendingPaymentRepository;
 
 
 @PropertySource("classpath:message.properties")
@@ -103,8 +111,15 @@ public class SBIServiceImpl implements SBIService {
 	
 	@Autowired
 	PaymentRepository thepaymentrepository ;
+	
 	@Autowired
-	FeereceiptRepository theFeereceiptRepository ;
+	PendingPaymentRepository thePendingPaymentRepository ;
+	
+	 @Autowired
+	 EpayExceptionRepository theEpayExceptionRepository;
+	 
+	
+	
 	
 		
 //	public SBIServiceImpl(PaymentRepository paymentrepository) {
@@ -307,7 +322,7 @@ public class SBIServiceImpl implements SBIService {
 
         } catch (MalformedURLException e) {
 
-//               GenericExceptionLog.exceptionJava(e, "Exception Occured in :: urlConnection() for "+gatewayUrl, "AggGatewayURLConnection");
+         //      GenericExceptionLog.exceptionJava(e, "Exception Occured in :: urlConnection() for "+gatewayUrl, "AggGatewayURLConnection");
 
         } catch (ProtocolException e) {
 
@@ -379,8 +394,7 @@ public class SBIServiceImpl implements SBIService {
 	
 	// save transaction in payment
 	@Override
-	public void savePayment(String[] data ) throws ParseException {
-		
+	public Student savePayment(String[] data,String dvstatus ,String statusdecription)  	{
 		
 	   	
     	  //** DV response structure 
@@ -402,7 +416,8 @@ public class SBIServiceImpl implements SBIService {
 	   	  String Other_Details="";
 	   	  String MerchantOrderNumber="";
 	   	  String Amount="";
-	   	  String Status_Description="";
+	   	  String Category="";
+	  
 	   	  String BankCode="";
 	   	  String Bank_Reference_Number="";
 	   	  String Transaction_Date="";
@@ -411,11 +426,17 @@ public class SBIServiceImpl implements SBIService {
 	   	  String Total_Fee_GST="";
 	   	  String Reason="";
 	   	  String Merchant_ID="";
-	   	  Double amt=0.0;
+	   	  Double trxamt=0.0;
+	   	  Double gstamt=0.0;
+	   	  String rollno="";
+	   	  String enrollno="";
+	   	  String reftype="";
+	   	  String insertstatus ="success";
+	   	  Student student=null;
 	   	  
-	   	 
+	   	 try {
 	   	  
-	   	  //Extract Data for Browser response
+	   	  //Extract Data from Browser response
 	   
 	   		MerchantOrderNumber =data[0];  
 	   		ATRN = data[1];
@@ -423,7 +444,7 @@ public class SBIServiceImpl implements SBIService {
 	   		Amount = data[3];
 	   		Currency = data[4];
 	   		Pay_Mode=data[5];
-	   		Other_Details=data[6];
+	   		
 	   		Reason = data[7];
 	   		BankCode=data[8];
 	   		Bank_Reference_Number=data[9];
@@ -432,69 +453,161 @@ public class SBIServiceImpl implements SBIService {
 	   		CIN=data[12];
 	   		Merchant_ID=data[13];
 	   		Total_Fee_GST=data[14];
-	   		   	  
-	   	  
+	   		
+	   		Other_Details=data[6];
+	   		
+	   	
+	   		
+	   		
+	   		// Get ref number and ref type from other detail
+	   		
+	   	 String OtherDetails_data[]= Other_Details.split("\\,");  
+	   	 
+	   //* otherdetail structure 
+
+	    	// category[0]-rollnumber[1]-studentname[2]-programname[3]-reftype[4]-semesterstartdate[5]-semesterenddate[6]
+	    	//-latefee[7]-entityid[8]-programid[9]-pendingsemester[10]-feepending[11]-feetype[12]
+	   	
+	   	Category=OtherDetails_data[0];
+	   	 student = new Student();
+	   	if (Category.equalsIgnoreCase("CER"))
+	   		student= otherdetailforcertificate(student, OtherDetails_data);
+	   	
+	   	if (Category.equalsIgnoreCase("CON")||Category.equalsIgnoreCase("newadm")|| Category.equalsIgnoreCase("appfee"))
+	   		student= otherdetailforcontinue(student, OtherDetails_data);
+	   	
+	   	student.setATRN(ATRN);
+	   	student.setMerchantorderno(MerchantOrderNumber);
+	   	student.setCategory(Category);
+	   	 
+	   	 reftype =student.getReftype();
+	   	 rollno = student.getRoll_number();
+	   	 enrollno=student.getEnrolno();
+	   	
+	   	payment =findPaymentByATRN(student.getATRN());
+		if (payment==null)
+			payment = findPaymentByMerchantorderno(student.getMerchantorderno());
+		if (payment==null) {
+			payment = new Payment();	
+			
+		}
+	   	 
+	   	 
+	   	 //***************************
+	   	  payment.setCategory(Category);
 	   	  payment.setMerchantorderno(MerchantOrderNumber);
     	  payment.setATRN(ATRN);
     	  payment.setTransaction_status(Transaction_Status);
     	  
     	  if(isNumeric(Amount)) {
-    		  amt =Double.parseDouble(Amount); 
-    		  payment.setAmount(BigDecimal.valueOf(amt));
+    		  trxamt =Double.parseDouble(Amount); 
+    		  payment.setAmount(BigDecimal.valueOf(trxamt));
     	  }else {
-    		  
+    		  trxamt=0.0;
     	  }
-    	     	 
+    	    
+    	  student.setAmount(trxamt.floatValue());
     	  payment.setCurrency(Currency);
     	  payment.setPayment_mode(Pay_Mode);
     	  payment.setOtherdetail(Other_Details);
     	  payment.setReason(Reason);
     	  payment.setBank_code(BankCode);
     	  payment.setBank_Reference_Number(Bank_Reference_Number);
-    	  
-    	  
-    	  try {
-    		    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-    		    Date parsedDate = dateFormat.parse(Transaction_Date);
-    		 		    
-    		    
-    		    Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-    		    payment.setTransaction_date(timestamp);
-    		    
-    		  
-    		} catch(Exception e) { //this generic but you can control another types of exception
-    		    // look the origin of excption 
-    		}
+    	  Timestamp timestamp = new Timestamp(0);
+    	  SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     	  
     	 
-    	
-    	
-    	
-    	  LocalDateTime now = LocalDateTime.now();  
+    		   
+    		    Date parsedDate = formatter.parse(Transaction_Date);
+    		     timestamp =new java.sql.Timestamp(parsedDate.getTime());    
+    		    
+    		   
+    		    payment.setTransaction_date(timestamp);
+    		    
+    	    	
+    		    timestamp = new Timestamp(System.currentTimeMillis());;
+    	  
 
-    	  payment.setInsert_time(now);
+    	  payment.setInsert_time(timestamp);
     	  payment.setCountry(Country);
     	  payment.setCIN(CIN);
     	  payment.setMerchant_ID(Merchant_ID);
+    	  payment.setDv_status(dvstatus);
+    	  payment.setStatusdescription(statusdecription);
+    	  if (student.getReftype().contentEquals("E")) {
+    		  payment.setRefnumber(enrollno);
+    	  }else {
+    		  payment.setRefnumber(rollno);
+    	  }
+    	  
+    	  payment.setType(reftype);
+    	  
+    	  
     	  if(isNumeric(Total_Fee_GST)) {
-    		  amt =Double.parseDouble(Total_Fee_GST); 
-    		  payment.setTotal_Fee_GST(BigDecimal.valueOf(amt)); 
+    		  gstamt =Double.parseDouble(Total_Fee_GST); 
+    		  payment.setTotal_Fee_GST(BigDecimal.valueOf(gstamt)); 
     	  }else {
     		  
     	  }
     		  
     	 
+     		  thepaymentrepository.save(payment);
+     		  student.setPayment(payment);
+     		  
+
+    		  
+    		  // if transaction is not successful make an entry into pending payments
+    		  // So that later on double verification can update Payment status based on pending payments 
+    		  if (!(dvstatus.equalsIgnoreCase("Success"))) {
+    			  
+    			  PendingPayment pendingPayment = new PendingPayment();
+    			  pendingPayment.setATRN(ATRN);
+    			  pendingPayment.setAmount(BigDecimal.valueOf(trxamt));
+    			  pendingPayment.setMerchant_Order_Number(MerchantOrderNumber);
+    			  pendingPayment.setTrx_status(dvstatus);
+    			  
+    			  Date  currentdate =  new Date();
+    			       timestamp = new Timestamp(currentdate.getTime());
+
+    			  
+    			  pendingPayment.setInsert_time(timestamp);
+    			  pendingPayment.setCreated_by("SBIService");
+    		   		  
+	    		  pendingPayment.setPayment(payment);
+	    		  thePendingPaymentRepository.save(pendingPayment);
+    		  
+    		  
+    		  }else {
+    			  
+    		
+    			  
+    			  
+    		  }
+	
+    		  
+    	  }catch(DataException e) {
+    		  logerror(ATRN, MerchantOrderNumber, String.valueOf(trxamt) , e.getMessage(),"savePayment");
+    			insertstatus="error";
+    		  
+    	  }
+	   	 
+	   	 
+	   	 catch(Exception e) { //this generic but you can control another types of exception
+  		    // look the origin of excption 
+  			
+  			
+  			logerror(ATRN, MerchantOrderNumber, String.valueOf(trxamt) , e.getMessage(),"savePayment");
+  			insertstatus="error";
+  			
+  		}
     	  
-    	
-    	  
-    	    	  
-    	  
-    	 
-       	  thepaymentrepository.save(payment);
-			
+    	 student.setMessage(insertstatus);  
+	   	 return student;
 	}
 	
-	public static boolean isNumeric(String strNum) {
+	
+	@Override
+	public boolean isNumeric(String strNum) {
 	    if (strNum == null) {
 	        return false;
 	    }
@@ -504,6 +617,25 @@ public class SBIServiceImpl implements SBIService {
 	        return false;
 	    }
 	    return true;
+	}
+
+
+
+
+
+
+
+	@Override
+	public Payment findPaymentByATRN(String ATRN) {
+		return thepaymentrepository.findByATRN(ATRN);
+		
+	}
+
+	@Override
+	public Payment findPaymentByMerchantorderno(String merchantorder) {
+		
+			return thepaymentrepository.findByMerchantorderno(merchantorder);
+		
 	}
 
 
@@ -520,78 +652,339 @@ public class SBIServiceImpl implements SBIService {
 //-latefee[7]-entityid[8]-programid[9]-pendingsemester[10]-feepending[11]
 
 
+  @Override
+  public void logerror(String ATRN,String MerchantOrderNumber ,String trxamt,String message,String method) {
+	  
+	  Epayerrorlog  error =null;
+	  error= theEpayExceptionRepository.findByMerchantOrderNumber(MerchantOrderNumber);
+	    if (error == null)
+	    	  error = new Epayerrorlog();
+	    error.setATRN(ATRN);
+		error.setMerchantOrderNumber(MerchantOrderNumber);
+		error.setCreated_by(method);
+		Date now = new Date();
+		  			
+		error.setInsert_time(now);
+		error.setAmount(trxamt);
+		error.setError(message);
+		
+		
+		
+		theEpayExceptionRepository.save(error);
+  }
 
 
-@Override
-public void savestudentfee(String[] data) throws Exception {
-	// TODO Auto-generated method stub
-	
-	Studentfeereceipt sfr = new Studentfeereceipt();
-	String OtherDetails = data[5];
-	
-	String resdata[]= OtherDetails.split("\\-");
-	String refno ="";
-	String reftype ="";
-	int paymentid;
-	String Semester_code="";
-	String entityid ="";
-	String Programid = "";
-	String ssd="";
-	String sed="";
-	String amt="";
-	String latefee="";
-	String ATRN="";
-	String merchantorder="";
-	
-	// extract data from dv data
-	amt=data[7];
-	ATRN=data[1];
-	merchantorder=data[6];
-	
-	// extract student details from  other details of dv data
-	
-	refno = resdata[1];
-	reftype = resdata[4];
-	Semester_code=resdata[10];
-	entityid=resdata[10];
-	Programid=resdata[9];
-	ssd=resdata[5];
-	sed=resdata[6];
-	latefee=resdata[7];
-	
-	Payment payment = thepaymentrepository.findByATRN(Semester_code);
-	if (payment!=null)
-		paymentid=payment.getId();
-	else {
-		payment = thepaymentrepository.findByMerchantorderno(merchantorder);
+  @Override
+   public Student ParseDVResponse(String[] data) {
+	   
+	  
+		  
+	  
+	  Student student = new Student();	
 		
-		if (payment!=null)
-			paymentid=payment.getId();
-		else
-			throw new Exception("Record not found in Payment table for student"+OtherDetails);
-	}
-	
-	sfr.setProgramid(Programid);
-	sfr.setRollnumber(refno);
-	sfr.setReftype(reftype);
-	sfr.setSemester(Semester_code);
-	sfr.setPayment(payment);
-	
-	Date  now =  new Date();
-	Timestamp timestamp = new Timestamp(now.getTime());
+			
+		
+		String amt="";
+		
+		String ATRN="";
+		String merchantorder="";
+		String category="";
+		
+		Float amount=0.0f;
+		try {
+			
+			
+		//*********************** extract data from dv data**************************
+		amt=data[7];
+		ATRN=data[1];
+		if (isNumeric(amt)) {
+			amount = Float.parseFloat(amt);
 
-	sfr.setInsert_time(timestamp);
-	
-	
-	theFeereceiptRepository.save(sfr);
-	
+		}
+		
+		merchantorder=data[6];
+		String OtherDetails = data[5];
+		student.setATRN(ATRN);
+		student.setMerchantorderno(merchantorder);
+		student.setAmount(amount);
+		
+		//****************************************************************************
+		
+		// extract student details from  other details of dv data
 		
 		
-	 
+		String resdata[]= OtherDetails.split("\\,");
+		category=resdata[0];
+		student.setCategory(category);
 		
-	
+		if (
+				student.getCategory().equalsIgnoreCase("CON")||
+				student.getCategory().equalsIgnoreCase("newadm")||
+				student.getCategory().equalsIgnoreCase("appfee")
+				) {
+			
+			student=	otherdetailforcontinue(student, resdata);
+		}
+		
+		if (
+				student.getCategory().equalsIgnoreCase("CER")
+				
+				) {
+			
+			student=	otherdetailforcertificate(student, resdata);
+		}
+		
+		
+		}
+		
+		catch(Exception e) {
+			student.setStatus("error");
+			
+			student.setMessage(e.getMessage());
+			System.out.println(e.getMessage());
+			
+		}
+   
+  
+        return student;  
+
+
+
 }
 
+
+
+  /***************************** otherdetail structure  for Certificates  category  ***************************
+
+	// category[0]-rollno[1]-enrolno[2]-studentname[3]-programname[4]-reftype[5]-address[6]-pincode[7]
+	//phone[8]-mode[9]-programid[10]-semester[11]-certificateType[12]
+	 * 
+	 *
+	 *  this.category 
++this.coma+this.rollnumber
++this.coma+this.enrolno
++this.coma+this.studentname
++this.coma+this.programname
++this.coma+this.rectype
++this.coma+this.address
++this.coma+this.pincode 
++this.coma+this.phone
++this.coma+this.mode
++this.coma+this.programid
++this.coma+this.semester
++this.coma+this.certificatetype
+/
+
+	/********************************************************************************************************/ 
+
+
+
+  private Student otherdetailforcertificate(Student student, String[] resdata) {
+	
+	 
+		String rollnumber ="";
+        String enrolno ="";
+		String studentname="";
+		String programname ="";
+		String rectype = "";
+		String address="";
+		String pincode="";
+		
+		String phone="";
+		String mode="";
+		String programid="";
+		String semester ="";
+		String certificatetype ="";
+		
+
+		try {
+			
+				
+				rollnumber = resdata[1];
+				enrolno = resdata[2];
+				studentname=resdata[3];
+				programname=resdata[4];
+				rectype=resdata[5];
+				address=resdata[6];
+				pincode=resdata[7];
+				phone=resdata[8];
+				mode=resdata[9];
+				programid=resdata[10];
+				semester=resdata[11];
+				certificatetype=resdata[12];
+				
+//				Payment payment =findPaymentByATRN(student.getATRN());
+//				if (payment==null)
+//					payment = findPaymentByMerchantorderno(student.getMerchantorderno());
+//				if (payment==null) {
+//						
+//					throw new Exception("Payment record not found");
+//				}
+					
+					
+					 
+				
+			 	student.setRoll_number(rollnumber);
+			 	student.setEnrolno(enrolno);
+			 	student.setStudentname(studentname);
+			 	student.setProgramname(programname);
+			 	student.setReftype(rectype);
+			 	student.setAddress(address);
+			 	student.setPincode(pincode);
+			 	student.setPhone(phone);
+			 	student.setMode(mode);
+			 	student.setProgramid(programid);
+			 	student.setSemestercode(semester);
+			 	student.setCertificatetype(certificatetype);
+			 	
+			 	//student.setPayment(payment);
+			 	
+			 		        
+		        
+		        student.setStatus("success");
+		        
+		      
+			
+			
+		}
+		
+		catch(Exception e) {
+			student.setStatus("error");
+			
+			student.setMessage(e.getMessage());
+			e.printStackTrace();
+		}
+		
+		  return student;
+		
+
+	}
+
+	  
+
+
+
+
+
+
+
+
+/***************************** otherdetail structure  for continue and new admission fee category con,new adm***************************
+
+	// category[0]-rollnumber[1]-studentname[2]-programname[3]-reftype[4]-semesterstartdate[5]-semesterenddate[6]
+	//-latefee[7]-entityid[8]-programid[9]-pendingsemester[10]-feepending[11]-feetype[12]
+	 * 
+	 * 
+	 * this.category 
+       +this.coma+this.rollnumber
+       +this.coma+this.studentname
+       +this.coma+this.programname
+       +this.coma+this.rectype
+       +this.coma+this.semesterstartdate
+       +this.coma+this.semesterenddate 
+       +this.coma+this.latefee
+       +this.coma+this.entityid
+       +this.coma+this.programid
+       +this.coma+this.semester
+       +this.coma+this.feepending
+       +this.coma+this.feetype);
+	 */
+
+	/********************************************************************************************************/ 
+	  
+	 
+
+private Student otherdetailforcontinue(Student student, String[] resdata) throws Exception {
+	
+	String rollnumber ="";
+	String studentname="";
+	String programname="";
+	String reftype ="";
+	Date semstartdate=null;
+	Date semenddate=null;
+	String latefee="";
+	String entityid ="";
+	String Programid = "";
+	String semester="";
+	String feepending="";
+	String feetype="";
+	
+	String ssd="";
+	String sed="";
+	
+	
+	
+	Float latefeeamt=0.0f;
+	
+
+	try {
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			rollnumber = resdata[1];
+			studentname=resdata[2];
+			programname=resdata[3];
+			reftype = resdata[4];
+			 semstartdate=dateFormat.parse(resdata[5]);
+			 semenddate=dateFormat.parse(resdata[6]);
+			 latefee=resdata[7];
+			
+			entityid=resdata[8];
+			Programid=resdata[9];
+			semester=resdata[10];
+			feepending=resdata[11];
+			
+			feetype=resdata[12];
+			
+			
+				
+			
+				 if ( isNumeric(latefee)) {
+				 	 latefeeamt=      Float.parseFloat(latefee);
+					 
+			 }
+			
+		 	student.setApplicationnumber(rollnumber);
+		 	student.setRoll_number(rollnumber);
+		 	student.setStudentname(studentname);
+		 	student.setProgramname(programname);
+		 	student.setReftype(reftype);
+		 	student.setSemesterstartdate(semstartdate);
+		 	student.setSemesterenddate(semenddate);
+		 	student.setLatefee(latefeeamt);
+		 	student.setEntityid(entityid);
+		 	
+	        student.setProgramid(Programid);
+	        student.setSemestercode(semester);
+	        student.setFeepending(feepending);
+	        student.setFeetype(feetype);
+	       
+	        
+	        
+	    
+	        student.setStatus("success");
+	        
+	      
+		
+		
+	} catch (ParseException e) {
+		student.setStatus("error");
+		
+		student.setMessage(e.getMessage());
+		e.printStackTrace();
+	}
+	
+	catch(Exception e) {
+		student.setStatus("error");
+		
+		student.setMessage(e.getMessage());
+		e.printStackTrace();
+	}
+	
+	  return student;
+	
+
+}
+  
 }
 
 

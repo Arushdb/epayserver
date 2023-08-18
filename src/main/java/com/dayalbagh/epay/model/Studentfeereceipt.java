@@ -38,7 +38,7 @@ public class Studentfeereceipt {
 	@JoinColumn(name = "payment_id", referencedColumnName = "id")
 	private Payment payment;
 
-	private String remarks;
+	
 	@Column(name = "program_id")
 	private String programid;
 
@@ -49,6 +49,15 @@ public class Studentfeereceipt {
 	private Date insert_time;
 	
 	private String reftype ;
+	
+	@Column(name = "entity_id")
+	private String entityid ;
+	
+	private java.math.BigDecimal  amount ;
+	
+	private java.math.BigDecimal  latefee ;
+	
+	private String feetype;
 
 	public Studentfeereceipt() {
 
@@ -90,13 +99,7 @@ public class Studentfeereceipt {
 		this.payment = payment;
 	}
 
-	public String getRemarks() {
-		return remarks;
-	}
-
-	public void setRemarks(String remarks) {
-		this.remarks = remarks;
-	}
+	
 
 	
 
@@ -131,5 +134,39 @@ public class Studentfeereceipt {
 	public void setReftype(String reftype) {
 		this.reftype = reftype;
 	}
+
+	public String getEntityid() {
+		return entityid;
+	}
+
+	public java.math.BigDecimal getAmount() {
+		return amount;
+	}
+
+	public java.math.BigDecimal getLatefee() {
+		return latefee;
+	}
+
+	public void setEntityid(String entityid) {
+		this.entityid = entityid;
+	}
+
+	public void setAmount(java.math.BigDecimal amount) {
+		this.amount = amount;
+	}
+
+	public void setLatefee(java.math.BigDecimal latefee) {
+		this.latefee = latefee;
+	}
+
+	public String getFeetype() {
+		return feetype;
+	}
+
+	public void setFeetype(String feetype) {
+		this.feetype = feetype;
+	}
+	
+	
 
 }
