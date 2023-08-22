@@ -193,8 +193,11 @@ public class CertificateServiceImpl implements CertificateService {
 		Certificatesemester cerobj=null;
 		Certificate cresem = null;
 		try {
+			int paymentid =student.getPayment().getId();
+			Certificate certificate=  theCertificateRepository.findByPayment_id(paymentid);
+			if(certificate==null)
+			   certificate = new Certificate();
 			
-			  Certificate certificate = new Certificate();
 			  certificate.setAddress(student.getAddress());
 			  certificate.setMode(student.getMode());
 			  certificate.setPhone(student.getPhone());
@@ -224,7 +227,12 @@ public class CertificateServiceImpl implements CertificateService {
 				 String resdata[]= str.split("\\:");
 				 
 				  for(String sem:resdata) {
+					 
+					cerobj=  theCertificateSemesterRepository.findByCertificateAndSemester(certificate,sem);
+					  
+					  if(cerobj==null) 
 					  cerobj = new Certificatesemester();
+					  
 					  cerobj.setSemester(sem);
 					  cerobj.setCertificate(certificate);
 					  theCertificateSemesterRepository.save(cerobj);

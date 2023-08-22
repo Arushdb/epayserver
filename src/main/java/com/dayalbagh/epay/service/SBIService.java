@@ -33,7 +33,7 @@ public interface SBIService {
 	Payment findPaymentByATRN(String ATRN);
 	Payment findPaymentByMerchantorderno(String ATRN);
 
-	Student savePayment(String[] data, String dvstatus, String statusdecription) ;
+	Student savePayment(String[] data, String dvstatus, String statusdecription, String method) ;
 
 
 

@@ -195,6 +195,13 @@ public class Certificate {
 	public void setCertificatesemester(List<Certificatesemester> certificatesemester) {
 		this.certificatesemester = certificatesemester;
 	}
+
+
+
+
+	public int getId() {
+		return id;
+	}
 	
 	
 

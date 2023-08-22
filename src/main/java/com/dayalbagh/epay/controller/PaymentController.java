@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -16,11 +18,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.dayalbagh.epay.AES256Bit;
 import com.dayalbagh.epay.model.Payment;
@@ -82,14 +92,18 @@ public class PaymentController {
 	 @PostMapping("/paymentsuccess")
 	 public String Paymentsuccess(@ModelAttribute("encData") String encData,
 			 @ModelAttribute("merchIdVal") String merchIdVal,
-			 @ModelAttribute("Bank_Code") String Bank_Code,Model model) 
+			 @ModelAttribute("Bank_Code") String Bank_Code,
+			 @ModelAttribute("method") String method,
+			 Model model) 
 	 
 	 {
 		 
 		
+		 if(method.equalsIgnoreCase(""))
+			 method="browserResponse";
 		 Studentfeereceipt feereceipt =new Studentfeereceipt();
 		 
-		 System.out.println("encData :"+encData);
+		 System.out.println("encData :"+method+encData);
 		
 				 
 		 //String str1 = request.getAttribute("encData").toString();
@@ -114,32 +128,19 @@ public class PaymentController {
 	      
 	      // Save Browser response and dvstatus 
 	     
-		Student student=	sbiservice.savePayment(resdata,trxstatus,statusdesc);
+		Student student=	sbiservice.savePayment(resdata,trxstatus,statusdesc,method);
+		student.setMethod(method);
 		// check if writing into  payment table is error	     
 		if (student.getMessage().equalsIgnoreCase("error")) {
 			   return "payment_failure";
 	    	  
 	      }
 	        
-	   
-	      
-	      //** DV response structure 
-//		  Merchant ID|SBIePayRefID/ATRN|Transaction Status|Country|
-	//  Currency|Other Details|MerchantOrderNumber|Amount|Status Description|
-//		  BankCode|Bank Reference Number|Transaction Date|Pay Mode|CIN|
-//		  Merchant ID|Total Fee GST|Ref1|Ref2|Ref3|Ref4|Ref5|Ref6|Ref7|Ref8|Ref9| Ref10
-	      
-//	      String OtherDetails = dvdata_ary[5];
-//	      
-//	      String OtherDetails_data[]= OtherDetails.split("\\,");
-	      
-	      // if data is verified  store in relevent table
-	      if (student.getMessage().equalsIgnoreCase("Success")) {
+	   // if double verification is success;
+	
+	      if (trxstatus.equalsIgnoreCase("Success")) {
 	    	  
-	    	//* otherdetail structure for Student FEE
-
-	    	// category[0]-rollnumber[1]-studentname[2]-programname[3]-reftype[4]-semesterstartdate[5]-semesterenddate[6]
-	    	//-latefee[7]-entityid[8]-programid[9]-pendingsemester[10]-feepending[11]
+	    
   
 	    	  String category = student.getCategory();
 	    	  if (category.equalsIgnoreCase("CON") ||category.equalsIgnoreCase("newadm") ) {
@@ -151,7 +152,7 @@ public class PaymentController {
 	    	  // For Application Fee
 	    	  
 	    	  if (category.equalsIgnoreCase("appfee")  ) {
-	    		  String studentfeestatus = studentservice.saveStudentAppfee(dvdata_ary); 
+	    		  String studentfeestatus = studentservice.saveStudentAppfee(student); 
 	    		  if (studentfeestatus.equalsIgnoreCase("error"))
 	    			  return "payment_failure";
 	    	  } 
@@ -182,6 +183,27 @@ public class PaymentController {
 	 }
 	 
 	 @PostMapping("/pushpayment")
+	  public ModelAndView redirecttoPaymentSuccess(HttpServletRequest request,
+			 @ModelAttribute("pushRespData") String encData,
+	 		@ModelAttribute("merchIdVal") String merchIdVal,
+	 		@ModelAttribute("Bank_Code") String Bank_Code,Model model,
+	 		RedirectAttributes redirectAttributes
+			 )
+	 
+	 {
+		 
+		 request.setAttribute(
+			      View.RESPONSE_STATUS_ATTRIBUTE, HttpStatus.TEMPORARY_REDIRECT);
+		 redirectAttributes.addAttribute("encData", encData);
+		 redirectAttributes.addAttribute("merchIdVal", merchIdVal);
+		 redirectAttributes.addAttribute("Bank_Code", Bank_Code);
+		 redirectAttributes.addAttribute("method", "pushresponse");
+	     
+		 return new ModelAndView("redirect:/paymentsuccess");
+	 }
+	 
+	 
+	// @PostMapping("/pushpayment")
 	 public String pushpayment(@ModelAttribute("pushRespData") String encData,
 			 @ModelAttribute("merchIdVal") String merchIdVal,
 			 @ModelAttribute("Bank_Code") String Bank_Code,Model model) {

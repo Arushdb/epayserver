@@ -394,7 +394,7 @@ public class SBIServiceImpl implements SBIService {
 	
 	// save transaction in payment
 	@Override
-	public Student savePayment(String[] data,String dvstatus ,String statusdecription)  	{
+	public Student savePayment(String[] data,String dvstatus ,String statusdecription,String method)  	{
 		
 	   	
     	  //** DV response structure 
@@ -483,14 +483,24 @@ public class SBIServiceImpl implements SBIService {
 	   	 reftype =student.getReftype();
 	   	 rollno = student.getRoll_number();
 	   	 enrollno=student.getEnrolno();
-	   	
+	   	Timestamp timestamp = new Timestamp(0);
 	   	payment =findPaymentByATRN(student.getATRN());
-		if (payment==null)
-			payment = findPaymentByMerchantorderno(student.getMerchantorderno());
 		if (payment==null) {
-			payment = new Payment();	
 			
+				payment = new Payment();
+				payment.setCreatedby(method);
+				 timestamp = new Timestamp(System.currentTimeMillis());;
+		    	 payment.setInsert_time(timestamp);
+
+				
+			
+		}else {
+			
+			payment.setModifiedby(method);
+			timestamp = new Timestamp(System.currentTimeMillis());;
+	    	 payment.setModification_time(timestamp);
 		}
+			
 	   	 
 	   	 
 	   	 //***************************
@@ -513,7 +523,8 @@ public class SBIServiceImpl implements SBIService {
     	  payment.setReason(Reason);
     	  payment.setBank_code(BankCode);
     	  payment.setBank_Reference_Number(Bank_Reference_Number);
-    	  Timestamp timestamp = new Timestamp(0);
+    	  
+    	  
     	  SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     	  
     	 
@@ -525,11 +536,7 @@ public class SBIServiceImpl implements SBIService {
     		    payment.setTransaction_date(timestamp);
     		    
     	    	
-    		    timestamp = new Timestamp(System.currentTimeMillis());;
-    	  
-
-    	  payment.setInsert_time(timestamp);
-    	  payment.setCountry(Country);
+    	    	  payment.setCountry(Country);
     	  payment.setCIN(CIN);
     	  payment.setMerchant_ID(Merchant_ID);
     	  payment.setDv_status(dvstatus);
@@ -900,8 +907,8 @@ private Student otherdetailforcontinue(Student student, String[] resdata) throws
 	String studentname="";
 	String programname="";
 	String reftype ="";
-	Date semstartdate=null;
-	Date semenddate=null;
+	Date semstartdate=new Date();
+	Date semenddate=new Date();
 	String latefee="";
 	String entityid ="";
 	String Programid = "";
@@ -924,8 +931,13 @@ private Student otherdetailforcontinue(Student student, String[] resdata) throws
 			studentname=resdata[2];
 			programname=resdata[3];
 			reftype = resdata[4];
-			 semstartdate=dateFormat.parse(resdata[5]);
-			 semenddate=dateFormat.parse(resdata[6]);
+			
+			if (isValidDate(resdata[5]))
+			  semstartdate=dateFormat.parse(resdata[5]);
+			
+			if (isValidDate(resdata[6]))
+				  semstartdate=dateFormat.parse(resdata[6]);
+			 
 			 latefee=resdata[7];
 			
 			entityid=resdata[8];
@@ -983,6 +995,17 @@ private Student otherdetailforcontinue(Student student, String[] resdata) throws
 	  return student;
 	
 
+}
+
+public static boolean isValidDate(String inDate) {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    dateFormat.setLenient(false);
+    try {
+        dateFormat.parse(inDate.trim());
+    } catch (ParseException pe) {
+        return false;
+    }
+    return true;
 }
   
 }

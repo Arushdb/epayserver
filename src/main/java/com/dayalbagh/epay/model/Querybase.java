@@ -134,13 +134,13 @@ import javax.persistence.SqlResultSetMappings;
 				),
 
 		@NamedNativeQuery(name = "getapplicantdetail", query = " select  first_name as studentname ,apr.application_number as applicationnumber ,"
-				+ " cast(expected_fee as decimal)  as appfee  from admissionform_live.student_application_status sas "
+				+ " cast(expected_fee as decimal)  as appfee,verification_status as message  from admissionform_live.student_application_status sas "
 				+ " join admissionform_live.applicant_program_registration apr "
 				+ " on apr.application_number= sas.application_number "
 				+ " join admissionform_live.program_form pf on pf.program_id = apr.program_id "
 				+ " join admissionform_live.entity_student es on es.application_number=apr.application_number "
 
-				+ " where application_status='D' "
+				+ " where application_status='D'  "
 				+ " and sas.application_number=:appno and available= 'Y'  and curdate()<= close_date  and sas.session_start_date =:sessionstartdate "
 				+ " group by form_number ", resultSetMapping = "applicantdetail"),
 		
@@ -153,11 +153,13 @@ import javax.persistence.SqlResultSetMappings;
 				+ " and sas.application_number=:appno "
 				+ " where application_status='D' and curdate() <= date_add(close_date,interval 5 month)"
 				+ "  group by form_number " ,resultSetMapping = "applicantdetail"),
+		
 		@NamedNativeQuery(name="updatestudentappfee",
-		query = " 	update student_application_status set  actual_deposited_fee=:amount,"
-				+ "	fee_verification_time=now(),fee_verified_by=:method ,verification_status='rec "
-				+ "      where application_number=:appno "
-				+ "      and session_start_date =:ssd  "
+		query = " 	update admissionform_live.student_application_status set  actual_deposited_fee=?,"
+				+ "	fee_verification_time=now(),fee_verified_by=? ,verification_status='rec' ,"
+				+ " ATRN=?,merchant_order_number=? "
+				+ "      where application_number=?"
+				+ "      and session_start_date =?"
 				)
 				
 }
@@ -195,8 +197,8 @@ import javax.persistence.SqlResultSetMappings;
 		@SqlResultSetMapping(name = "applicantdetail", classes = {
 				@ConstructorResult(targetClass = Student.class, columns = { @ColumnResult(name = "studentname"),
 
-						@ColumnResult(name = "applicationnumber"), @ColumnResult(name = "appfee")
-
+						@ColumnResult(name = "applicationnumber"), @ColumnResult(name = "appfee"),
+						@ColumnResult(name = "message")
 				}
 
 				) }),

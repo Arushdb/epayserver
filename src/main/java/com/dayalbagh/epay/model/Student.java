@@ -76,6 +76,7 @@ public class Student {
 	private String address;
 	private String pincode;
 	private String phone;
+	private String method; // push response or browser response
 	
 	public Student() {
 		
@@ -144,11 +145,12 @@ public class Student {
 	
 	
 
-	public Student(String studentname, String applicationnumber, java.math.BigDecimal appfee) {
+	public Student(String studentname, String applicationnumber, java.math.BigDecimal appfee,String message) {
 		
 		this.studentname = studentname;
 		this.applicationnumber = applicationnumber;
 		this.appfee = appfee;
+		this.message = message;
 		
 	}
 	
@@ -345,6 +347,12 @@ public class Student {
 	}
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+	public String getMethod() {
+		return method;
+	}
+	public void setMethod(String method) {
+		this.method = method;
 	}
 	
 	

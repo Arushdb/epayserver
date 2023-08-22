@@ -59,6 +59,7 @@ public class Payment {
 	private String transaction_status;
 	private String currency;
 	private String Category;
+	private String createdby;
 	
 	@Column(name="status_description")
 	private String statusdescription;
@@ -77,6 +78,8 @@ public class Payment {
 	@Column(name = "modification_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date modification_time;
+	
+	private String modifiedby;
 	
 	
 	
@@ -313,6 +316,22 @@ public class Payment {
 
 	public void setCategory(String category) {
 		Category = category;
+	}
+
+	public String getCreatedby() {
+		return createdby;
+	}
+
+	public void setCreatedby(String createdby) {
+		this.createdby = createdby;
+	}
+
+	public String getModifiedby() {
+		return modifiedby;
+	}
+
+	public void setModifiedby(String modifiedby) {
+		this.modifiedby = modifiedby;
 	}
 	
 	

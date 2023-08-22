@@ -232,8 +232,12 @@ public class StudentController {
 		
 		theapplicant = studentservice.getapplicantdetail(appno);
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		if(theapplicant.size()>0)  
-		return gson.toJson(theapplicant);
+		if(theapplicant.size()>0) {
+			if (theapplicant.get(0).getMessage().equalsIgnoreCase("rec"))
+				throw new Exception("Fees Already Paid");
+			return gson.toJson(theapplicant);
+		}
+		
 		throw new Exception("E payment not available");
 		
 	}
@@ -244,6 +248,7 @@ public class StudentController {
 		List<Student> theapplicant  = new ArrayList<>();
 		
 		theapplicant.add(studentservice.getadmissiondetail(appno));
+		
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		if(theapplicant.size()>0 && theapplicant.get(0).getAmount()>0)  
 		return gson.toJson(theapplicant);

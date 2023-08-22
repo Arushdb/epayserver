@@ -60,6 +60,7 @@ public class Admfeedates {
 	private String learningmode;
 	
 	private String entityid;
+	private String feestatus;
 
 	
 	public Admfeedates() {
@@ -232,6 +233,18 @@ public class Admfeedates {
 
 	public void setEntityid(String entityid) {
 		this.entityid = entityid;
+	}
+
+
+
+	public String getFeestatus() {
+		return feestatus;
+	}
+
+
+
+	public void setFeestatus(String feestatus) {
+		this.feestatus = feestatus;
 	}
 
 

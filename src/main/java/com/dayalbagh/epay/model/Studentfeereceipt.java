@@ -48,6 +48,10 @@ public class Studentfeereceipt {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date insert_time;
 	
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date modification_time;
+	
 	private String reftype ;
 	
 	@Column(name = "entity_id")
@@ -58,6 +62,10 @@ public class Studentfeereceipt {
 	private java.math.BigDecimal  latefee ;
 	
 	private String feetype;
+	
+	private String createdby;
+	
+	private String modifiedby;
 
 	public Studentfeereceipt() {
 
@@ -165,6 +173,30 @@ public class Studentfeereceipt {
 
 	public void setFeetype(String feetype) {
 		this.feetype = feetype;
+	}
+
+	public Date getModification_time() {
+		return modification_time;
+	}
+
+	public String getCreatedby() {
+		return createdby;
+	}
+
+	public String getModifiedby() {
+		return modifiedby;
+	}
+
+	public void setModification_time(Date modification_time) {
+		this.modification_time = modification_time;
+	}
+
+	public void setCreatedby(String createdby) {
+		this.createdby = createdby;
+	}
+
+	public void setModifiedby(String modifiedby) {
+		this.modifiedby = modifiedby;
 	}
 	
 	

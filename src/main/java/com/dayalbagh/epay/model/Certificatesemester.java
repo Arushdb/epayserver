@@ -26,12 +26,14 @@ public class Certificatesemester {
 	private String semester;
 	
 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH })
-	@JoinColumn(name ="certificateid" ,nullable =false )
+	@JoinColumn(name ="certificateid" ,nullable =false,referencedColumnName = "id" )
 	private Certificate certificate;
 		
 	public Certificatesemester() {
 	
 	}
+	
+	
 
 	public String getSemester() {
 		return semester;
@@ -48,6 +50,8 @@ public class Certificatesemester {
 	public void setCertificate(Certificate certificate) {
 		this.certificate = certificate;
 	}
+
+	
 		
 	
 	

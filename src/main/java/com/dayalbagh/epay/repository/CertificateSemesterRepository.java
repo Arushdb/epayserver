@@ -13,7 +13,7 @@ import com.dayalbagh.epay.model.Studentfeereceipt;
 @Repository
 public interface CertificateSemesterRepository extends JpaRepository<Certificatesemester, Integer> {
 
-	
+	Certificatesemester findByCertificateAndSemester(Certificate cer,String sem);
 	
 	
 }

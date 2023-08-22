@@ -44,9 +44,11 @@ public interface StudentService {
 
 	
 
-	String saveStudentAppfee(String[] dvdata_ary);
+	String saveStudentAppfee(Student student);
 
 	String savestudentfee(Student student);
+
+	
 	
 	
 		

@@ -18,11 +18,13 @@ import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dayalbagh.epay.exception.ResourceNotFoundException;
 import com.dayalbagh.epay.model.Admfeedates;
@@ -353,6 +355,8 @@ public class StudentServiceImpl implements StudentService {
 			Date date1 = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
 			
 			theapplicant.get(0).setSemesterstartdate(date1);
+		
+			
 			return theapplicant;
 			
 		} catch (Exception e) {
@@ -382,6 +386,8 @@ public class StudentServiceImpl implements StudentService {
 
 		theadmfeedates = theadmfeedatesRepository.findByApplicationnumberAndLastdateGreaterThanEqual(appno, date);
 		if (theadmfeedates.size() > 0) {
+			if (theadmfeedates.get(0).getFeestatus()!=null &&theadmfeedates.get(0).getFeestatus().equalsIgnoreCase("rec"))
+				throw new Exception("Fee Already Paid");
 			theapplicant = getFeeAmount(theadmfeedates.get(0).getProgramid(), theadmfeedates.get(0).getSemester(),
 					theadmfeedates.get(0).getBranchid(), "00", theadmfeedates.get(0).getLearningmode(), "N", "N");
 
@@ -412,9 +418,25 @@ public class StudentServiceImpl implements StudentService {
 				
 		try {
 
-		Studentfeereceipt sfr = new Studentfeereceipt();	
+		Studentfeereceipt sfr = null;	
+		int paymentid =student.getPayment().getId();
+		sfr =thefeereceiptRepository.findByPayment_id(paymentid);
 		
+		if( sfr==null) {
+			
+			Date  now =  new Date();
+			Timestamp timestamp = new Timestamp(now.getTime());
+			sfr = new Studentfeereceipt();
+			sfr.setInsert_time(timestamp);
+			sfr.setCreatedby(student.getMethod());
+		}else {
+			Date  now =  new Date();
+			Timestamp timestamp = new Timestamp(now.getTime());
+			sfr.setModification_time(timestamp);
+			sfr.setModifiedby(student.getMethod());
+		}
 		
+			
 		sfr.setProgramid(student.getProgramid());
 		sfr.setRollnumber(student.getRoll_number());
 		sfr.setReftype(student.getReftype());
@@ -428,10 +450,7 @@ public class StudentServiceImpl implements StudentService {
 		sfr.setFeetype(student.getFeetype());
 		
 		
-		Date  now =  new Date();
-		Timestamp timestamp = new Timestamp(now.getTime());
-
-		sfr.setInsert_time(timestamp);
+		
 		
 		
 		thefeereceiptRepository.save(sfr);
@@ -557,21 +576,47 @@ public class StudentServiceImpl implements StudentService {
 	}
 	
 		
-
+    @Transactional()
 	@Override
-	public String saveStudentAppfee(String[] dvdata_ary) {
+	public String saveStudentAppfee(Student student) {
 		
-	Student student=	sbiservice.ParseDVResponse(dvdata_ary);
+	
+		try {
+			
+			 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			// formatter.
+			String str= df.format(student.getSemesterstartdate());
+			java.sql.Date date = java.sql.Date.valueOf(str);
 		
-		String studentname = em.createNamedQuery("updatestudentappfee")
-				.setParameter("appno", student.getApplicationnumber())
-				.setParameter("method", "saveStudentAppfee")
-				.setParameter("amount", student.getAmount())
-				.setParameter("ssd", student.getSemesterstartdate())
-				.getSingleResult()
-				.toString();
+			 
+		int count = em.createNamedQuery("updatestudentappfee")
+				.setParameter(1,student.getAmount())
+				.setParameter(2, "saveStudentAppfee")
+				.setParameter(3, student.getATRN())
+				.setParameter(4, student.getMerchantorderno())
+				
+				.setParameter(5,student.getApplicationnumber() )
+				.setParameter(6, date).executeUpdate();
+			
+//		javax.persistence.Query query=	em.createQuery("update admissionform_live.student_application_status set  actual_deposited_fee=:amount"
+//					+" ,fee_verification_time=now(),fee_verified_by=:method ,verification_status='rec' "
+//					+"  where application_number=:appno"
+//					+ "  and session_start_date =:ssd"
+//					);
 		
-		return null;
+//		query.setParameter(appno,student.getApplicationnumber() );
+//		int count =query.executeUpdate();
+//			
+//			
+				
+				
+		
+		return "success";
+	}catch(Exception e ) {
+		e.printStackTrace();
+		sbiservice.logerror(student.getATRN(), student.getMerchantorderno(), String.valueOf(student.getAmount()) , e.toString(),"saveStudentAppfee");
+	    return "error";
+	}
 	}
 
 
