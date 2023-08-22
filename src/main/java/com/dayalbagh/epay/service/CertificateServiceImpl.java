@@ -245,6 +245,8 @@ public class CertificateServiceImpl implements CertificateService {
 			  
 		}catch(Exception e) {
 			sbiservice.logerror(student.getATRN(), student.getMerchantorderno(), String.valueOf(student.getAmount()) , e.getMessage(),"savecertificateDetail");
+		    return "error";
+		    
 		}
 		  
 		  return writestatus;

@@ -112,7 +112,7 @@ public class PaymentController {
 		 encData = encData.replaceAll(" ", "+");
 				 
 		 String str = sbiservice.decrypt(encData);
-		 
+		 System.out.println("decrypt  :"+str);
 		 
 		 String resdata[]= str.split("\\|");
 		 System.out.println("encData :"+resdata[0]+"data:"+encData);
@@ -198,7 +198,7 @@ public class PaymentController {
 		 redirectAttributes.addAttribute("merchIdVal", merchIdVal);
 		 redirectAttributes.addAttribute("Bank_Code", Bank_Code);
 		 redirectAttributes.addAttribute("method", "pushresponse");
-	     
+	     System.out.println("in side push response");
 		 return new ModelAndView("redirect:/paymentsuccess");
 	 }
 	 

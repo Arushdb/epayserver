@@ -462,6 +462,7 @@ public class SBIServiceImpl implements SBIService {
 	   		// Get ref number and ref type from other detail
 	   		
 	   	 String OtherDetails_data[]= Other_Details.split("\\,");  
+	   	 System.out.println("OtherDetails_data"+OtherDetails_data);
 	   	 
 	   //* otherdetail structure 
 

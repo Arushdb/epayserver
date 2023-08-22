@@ -40,8 +40,8 @@ public class Double_verification {
 //		                   params.put("encdata", encdata);
 
 		                   params.put("queryRequest", messageData);
-		        params.put("aggregatorId", "SBIEPAY");
-		        params.put("merchantId", mecode);
+		                   params.put("aggregatorId", "SBIEPAY");
+		                   params.put("merchantId", mecode);
 		       
 		               URL url = new URL(gatewayUrl);
 
