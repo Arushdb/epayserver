@@ -21,6 +21,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -89,7 +90,7 @@ public class PaymentController {
 	        return "payment_request";
 	    }
 	
-     @Transactional()
+     @Transactional(propagation = Propagation.REQUIRES_NEW)
 	 @PostMapping("/paymentsuccess")
 	 public String Paymentsuccess(@ModelAttribute("encData") String encData,
 			 @ModelAttribute("merchIdVal") String merchIdVal,
