@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -71,8 +72,9 @@ public class Payment {
 	@OneToOne(mappedBy = "payment")
 	private Certificate certificate;
 	
-	@Column(name = "insert_time" ,columnDefinition = "insert_time")
 	
+	@Column(name = "insert_time" ,columnDefinition = "insert_time")
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date insert_time ;
 	
 	@Column(name = "modification_time")

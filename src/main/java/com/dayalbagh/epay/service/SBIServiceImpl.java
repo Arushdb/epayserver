@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 import javax.crypto.spec.SecretKeySpec;
@@ -407,7 +408,11 @@ public class SBIServiceImpl implements SBIService {
 	//	  Merchant Order Number|SBIePayRefID/ATRN|Transaction Status|Amount|
 	//    Currency|Pay Mode|Other Details|Reason/Message|Bank Code|Bank Reference Number|
 	// 	  Transaction Date|Country|CIN|Merchant ID|Total Fee GST |Ref1|Ref2|Ref3|Ref4|Ref5|Ref6|Ref7|Ref8|Ref9
-  	  
+		 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
+		  TimeZone istTimeZone= TimeZone.getTimeZone("IST");
+		  df.setTimeZone(istTimeZone);
+		  
+		  
 		  Payment payment = new Payment();
 	   	  String ATRN="";
 	   	  String Transaction_Status="";
@@ -486,20 +491,32 @@ public class SBIServiceImpl implements SBIService {
 	   	 enrollno=student.getEnrolno();
 	   	Timestamp timestamp = new Timestamp(0);
 	   	payment =findPaymentByATRN(student.getATRN());
+	  
+	   	
+	   	Date currentdate = new Date();
+	   
+//	   String strdate=	df.format(dt);
+//	   Date currentdate =df.parse(strdate);
+	  
+	  
+	   
+	   
 		if (payment==null) {
 			
 				payment = new Payment();
 				payment.setCreatedby(method);
-				 timestamp = new Timestamp(System.currentTimeMillis());;
-		    	 payment.setInsert_time(timestamp);
+
+				 
+				
+		    	 payment.setInsert_time(currentdate);
 
 				
 			
 		}else {
 			
 			payment.setModifiedby(method);
-			timestamp = new Timestamp(System.currentTimeMillis());;
-	    	 payment.setModification_time(timestamp);
+			//timestamp = new Timestamp(System.currentTimeMillis());;
+	    	 payment.setModification_time(currentdate);
 		}
 			
 	   	 
@@ -574,11 +591,11 @@ public class SBIServiceImpl implements SBIService {
     			  pendingPayment.setMerchant_Order_Number(MerchantOrderNumber);
     			  pendingPayment.setTrx_status(dvstatus);
     			  
-    			  Date  currentdate =  new Date();
-    			       timestamp = new Timestamp(currentdate.getTime());
+    			   // currentdate =  new Date();
+    			     //  timestamp = new Timestamp(currentdate.getTime());
 
     			  
-    			  pendingPayment.setInsert_time(timestamp);
+    			  pendingPayment.setInsert_time(currentdate);
     			  pendingPayment.setCreated_by("SBIService");
     		   		  
 	    		  pendingPayment.setPayment(payment);
@@ -908,8 +925,8 @@ private Student otherdetailforcontinue(Student student, String[] resdata) throws
 	String studentname="";
 	String programname="";
 	String reftype ="";
-	Date semstartdate=new Date();
-	Date semenddate=new Date();
+	Date semstartdate=null;
+	Date semenddate=null;
 	String latefee="";
 	String entityid ="";
 	String Programid = "";
@@ -932,12 +949,15 @@ private Student otherdetailforcontinue(Student student, String[] resdata) throws
 			studentname=resdata[2];
 			programname=resdata[3];
 			reftype = resdata[4];
+			String date1 = resdata[5];
+			String date2 = resdata[6];
 			
 			if (isValidDate(resdata[5]))
-			  semstartdate=dateFormat.parse(resdata[5]);
+			  semstartdate=dateFormat.parse(date1);
+		
 			
 			if (isValidDate(resdata[6]))
-				  semstartdate=dateFormat.parse(resdata[6]);
+				  semenddate=dateFormat.parse(date2);
 			 
 			 latefee=resdata[7];
 			
