@@ -40,6 +40,8 @@ public interface SBIService {
 	void logerror(String ATRN, String MerchantOrderNumber, String trxamt, String message, String method);
 
 	Student ParseDVResponse(String[] dvdata);
+
+	void updatePaymentstatus(Payment payment);
 	
 	
 	

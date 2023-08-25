@@ -17,12 +17,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.crypto.spec.SecretKeySpec;
@@ -32,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpRequest;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.dayalbagh.epay.AES256Bit;
@@ -104,11 +107,16 @@ public class SBIServiceImpl implements SBIService {
 	public String getMerchantId() {
 		return MerchantId;
 	}
+	
+	@Value("${run-frquency.minutes}")
+	private int rate;
 
 	static String SuccessURL;
 	static String FailURL;
 	static String gatewayUrl;
 	static String key_Array;
+	
+	
 	
 	@Autowired
 	PaymentRepository thepaymentrepository ;
@@ -118,6 +126,7 @@ public class SBIServiceImpl implements SBIService {
 	
 	 @Autowired
 	 EpayExceptionRepository theEpayExceptionRepository;
+	 
 	 
 	
 	
@@ -152,6 +161,8 @@ public class SBIServiceImpl implements SBIService {
 			gatewayUrl=livegatewayUrl;
 			key_Array=livekey_Array;
 		}
+		
+		
 		
 		
 	}
@@ -583,13 +594,13 @@ public class SBIServiceImpl implements SBIService {
     		  
     		  // if transaction is not successful make an entry into pending payments
     		  // So that later on double verification can update Payment status based on pending payments 
-    		  if (!(dvstatus.equalsIgnoreCase("Success"))) {
+    		  if ((dvstatus.equalsIgnoreCase("Success"))) {
     			  
     			  PendingPayment pendingPayment = new PendingPayment();
     			  pendingPayment.setATRN(ATRN);
     			  pendingPayment.setAmount(BigDecimal.valueOf(trxamt));
     			  pendingPayment.setMerchant_Order_Number(MerchantOrderNumber);
-    			  pendingPayment.setTrx_status(dvstatus);
+    			  pendingPayment.setTrxstatus(dvstatus);
     			  
     			   // currentdate =  new Date();
     			     //  timestamp = new Timestamp(currentdate.getTime());
@@ -663,6 +674,12 @@ public class SBIServiceImpl implements SBIService {
 		
 	}
 
+	@Override
+	public  void updatePaymentstatus(Payment payment) {
+		
+			 thepaymentrepository.save(payment);
+		
+	}
 
 
 	  //** DV response structure 
@@ -1029,6 +1046,49 @@ public static boolean isValidDate(String inDate) {
     return true;
 }
   
+//@Scheduled(fixedRateString = "${run-frquency.minutes}" ,timeUnit = TimeUnit.MINUTES)
+public void processpendingpayment() {
+	
+	String status = "success";
+	Payment payment=null;
+	String dvdata ="";
+	String [] dvdata_ary;
+	List<PendingPayment> pendingpayment = new ArrayList<>();
+	String data[] = new String[5];
+	System.out.println("in side process pending payment method ");
+	
+	pendingpayment =thePendingPaymentRepository.findAllByTrxstatusNot(status);
+	if (pendingpayment.size()>0) {
+		
+		for (PendingPayment pending:pendingpayment) {
+			data[0]=pending.getMerchant_Order_Number();
+			data[1]=pending.getATRN();
+			data[3]=pending.getAmount().toString();
+			dvdata =verifyPayment(data);
+			 dvdata_ary= dvdata.split("\\|");
+			 String trxstatus = dvdata_ary[2];
+		      String statusdesc=dvdata_ary[8];
+		      pending.setTrxstatus(trxstatus);
+		      pending.setModification_time(new Date());
+		      pending.setProcess_time(null);
+		      
+		      
+		      thePendingPaymentRepository.save(pending);
+		      payment =thepaymentrepository.findByMerchantorderno(pending.getMerchant_Order_Number());
+		      payment.setTransaction_status(trxstatus);
+		      payment.setModifiedby("processpendingpayment");
+		      payment.setModification_time(new Date());
+		      thepaymentrepository.save(payment);
+		      
+		      
+			
+			
+		}
+		
+	}
+}
+
+
 }
 
 

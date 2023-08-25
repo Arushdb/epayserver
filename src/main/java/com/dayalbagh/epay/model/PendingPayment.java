@@ -28,7 +28,8 @@ public class PendingPayment {
 	private String Merchant_Order_Number;
 	@Column(name="Amount", precision = 17 ,scale = 3)
 	private BigDecimal amount;
-	private String trx_status;
+	@Column(name = "trx_status")
+	private String trxstatus;
 	
 	@Column(name = "process_time", columnDefinition = "Date")
 	@Temporal(TemporalType.DATE)
@@ -49,6 +50,8 @@ public class PendingPayment {
 	
 	
 	private String created_by ;
+	@Column(name = "modify_by")
+	private String modifiedBy;
 	
 	
 	
@@ -139,9 +142,7 @@ public class PendingPayment {
 
 
 
-	public String getTrx_status() {
-		return trx_status;
-	}
+	
 
 
 
@@ -167,8 +168,20 @@ public class PendingPayment {
 
 
 
-	public void setTrx_status(String trx_status) {
-		this.trx_status = trx_status;
+	
+
+
+
+
+	public String getTrxstatus() {
+		return trxstatus;
+	}
+
+
+
+
+	public void setTrxstatus(String trxstatus) {
+		this.trxstatus = trxstatus;
 	}
 
 
@@ -183,6 +196,20 @@ public class PendingPayment {
 
 	public void setPayment(Payment payment) {
 		this.payment = payment;
+	}
+
+
+
+
+	public String getModifiedBy() {
+		return modifiedBy;
+	}
+
+
+
+
+	public void setModifiedBy(String modifiedBy) {
+		this.modifiedBy = modifiedBy;
 	}
 	
 	

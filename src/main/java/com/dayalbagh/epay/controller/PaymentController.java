@@ -3,11 +3,14 @@ package com.dayalbagh.epay.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.RequestDispatcher;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +40,10 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.dayalbagh.epay.AES256Bit;
 import com.dayalbagh.epay.model.Payment;
+import com.dayalbagh.epay.model.PendingPayment;
 import com.dayalbagh.epay.model.Student;
 import com.dayalbagh.epay.model.Studentfeereceipt;
+import com.dayalbagh.epay.repository.PendingPaymentRepository;
 import com.dayalbagh.epay.service.CertificateService;
 import com.dayalbagh.epay.service.SBIService;
 import com.dayalbagh.epay.service.StudentService;
@@ -54,6 +60,11 @@ public class PaymentController {
 	
 	@Autowired
 	private CertificateService certificateService;
+	
+	@Autowired
+	private PendingPaymentRepository  thePendingPaymentRepository;
+	
+	
 	
 	
 
@@ -118,9 +129,14 @@ public class PaymentController {
 		 
 		 String resdata[]= str.split("\\|");
 		 System.out.println("encData :"+resdata[0]+"data:"+encData);
-	         
+	       
+		
+		 
 	   // Verify via Double verification 
 	      String dvdata =sbiservice.verifyPayment(resdata);
+	      
+	    
+	      
 	      System.out.println("DV Data:"+dvdata);
 	      
 	      String [] dvdata_ary= dvdata.split("\\|");
@@ -205,28 +221,7 @@ public class PaymentController {
 	 }
 	 
 	 
-	// @PostMapping("/pushpayment")
-	 public String pushpayment(@ModelAttribute("pushRespData") String encData,
-			 @ModelAttribute("merchIdVal") String merchIdVal,
-			 @ModelAttribute("Bank_Code") String Bank_Code,Model model) {
 		 
-		 
-		 encData = encData.replaceAll(" ", "+");
-		 String str = sbiservice.decrypt(encData);
-		 String resdata[]= str.split("\\|");
-		 String message = resdata[2];  
-		 model.addAttribute("message", message);
-		 
-		 
-	      
-		 System.out.println("Push encrypted Data:"+encData);
-	     System.out.println("Push Decrypted String:"+sbiservice.decrypt(encData));
-	     System.out.println(merchIdVal);
-	     System.out.println(Bank_Code);
-	      
-	     return "pushpayment_success";
-	 }
-	 
 	 
 	 
 	 
@@ -234,7 +229,8 @@ public class PaymentController {
 	 public String paymentFailure(@ModelAttribute("encData") String encData,
 			 @ModelAttribute("merchIdVal") String merchIdVal,
 			 @ModelAttribute("Bank_Code") String Bank_Code) {
-	      
+	     
+		 System.out.print("inside payment failure");
 		 System.out.println("encrypted Data:"+encData);
 	     System.out.println("Decrypted String:"+sbiservice.decrypt(encData));
 	     System.out.println(merchIdVal);
@@ -242,7 +238,89 @@ public class PaymentController {
 	      
 	     return "payment_failure";
 	 }
-	 
-	 
+	 @Transactional()
+	 @Scheduled(fixedRateString = "${run-frquency.minutes}" ,timeUnit = TimeUnit.MINUTES)
+	 public void processpendingpayment() {
+	 	
+	 	String status = "success";
+	 	Payment payment=null;
+	 	String dvdata ="";
+	 	String [] dvdata_ary;
+	 	List<PendingPayment> pendingpayment = new ArrayList<>();
+	 	String data[] = new String[5];
+	 	System.out.println("in side process pending payment method ");
+	 	
+	 	pendingpayment = thePendingPaymentRepository.findAllByTrxstatusNot(status);
+	 	if (pendingpayment.size()>0) {
+	 		
+	 		for (PendingPayment pending:pendingpayment) {
+	 			data[0]=pending.getMerchant_Order_Number();
+	 			data[1]=pending.getATRN();
+	 			data[3]=pending.getAmount().toString();
+	 			dvdata =sbiservice.verifyPayment(data);
+	 			 dvdata_ary= dvdata.split("\\|");
+	 			 String trxstatus = dvdata_ary[2];
+	 		      String statusdesc=dvdata_ary[8];
+	 		      pending.setTrxstatus(trxstatus);
+	 		     pending.setModifiedBy("processpendingpayment");
+	 		      
+	 		      pending.setModification_time(new Date());
+	 		     // pending.setProcess_time(null);
+	 		      
+	 		      
+	 		      thePendingPaymentRepository.save(pending);
+	 		      payment =sbiservice.findPaymentByMerchantorderno(pending.getMerchant_Order_Number());
+	 		      payment.setDv_status(trxstatus);
+	 		      payment.setStatusdescription(statusdesc);
+	 		      payment.setModifiedby("processpendingpayment");
+	 		      payment.setModification_time(new Date());
+	 		     
+	 		     sbiservice.updatePaymentstatus(payment);
+	 		      
+	 		    // if double verification is success;
+	 			
+	 		      if (trxstatus.equalsIgnoreCase("Success")) {
+	 		    	  
+	 		    	  Student student = sbiservice.ParseDVResponse(dvdata_ary);
+	 		    	  student.setPayment(payment);
+	 		    	  student.setMethod("processpendingpayment");
+	 		    
+	 	  
+	 		    	  String category = student.getCategory();
+	 		    	  if (category.equalsIgnoreCase("CON") ||category.equalsIgnoreCase("newadm") ) {
+	 		    		  
+	 		    		  studentservice.savestudentfee(student); 
+	 		    		 
+	 		    	  }
+	 				
+	 		    	  // For Application Fee
+	 		    	  
+	 		    	  if (category.equalsIgnoreCase("appfee")  ) {
+	 		    		   studentservice.saveStudentAppfee(student); 
+	 		    		  
+	 		    	  } 
+	 					
+	 		    	  
+	 		    	  if (category.equalsIgnoreCase("CER")  ) {
+	 		    		  certificateService.savecertificateDetail(student); 
+	 		    		 
+	 		    	  } 
+	 		      
+	 		      
+	 		      
+	 		      
+	 		      }else {
+	 		    	
+	 		    	  
+	 		      } 
+	 			
+	 			
+	 		}
+	 		
+	 	}
+	 }
+
+
+
 
 }
