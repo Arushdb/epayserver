@@ -594,7 +594,7 @@ public class SBIServiceImpl implements SBIService {
     		  
     		  // if transaction is not successful make an entry into pending payments
     		  // So that later on double verification can update Payment status based on pending payments 
-    		  if ((dvstatus.equalsIgnoreCase("Success"))) {
+    		  if (!(dvstatus.equalsIgnoreCase("Success"))) {
     			  
     			  PendingPayment pendingPayment = new PendingPayment();
     			  pendingPayment.setATRN(ATRN);
