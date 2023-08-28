@@ -48,6 +48,9 @@ public interface StudentService {
 
 	String savestudentfee(Student student);
 
+	boolean isSemregistered(String rollno, String sem,java.sql.Date semesterstartdate,
+			java.sql.Date semesterenddate);
+
 	
 	
 	

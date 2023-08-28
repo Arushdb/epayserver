@@ -20,6 +20,9 @@ public interface DefaulterRepository extends JpaRepository<Defaulters, Integer> 
 	
 	List<Defaulters> findAllByRollnumberAndDefaulter(String rollno,int status);
 	
+	Defaulters findByRollnumberAndSemestercode(String rollno,String sem);
+	
+	
 		
 	 
 	

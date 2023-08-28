@@ -56,6 +56,14 @@ public class Defaulters {
 	
 	private float fine ;
 	private float amount;
+	@Column(name = "feestatus")
+	private String feestatus;
+	
+	private Date semester_start_date;
+	private Date semester_end_date;
+	private String feetype;
+	private String entity_id;
+	
 
 	
 	public Defaulters() {
@@ -191,6 +199,56 @@ public class Defaulters {
 
 	public void setAmount(float amount) {
 		this.amount = amount;
+	}
+
+
+	public String getFeestatus() {
+		return feestatus;
+	}
+
+
+	public void setFeestatus(String feestatus) {
+		this.feestatus = feestatus;
+	}
+
+
+	public Date getSemester_start_date() {
+		return semester_start_date;
+	}
+
+
+	public Date getSemester_end_date() {
+		return semester_end_date;
+	}
+
+
+	public String getFeetype() {
+		return feetype;
+	}
+
+
+	public String getEntity_id() {
+		return entity_id;
+	}
+
+
+	public void setSemester_start_date(Date semester_start_date) {
+		this.semester_start_date = semester_start_date;
+	}
+
+
+	public void setSemester_end_date(Date semester_end_date) {
+		this.semester_end_date = semester_end_date;
+	}
+
+
+	public void setFeetype(String feetype) {
+		this.feetype = feetype;
+	}
+
+
+	public void setEntity_id(String entity_id) {
+		this.entity_id = entity_id;
 	}
 
 	

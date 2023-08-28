@@ -51,6 +51,7 @@ public class Student {
 	private String merchantorderno;
 	private String ATRN;
 	private Payment payment;
+	private String defaulter;
 	
 	
 	private java.math.BigDecimal  appfee ;
@@ -353,6 +354,12 @@ public class Student {
 	}
 	public void setMethod(String method) {
 		this.method = method;
+	}
+	public String getDefaulter() {
+		return defaulter;
+	}
+	public void setDefaulter(String defaulter) {
+		this.defaulter = defaulter;
 	}
 	
 	

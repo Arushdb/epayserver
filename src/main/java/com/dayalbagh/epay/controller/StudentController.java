@@ -117,7 +117,8 @@ public class StudentController {
 
 			});
 			
-			Gson gson = new Gson();
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+			
 			
 			return gson.toJson(defaulter);
 		
@@ -189,6 +190,14 @@ public class StudentController {
 			
 			if(feepaid)
 				throw new Exception("Fee Already Paid");
+			
+			if (studentservice.isSemregistered(rollno,semestercode, semesterstartdate , semesterenddate)) {
+				System.out.println("Cuurently registered in semesterstartdate:"+rollno+semestercode+":"+semesterstartdate);
+			}else {
+				throw new Exception("You are currently not registered in semester/year: "+semestercode
+						+ ". Please register before payment of fee. ");
+
+			}
 				
 				Boolean feeisdelayed = studentservice.getpaymentdelaystatus(type);
 				if(feeisdelayed)

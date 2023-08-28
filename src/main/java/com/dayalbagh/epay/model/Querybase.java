@@ -160,6 +160,15 @@ import javax.persistence.SqlResultSetMappings;
 				+ " ATRN=?,merchant_order_number=? "
 				+ "      where application_number=?"
 				+ "      and session_start_date =?"
+				),
+		@NamedNativeQuery(name = "isStudentRegistered",
+		query = "select if(count(*)>0,true,false) from cms_live.student_registration_semester_header srsh "
+		        + " join cms_live.program_course_header pch on pch.program_course_key = srsh.program_course_key "
+				+ " where roll_number=:rollno  and pch.semester_code =:sem "
+			
+				+ " and session_start_date =:ssd and session_end_date =:sed "
+						
+				
 				)
 				
 }

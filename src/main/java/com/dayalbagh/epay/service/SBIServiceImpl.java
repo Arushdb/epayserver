@@ -39,12 +39,14 @@ import org.springframework.stereotype.Service;
 
 import com.dayalbagh.epay.AES256Bit;
 import com.dayalbagh.epay.model.Certificate;
+import com.dayalbagh.epay.model.Defaulters;
 import com.dayalbagh.epay.model.Epayerrorlog;
 import com.dayalbagh.epay.model.Payment;
 import com.dayalbagh.epay.model.PendingPayment;
 import com.dayalbagh.epay.model.Student;
 import com.dayalbagh.epay.model.Studentfeereceipt;
 import com.dayalbagh.epay.repository.CertificateRepository;
+import com.dayalbagh.epay.repository.DefaulterRepository;
 import com.dayalbagh.epay.repository.EpayExceptionRepository;
 import com.dayalbagh.epay.repository.FeereceiptRepository;
 import com.dayalbagh.epay.repository.PaymentRepository;
@@ -126,6 +128,9 @@ public class SBIServiceImpl implements SBIService {
 	
 	 @Autowired
 	 EpayExceptionRepository theEpayExceptionRepository;
+	 
+	 @Autowired
+	 DefaulterRepository theDefaulterRepository;
 	 
 	 
 	
@@ -615,8 +620,21 @@ public class SBIServiceImpl implements SBIService {
     		  
     		  }else {
     			  
-    		
-    			  
+    		//  update defaulter status 
+    			  if (student.getDefaulter().equalsIgnoreCase("Y")) {
+    				  
+    				 Defaulters def = theDefaulterRepository.findByRollnumberAndSemestercode(student.getRoll_number(), 
+    						 student.getSemestercode() );
+    				 
+    				 if (def!=null) {
+    					 def.setDefaulter(0);
+    					 def.setModifiedby(method);
+    					 def.setModifiedtime(new Date());
+    					 def.setFeestatus("rec");
+    					 theDefaulterRepository.save(def);
+    					 
+    				 }
+    			  }
     			  
     		  }
 	
@@ -953,6 +971,7 @@ private Student otherdetailforcontinue(Student student, String[] resdata) throws
 	
 	String ssd="";
 	String sed="";
+	String defaulter="";
 	
 	
 	
@@ -984,6 +1003,7 @@ private Student otherdetailforcontinue(Student student, String[] resdata) throws
 			feepending=resdata[11];
 			
 			feetype=resdata[12];
+			defaulter =resdata[13];
 			
 			
 				
@@ -1007,6 +1027,7 @@ private Student otherdetailforcontinue(Student student, String[] resdata) throws
 	        student.setSemestercode(semester);
 	        student.setFeepending(feepending);
 	        student.setFeetype(feetype);
+	        student.setDefaulter(defaulter);
 	       
 	        
 	        

@@ -242,6 +242,11 @@ public class StudentServiceImpl implements StudentService {
 				studentobj.setProgramid(rec.getProgramid());
 				studentobj.setProgramname(rec.getProgramname());
 				studentobj.setAmount(rec.getAmount() + rec.getFine());
+				studentobj.setDefaulter("Y");
+				studentobj.setEntityid(rec.getEntity_id());
+				studentobj.setSemesterstartdate(rec.getSemester_start_date());
+				studentobj.setSemesterenddate(rec.getSemester_end_date());
+				studentobj.setFeetype(rec.getFeetype());
 
 				defaulterlist.add(studentobj);
 			});
@@ -617,6 +622,31 @@ public class StudentServiceImpl implements StudentService {
 		sbiservice.logerror(student.getATRN(), student.getMerchantorderno(), String.valueOf(student.getAmount()) , e.toString(),"saveStudentAppfee");
 	    return "error";
 	}
+	}
+
+	@Override
+	public boolean isSemregistered(String rollno,String sem , java.sql.Date semesterstartdate,
+			java.sql.Date semesterenddate) {
+		
+	
+			
+		
+	String count= em.createNamedQuery("isStudentRegistered")
+			.setParameter("rollno", rollno)
+			
+			.setParameter("ssd", semesterstartdate)
+			.setParameter("sed", semesterenddate)
+			
+			.setParameter("sem", sem)
+			.getSingleResult().toString();
+	
+	
+	if(count.equalsIgnoreCase("0"))
+		return false;
+	else
+		return true;
+		
+		
 	}
 
 
