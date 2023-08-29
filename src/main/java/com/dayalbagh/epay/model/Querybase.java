@@ -55,7 +55,8 @@ import javax.persistence.SqlResultSetMappings;
 				+ " join cms_live.student_master sm on sm.enrollment_number = sp.enrollment_number "
 				+ "	 join cms_live.program_master pm on pm.program_id = sp.program_id "
 				+ "  join cms_live.entity_master em on em.entity_id = sp.entity_id "
-				+ "	 where roll_number =:rollno and program_status in ('ACT','PAS','FAL')", resultSetMapping = "getstudentdetailmap"),
+				+ "	 where roll_number =:rollno and program_status in ('ACT','PAS','FAL') " 
+				+ " order by sp.register_date desc "  , resultSetMapping = "getstudentdetailmap"),
 		
 		@NamedNativeQuery(name = "valid_roll_enrol_dob", query = "select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid ,"
 
