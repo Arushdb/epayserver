@@ -1,6 +1,13 @@
 package com.dayalbagh.epay.service;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import com.dayalbagh.epay.model.Payment;
 import com.dayalbagh.epay.model.Student;
@@ -42,6 +49,9 @@ public interface SBIService {
 	Student ParseDVResponse(String[] dvdata);
 
 	void updatePaymentstatus(Payment payment);
+	
+	public String Aesdecrypt(String text ) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException ;
+
 	
 	
 	

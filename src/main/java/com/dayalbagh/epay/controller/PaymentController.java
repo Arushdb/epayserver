@@ -2,6 +2,9 @@ package com.dayalbagh.epay.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +15,9 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -69,11 +75,12 @@ public class PaymentController {
 	
 
 	 @GetMapping("/makepayment")
-	    public String showForm(Model model ,HttpServletRequest request,HttpServletResponse response) throws ServletException, IOException {
+	    public String showForm(Model model ,HttpServletRequest request,HttpServletResponse response) throws ServletException, IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 	      Student student = new Student();
 	      
-	     String totalfee = request.getParameter("totalfee");
-	     String Otherdetail=request.getParameter("Otherdetail");
+	      
+	     String totalfee =  sbiservice.Aesdecrypt(request.getParameter("totalfee"));
+	     String Otherdetail= sbiservice.Aesdecrypt(request.getParameter("Otherdetail"));
 	     
 
 	     //for testing
@@ -85,6 +92,7 @@ public class PaymentController {
 	     System.out.println("encrypted String:"+encryptdata);
 	     
 	     System.out.println("Decrypted String:"+sbiservice.decrypt(encryptdata));
+	     
 	     
 	     //String decryptdata =sbiservice.decrypt(encryptdata);
 	     

@@ -31,16 +31,17 @@
         padding: 10px;
         margin: 10px;
     }
+    h2{
+    background-color: fuchsia;
+    }
 </style>
 
 
 </head>
 <body>
     <div align="center">
-        <h2>Payment Failed!</h2>
-        <span>Data:</span><span>${str}</span><br/>
-        <span>Data:</span><span>${str}</span><br/>
-        <span>Data:</span><span>${str}</span><br/>
+        <h2>Payment Failed!,Please try after some time</h2>
+      
        
     </div>
 </body>

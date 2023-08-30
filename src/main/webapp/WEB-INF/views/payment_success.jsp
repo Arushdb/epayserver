@@ -32,6 +32,10 @@
         padding: 10px;
         margin: 10px;
     }
+    
+    h2{
+    background-color: green;
+    }
 </style>
 
 
@@ -40,11 +44,8 @@
 <
 <body>
     <div align="center">
-        <h2>Payment <span>${message}</span></h2>
-        <span>Data:</span><span>${message}</span><br/>
-         <span>Merchant ID:</span><span>${merchIdVal}</span><br/>
-          <span>Bank Code:</span><span>${Bank_Code}</span><br/>
-          
+        <h2>Your Payment is  <span>${message}</span></h2>
+                  
        
     </div>
 </body>
