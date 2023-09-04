@@ -193,12 +193,15 @@ public class PaymentController {
 			}
 
 		}
-
-		if (trxstatus.equalsIgnoreCase("Pending"))
-			return "payment_pending";
-
-		if (trxstatus.equalsIgnoreCase("fail"))
-			return "payment_fail";
+		String category = student.getCategory();
+		if (category.equalsIgnoreCase("CON") || category.equalsIgnoreCase("newadm")) {
+		return "con_payment_success";}
+//
+//		if (trxstatus.equalsIgnoreCase("Pending"))
+//			return "payment_pending";
+//
+//		if (trxstatus.equalsIgnoreCase("fail"))
+//			return "payment_fail";
 
 		return null;
 
