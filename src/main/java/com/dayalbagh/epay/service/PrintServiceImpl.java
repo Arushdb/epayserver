@@ -227,8 +227,9 @@ public class PrintServiceImpl implements PrintService {
 			PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filepath));
 
 			document.open();
-
-			String imgpath = context.getRealPath("/") + "\\WEB-INF\\classes\\images\\deiNewLogo.jpg";
+             // for window enviornment
+			//String imgpath = context.getRealPath("/") + "\\WEB-INF\\classes\\images\\deiNewLogo.jpg";
+			String imgpath = context.getRealPath("/") + "//WEB-INF//classes//images//deiNewLogo.jpg";
 			URL url = ResourceUtils.getURL(imgpath);
 
 			Image headerimg = Image.getInstance(url);
