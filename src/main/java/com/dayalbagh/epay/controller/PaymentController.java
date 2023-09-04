@@ -125,7 +125,7 @@ public class PaymentController {
 
 		if (method.equalsIgnoreCase(""))
 			method = "browserResponse";
-		Studentfeereceipt feereceipt = new Studentfeereceipt();
+		
 
 		System.out.println("encData :" + method + encData);
 
@@ -221,16 +221,27 @@ public class PaymentController {
 	}
 
 	@PostMapping("/paymentfailure")
-	public String paymentFailure(@ModelAttribute("encData") String encData,
-			@ModelAttribute("merchIdVal") String merchIdVal, @ModelAttribute("Bank_Code") String Bank_Code) {
+	public ModelAndView paymentFailure(HttpServletRequest request,@ModelAttribute("encData") String encData,
+			@ModelAttribute("merchIdVal") String merchIdVal, 
+			@ModelAttribute("Bank_Code") String Bank_Code,
+			Model model,
+			 RedirectAttributes redirectAttributes) {
 
 		System.out.print("inside payment failure");
 		System.out.println("encrypted Data:" + encData);
 		System.out.println("Decrypted String:" + sbiservice.decrypt(encData));
 		System.out.println(merchIdVal);
 		System.out.println(Bank_Code);
+		request.setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, HttpStatus.TEMPORARY_REDIRECT);
+		redirectAttributes.addAttribute("encData", encData);
+		redirectAttributes.addAttribute("merchIdVal", merchIdVal);
+		redirectAttributes.addAttribute("Bank_Code", Bank_Code);
+		redirectAttributes.addAttribute("method", "failureresponse");
+		System.out.println("in side push response");
+		return new ModelAndView("redirect:/paymentsuccess");
+		
 
-		return "payment_failure";
+		
 	}
 
 	@Transactional()
