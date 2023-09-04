@@ -51,7 +51,7 @@ import javax.persistence.SqlResultSetMappings;
 		@NamedNativeQuery(name = "getstudentdetail", query = "select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid ,"
 
 				+ "	pm.program_type as type,program_name as programname,em.entity_type as mode,sp.branch_id as branchid ,sp.specialization_id as specializationid"
-				+ " , sp.entity_id as entityid from cms_live.student_program sp "
+				+ " , sp.entity_id as entityid ,em.entity_name as entityName from cms_live.student_program sp "
 				+ " join cms_live.student_master sm on sm.enrollment_number = sp.enrollment_number "
 				+ "	 join cms_live.program_master pm on pm.program_id = sp.program_id "
 				+ "  join cms_live.entity_master em on em.entity_id = sp.entity_id "
@@ -198,7 +198,7 @@ import javax.persistence.SqlResultSetMappings;
 						@ColumnResult(name = "studentname"), @ColumnResult(name = "programid"),
 						@ColumnResult(name = "type"), @ColumnResult(name = "programname"), @ColumnResult(name = "mode"),
 						@ColumnResult(name = "branchid"), @ColumnResult(name = "specializationid"),
-						@ColumnResult(name = "entityid")
+						@ColumnResult(name = "entityid"),@ColumnResult(name = "entityName")
 
 				}
 

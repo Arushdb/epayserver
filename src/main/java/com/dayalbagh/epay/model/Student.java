@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 
 public class Student {
 	
@@ -52,6 +54,8 @@ public class Student {
 	private String ATRN;
 	private Payment payment;
 	private String defaulter;
+	private String  bankReferenceNumber;
+	
 	
 	
 	private java.math.BigDecimal  appfee ;
@@ -59,16 +63,22 @@ public class Student {
 	
 	
 	
-	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@Temporal(TemporalType.DATE)
 	private Date semesterstartdate;
 	
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@Temporal(TemporalType.DATE)
 	private Date semesterenddate;
 	
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	@Temporal(TemporalType.DATE)
+	private Date transactiondate;
+	
 	private String message;
 	private String entityid;
-	
+	private String entityName;
 	private String EncryptTrans;
 	
 	private String feetype;
@@ -99,7 +109,7 @@ public class Student {
 	}
 	
 	public Student(String roll_number, String studentname, String programid, Character type, String programname,
-			String mode, String branchid, String specializationid,String entityid) {
+			String mode, String branchid, String specializationid,String entityid,String entityName) {
 		
 		this.roll_number = roll_number;
 		this.studentname = studentname;
@@ -110,6 +120,7 @@ public class Student {
 		this.branchid = branchid;
 		this.specializationid = specializationid;
 		this.entityid=entityid ;
+		this.entityName=entityName;
 	}
 	public Student(String roll_number, String programname) {
 		
@@ -361,6 +372,25 @@ public class Student {
 	public void setDefaulter(String defaulter) {
 		this.defaulter = defaulter;
 	}
+	public Date getTransactiondate() {
+		return transactiondate;
+	}
+	public void setTransactiondate(Date transactiondate) {
+		this.transactiondate = transactiondate;
+	}
+	public String getBankReferenceNumber() {
+		return bankReferenceNumber;
+	}
+	public void setBankReferenceNumber(String bankReferenceNumber) {
+		this.bankReferenceNumber = bankReferenceNumber;
+	}
+	public String getEntityName() {
+		return entityName;
+	}
+	public void setEntityName(String entityName) {
+		this.entityName = entityName;
+	}
+	
 	
 	
 	
