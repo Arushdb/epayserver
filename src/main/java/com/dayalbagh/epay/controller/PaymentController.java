@@ -197,7 +197,10 @@ public class PaymentController {
 
 		}
 		
-		if (student.getMethod().equalsIgnoreCase("browserResponse"))
+		if (student.getMethod().equalsIgnoreCase("browserResponse")  ||
+				student.getMethod().equalsIgnoreCase("paymentFailure")
+				
+				)
 			return "con_payment_success";
 //		String category = student.getCategory();
 //		if (category.equalsIgnoreCase("CON") || category.equalsIgnoreCase("newadm")) {
