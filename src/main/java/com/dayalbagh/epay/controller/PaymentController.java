@@ -119,7 +119,7 @@ public class PaymentController {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	@GetMapping("/paymentsuccess")
+	@PostMapping("/paymentsuccess")
 	public String Paymentsuccess(@ModelAttribute("encData") String encData,
 			@ModelAttribute("merchIdVal") String merchIdVal, @ModelAttribute("Bank_Code") String Bank_Code,
 			@ModelAttribute("method") String method, Model model)
@@ -229,7 +229,7 @@ public class PaymentController {
 		return new ModelAndView("redirect:/paymentsuccess");
 	}
 
-	@GetMapping("/paymentfailure")
+	@PostMapping("/paymentfailure")
 	public ModelAndView paymentFailure(HttpServletRequest request,@ModelAttribute("encData") String encData,
 			@ModelAttribute("merchIdVal") String merchIdVal, 
 			@ModelAttribute("Bank_Code") String Bank_Code,
@@ -383,7 +383,7 @@ public class PaymentController {
 //		
 //	}
 
-	@RequestMapping(path = "/download", method = RequestMethod.GET)
+	@RequestMapping(path = "/download", method = RequestMethod.POST)
 	public void download(Student student,HttpServletResponse response) throws IOException {
 	
 		String filepath="";
@@ -394,7 +394,7 @@ public class PaymentController {
 		
 		
 		 File file = new File(filepath);
-		 String name =file.getName();
+		
 		
 		    response.setContentType("application/vnd.ms-excel");
 		    response.setHeader("Content-disposition", "attachment; filename=" + file.getName()

@@ -124,7 +124,7 @@ h2 {
         <a href="http://localhost:8080/epay/download">DownLoad PDF </a>
         -->
 		<form:form id="myform"  action="<%= downloadpdfpath %>" 
-			method="get" modelAttribute="student">
+			method="post" modelAttribute="student">
 			 
 			<form:input type="hidden" path="semesterstartdate"  />
 			
