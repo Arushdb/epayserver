@@ -215,12 +215,19 @@ public class PrintServiceImpl implements PrintService {
 		File file = new File(directory);
 
 		file.mkdirs();
-
-		String merchantorderno = "123456";
+        String category = student.getCategory();
+        String filename="";
+        if ((category.equalsIgnoreCase("con")||
+        		(category.equalsIgnoreCase("CER")))){
+        			filename = student.getRoll_number();
+        		}else {
+        			filename = student.getApplicationnumber();	
+        		}
+        		
 
 		Document document = new Document(PageSize.A4);
 
-		String filepath = directory + sep + merchantorderno + ".pdf";
+		String filepath = directory + sep + filename + ".pdf";
 
 		try {
 

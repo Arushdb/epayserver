@@ -624,7 +624,8 @@ public class SBIServiceImpl implements SBIService {
 
 		}
 
-		student.setMessage(insertstatus);
+		student.setMessage(dvstatus); // transaction status
+		student.setStatus(insertstatus); // payment file insertion status
 		return student;
 	}
 

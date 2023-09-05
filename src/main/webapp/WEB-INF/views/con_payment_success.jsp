@@ -1,4 +1,4 @@
-<%@page import="com.dayalbagh.epay.model.Student"%>
+
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
@@ -93,8 +93,8 @@ h2 {
   else
 	  downloadpdfpath=livedownloadpdf;
   
-  String trxstatus= request.getAttribute("message").toString();
-  Student mystudent =(Student)request.getAttribute("student");
+  String trxstatus= request.getAttribute("trxstatus").toString();
+ 
   String paystatus="";
   if (trxstatus.equalsIgnoreCase("success")){
 	  paystatus = "Successfully Completed";
@@ -103,18 +103,19 @@ h2 {
 		  
   
   if (trxstatus.equalsIgnoreCase("pending"))
-	  paystatus = "pending.Please notedown all the details and check status after some time";
+	  paystatus = "pending.Please notedown all the below details  for future reference."+
+	  " and check status after some time.";
   
   if (trxstatus.equalsIgnoreCase("fail"))
 	  paystatus = "failed.Please make payment again";
    %>
-  <%= "download pdf path="+downloadpdfpath %>
-  <%= "Transaction status="+trxstatus %>
-  
+
   
 <h2 id="demo"></h2>
 
 	<div id="divid" align="center">
+	
+		<button id="printbutton"    style="color: blue;size: 100px;width: 100px;height: 50px;font-size: 20px" onclick="window.print();window.history.back(); ">Print</button>
 		<h2>
 			Your Payment is <span><%=paystatus %></span> 
 		</h2>
@@ -128,8 +129,11 @@ h2 {
 			<form:input type="hidden" path="semesterstartdate"  />
 			
 			<form:input type ="hidden"  path="semesterenddate"  />
+			<form:input type ="hidden"  path="message"  />
 			<form:input type ="hidden"  path="category"  />
 			<form:input type ="hidden"  path="transactiondate"  />
+			<form:input type ="hidden"  path="programname" />
+			<form:input type ="hidden"  path="semestercode" />
 		
 			<form:input type ="hidden"  path="bankReferenceNumber"  />
 			
@@ -142,7 +146,7 @@ h2 {
 			
 			<tr>
 					<td>Your Payment status is  </td>
-					<td><form:input readonly="true" path="message" /></td>
+					<td><%=trxstatus %> </td>
 				</tr>
 				
 					<tr>
@@ -160,18 +164,10 @@ h2 {
 					<td><form:input readonly="true" path="studentname" /></td>
 				</tr>
 				<tr>
-					<td>Roll Number</td>
+					<td>Roll/Enrollment/Application Number</td>
 					<td><form:input readonly="true" path="roll_number" /></td>
 				</tr>
-				<tr>
-					<td>Program</td>
-					<td><form:input readonly="true" path="programname" /></td>
-				</tr>
 				
-				<tr>
-					<td>Semester</td>
-					<td><form:input readonly="true" path="semestercode" /></td>
-				</tr>
 			
 				
 				<tr>
@@ -192,16 +188,25 @@ h2 {
   var trxsts = "<%=trxstatus %>";
   trxsts =trxsts.toUpperCase();
  
- 
+  
   const button = document.getElementById("btn");
   const div = document.getElementById("divid");
+  const printbutton = document.getElementById("printbutton");
   if (trxsts=="SUCCESS"){
 	  button.disabled=false;
 	  div.style.color="green"; 
+	  printbutton.disabled=true;
+	  printbutton.hidden=true;
   }
 	   
   
-  if (trxsts!="SUCCESS"){
+  if (trxsts=="PENDING"){
+	  button.disabled=true;
+	  button.hidden=true;
+	  div.style.color="orange";   
+  }
+  
+  if (trxsts=="FAIL"){
 	  button.disabled=true;
 	  button.hidden=true;
 	  div.style.color="red";   
@@ -211,6 +216,8 @@ h2 {
 	  console.log('Button clicked!');
 	 // button.disabled=true;
 	  button.hidden=true;
+	  printbutton.disabled=false;
+	  printbutton.hidden=false;
 	  window.history.back(); 
 	});
  

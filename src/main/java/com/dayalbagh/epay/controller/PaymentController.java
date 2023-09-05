@@ -2,7 +2,9 @@ package com.dayalbagh.epay.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -28,6 +30,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -116,7 +119,7 @@ public class PaymentController {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	@PostMapping("/paymentsuccess")
+	@GetMapping("/paymentsuccess")
 	public String Paymentsuccess(@ModelAttribute("encData") String encData,
 			@ModelAttribute("merchIdVal") String merchIdVal, @ModelAttribute("Bank_Code") String Bank_Code,
 			@ModelAttribute("method") String method, Model model)
@@ -162,8 +165,9 @@ public class PaymentController {
 		// if double verification is success;
 		System.out.println("payment success encrypted Data:" + encData);
 		System.out.println("payment success Decrypted String:" + resdata);
-        String paysts = trxstatus.toUpperCase();
-		model.addAttribute("message", paysts);
+       
+		model.addAttribute("trxstatus", trxstatus.toUpperCase());
+		
 
 		model.addAttribute("student", student);
 
@@ -174,8 +178,7 @@ public class PaymentController {
 				String studentfeestatus = studentservice.savestudentfee(student);
 				if (studentfeestatus.equalsIgnoreCase("error"))
 					return "payment_failure";
-				if (student.getMethod().equalsIgnoreCase("browserResponse"))
-					return "con_payment_success";
+				
 			}
 
 			// For Application Fee
@@ -193,16 +196,19 @@ public class PaymentController {
 			}
 
 		}
-		String category = student.getCategory();
-		if (category.equalsIgnoreCase("CON") || category.equalsIgnoreCase("newadm")) {
-		return "con_payment_success";}
+		
+		if (student.getMethod().equalsIgnoreCase("browserResponse"))
+			return "con_payment_success";
+//		String category = student.getCategory();
+//		if (category.equalsIgnoreCase("CON") || category.equalsIgnoreCase("newadm")) {
+//		return "con_payment_success";}
+////
+////		if (trxstatus.equalsIgnoreCase("Pending"))
+////			return "payment_pending";
+////
+////		if (trxstatus.equalsIgnoreCase("fail"))
+////			return "payment_fail";
 //
-//		if (trxstatus.equalsIgnoreCase("Pending"))
-//			return "payment_pending";
-//
-//		if (trxstatus.equalsIgnoreCase("fail"))
-//			return "payment_fail";
-
 		return null;
 
 	}
@@ -223,7 +229,7 @@ public class PaymentController {
 		return new ModelAndView("redirect:/paymentsuccess");
 	}
 
-	@PostMapping("/paymentfailure")
+	@GetMapping("/paymentfailure")
 	public ModelAndView paymentFailure(HttpServletRequest request,@ModelAttribute("encData") String encData,
 			@ModelAttribute("merchIdVal") String merchIdVal, 
 			@ModelAttribute("Bank_Code") String Bank_Code,
@@ -239,7 +245,7 @@ public class PaymentController {
 		redirectAttributes.addAttribute("encData", encData);
 		redirectAttributes.addAttribute("merchIdVal", merchIdVal);
 		redirectAttributes.addAttribute("Bank_Code", Bank_Code);
-		redirectAttributes.addAttribute("method", "failureresponse");
+		redirectAttributes.addAttribute("method", "paymentFailure");
 		System.out.println("in side push response");
 		return new ModelAndView("redirect:/paymentsuccess");
 		
@@ -334,31 +340,79 @@ public class PaymentController {
 //	     }
 //	 }
 
+	//@RequestMapping(path = "/download", method = RequestMethod.GET)
+//	public ResponseEntity<InputStreamResource> download(Student student) throws IOException {
+//
+//	
+//		//public void download(Student student,HttpServletResponse response) throws IOException {
+//
+//		String filepath = "";
+//
+//		if (student.getCategory().equalsIgnoreCase("con")) {
+//			filepath = printService.exportContinuePDF(student);
+//		}
+//
+//		String curdir = System.getProperty("user.dir");
+//		;
+//		File file = new File(filepath);
+//		FileInputStream in = new FileInputStream(file);
+//		
+//		 
+//	    
+//		//InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+//		InputStreamResource resource = new InputStreamResource(in);
+//				
+//		
+//		
+//
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+//		headers.add("Pragma", "no-cache");
+//		headers.add("Expires", "0");
+//		// headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+
+//		// file.getName() + "\"");
+//		headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getName() + "\"");
+//		long length =file.length();
+//		ResponseEntity<InputStreamResource> res =   ResponseEntity.ok().headers(headers).contentLength(length)
+//				.contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+//		
+//		 return res;
+//		 
+//	 
+//	  
+//		
+//	}
+
 	@RequestMapping(path = "/download", method = RequestMethod.GET)
-	public ResponseEntity<InputStreamResource> download(Student student) throws IOException {
-
-		String filepath = "";
-
+	public void download(Student student,HttpServletResponse response) throws IOException {
+	
+		String filepath="";
 		if (student.getCategory().equalsIgnoreCase("con")) {
 			filepath = printService.exportContinuePDF(student);
 		}
+		
+		
+		
+		 File file = new File(filepath);
+		 String name =file.getName();
+		
+		    response.setContentType("application/vnd.ms-excel");
+		    response.setHeader("Content-disposition", "attachment; filename=" + file.getName()
+		    	+";Pragma="+ "no-cache"	
+		    		);
 
-		String curdir = System.getProperty("user.dir");
-		;
-		File file = new File(filepath);
 
-		InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+		    OutputStream out = response.getOutputStream();
+		    FileInputStream in = new FileInputStream(file);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-		headers.add("Pragma", "no-cache");
-		headers.add("Expires", "0");
-		// headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+
-		// file.getName() + "\"");
-		headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getName() + "\"");
+		    // copy from in to out
+		    IOUtils.copy(in,out);
 
-		return ResponseEntity.ok().headers(headers).contentLength(file.length())
-				.contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+		    out.close();
+		    in.close();
+		    file.delete();
+	
+	
 	}
-
+	
 }
