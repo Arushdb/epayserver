@@ -1,6 +1,8 @@
 package com.dayalbagh.epay.repository;
 
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Date;
 import java.util.List;
 
@@ -14,5 +16,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
 
      Payment findByMerchantorderno(String str);
      Payment findByATRN(String str);
+     Payment findByMerchantordernoAndAmount(String morderno,BigDecimal amount);
+     Payment findByATRNAndAmount(String atrn,BigDecimal amount);
+     
 	
 }

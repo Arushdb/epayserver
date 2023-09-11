@@ -47,7 +47,10 @@ h2 {
 </head>
 <body onload="closewindow()">
 
-			function closewindow() {
+
+	<script>
+	
+		function closewindow() {
 
 			setTimeout(function() {
 				window.close();
@@ -59,7 +62,7 @@ h2 {
 
 
 	<div align="center">
-		<h2>There is some issue while processing your payment.Please send email to edrp.helpdesk@gmail.com and contact EdRP office of Dayalbagh Educational Institute</h2>
+		<h2>Payment not found ,Please try with correct details.</h2>
 
 
 	</div>

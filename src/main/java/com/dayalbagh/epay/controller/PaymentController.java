@@ -330,61 +330,6 @@ public class PaymentController {
 		}
 	}
 
-//	 @RequestMapping(method = RequestMethod.GET, value = "/explorer/file/{id:.+}", produces = "application/pdf")
-//	 @ResponseBody
-//	 public ResponseEntity<?> getFile(@PathVariable Integer id) {
-//		 
-//		 Path path = Paths.get(file.getAbsolutePath());
-//	   //  String filename = explorerService.getById(id).getPath();
-//	     try {
-//	         return ResponseEntity.ok(resourceLoader.getResource("file:" + filename));
-//	     } catch (Exception e) {
-//	         return ResponseEntity.notFound().build();
-//	     }
-//	 }
-
-	//@RequestMapping(path = "/download", method = RequestMethod.GET)
-//	public ResponseEntity<InputStreamResource> download(Student student) throws IOException {
-//
-//	
-//		//public void download(Student student,HttpServletResponse response) throws IOException {
-//
-//		String filepath = "";
-//
-//		if (student.getCategory().equalsIgnoreCase("con")) {
-//			filepath = printService.exportContinuePDF(student);
-//		}
-//
-//		String curdir = System.getProperty("user.dir");
-//		;
-//		File file = new File(filepath);
-//		FileInputStream in = new FileInputStream(file);
-//		
-//		 
-//	    
-//		//InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-//		InputStreamResource resource = new InputStreamResource(in);
-//				
-//		
-//		
-//
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-//		headers.add("Pragma", "no-cache");
-//		headers.add("Expires", "0");
-//		// headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+
-//		// file.getName() + "\"");
-//		headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getName() + "\"");
-//		long length =file.length();
-//		ResponseEntity<InputStreamResource> res =   ResponseEntity.ok().headers(headers).contentLength(length)
-//				.contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
-//		
-//		 return res;
-//		 
-//	 
-//	  
-//		
-//	}
 
 	@RequestMapping(path = "/download", method = RequestMethod.POST)
 	public void download(Student student,HttpServletResponse response) throws IOException {
@@ -417,5 +362,35 @@ public class PaymentController {
 	
 	
 	}
+	
+	@GetMapping("/viewfeestatus")
+	public String viewfeestatus(Model model, HttpServletRequest request)  {
+		Student student = null;
+		String ordeno = request.getParameter("merchantorderno");
+		String ATRN = request.getParameter("ATRN");
+		String amount = request.getParameter("feeamount");
+		
+	try {
+		student=	printService.getFeeData(ordeno, ATRN, amount);
+	} catch (Exception e) {
+		
+		e.printStackTrace();
+		return "payment_not_found";
+		
+	}
+	
+	if(student==null)
+		return "payment_not_found";
+	
+	
+	model.addAttribute("trxstatus", student.getMessage().toUpperCase());
+	model.addAttribute("student", student);
+	return "con_payment_success";
+
+		
+			}
+
+
+
 	
 }

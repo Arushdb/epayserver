@@ -14,6 +14,10 @@ public interface PrintService {
 
 		public String exportContinuePDF(Student student) throws MalformedURLException, IOException ;
 
+		public Student getFeeData(String ordeno, String aTRN, String amount) throws Exception;
+		
+		
+
 	
 
 	

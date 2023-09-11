@@ -1,5 +1,7 @@
 package com.dayalbagh.epay.service;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -39,6 +41,8 @@ public interface SBIService {
 
 	Payment findPaymentByATRN(String ATRN);
 	Payment findPaymentByMerchantorderno(String ATRN);
+	 Payment findPaymentByByMerchantordernoAndAmount(String morderno,BigDecimal amount);
+     Payment findPaymentByATRNAndAmount(String atrn,BigDecimal amount);
 
 	Student savePayment(String[] data, String dvstatus, String statusdecription, String method) ;
 
@@ -52,8 +56,9 @@ public interface SBIService {
 	
 	public String Aesdecrypt(String text ) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException ;
 
+	public Student otherdetailforcertificate(Student student, String[] resdata);
 	
-	
+	public Student otherdetailforcontinue(Student student, String[] resdata) throws Exception;
 	
 	
 

@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -771,8 +772,8 @@ public class SBIServiceImpl implements SBIService {
 	 * 
 	 * /
 	 ********************************************************************************************************/
-
-	private Student otherdetailforcertificate(Student student, String[] resdata) {
+	@Override
+	public Student otherdetailforcertificate(Student student, String[] resdata) {
 
 		String rollnumber = "";
 		String enrolno = "";
@@ -858,8 +859,8 @@ public class SBIServiceImpl implements SBIService {
 	 */
 
 	/********************************************************************************************************/
-
-	private Student otherdetailforcontinue(Student student, String[] resdata) throws Exception {
+	@Override
+	public Student otherdetailforcontinue(Student student, String[] resdata) throws Exception {
 
 		String rollnumber = "";
 		String studentname = "";
@@ -1089,6 +1090,18 @@ public class SBIServiceImpl implements SBIService {
 			// Clean out temporary data
 			Arrays.fill(generatedData, (byte) 0);
 		}
+	}
+
+	@Override
+	public Payment findPaymentByByMerchantordernoAndAmount(String morderno, BigDecimal amount) {
+		// TODO Auto-generated method stub
+		return thepaymentrepository.findByMerchantordernoAndAmount(morderno, amount);
+	}
+
+	@Override
+	public Payment findPaymentByATRNAndAmount(String atrn, BigDecimal amount) {
+		// TODO Auto-generated method stub
+		return thepaymentrepository.findByATRNAndAmount(atrn, amount);
 	}
 
 }

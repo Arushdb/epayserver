@@ -167,6 +167,9 @@ public class PrintServiceImpl implements PrintService {
 
 	@Autowired
 	PaymentRepository thepaymentrepository;
+	
+	@Autowired
+	SBIService theSBIService;
 
 	@Autowired
 	PendingPaymentRepository thePendingPaymentRepository;
@@ -507,46 +510,60 @@ public class PrintServiceImpl implements PrintService {
 		return filepath;
 	}
 
-//	protected class Custompageevent extends PdfPageEventHelper {
-//
-//		int pagenumber = 0;
-//
-//		@Override
-//		public void onStartPage(PdfWriter writer, Document document) {
-//			try {
-//				pagenumber++;
-//				document.add(new Phrase("\n\n\n"));
-//				document.add(new Phrase("Hello Arush"));
-//
-//				String filename = "/images/deiLogoHeader.png";
-//				// File file = new File(getClass().getResource(filename).getFile());
-//
-////				Image headerimg = Image.getInstance(
-////						java.awt.Toolkit.getDefaultToolkit().createImage(getClass().getResource(filename)),null);
-//
-//				Image headerimg = Image.getInstance(filename);
-//
-//				headerimg.setAlignment(Element.ALIGN_MIDDLE);
-//				headerimg.setAbsolutePosition(0, 750);
-//				headerimg.scalePercent(25f, 16f);
-//
-//				writer.getDirectContent().addImage(headerimg);
-//
-//			} catch (Exception x) {
-//				x.printStackTrace();
-//				System.out.println("error in start page " + x.getMessage());
-//			}
-//		}
-//
-////		@Override
-////		public void onEndPage(PdfWriter writer, Document document) {
-////			
-////			Rectangle rect = writer.getBoxSize("art");
-////		
-////		ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_RIGHT,
-////				new Phrase(String.format("page %d", pagenumber)), rect.getRight(), rect.getLeft(), 0);
-////		}
-////		
-//	}
+	@Override
+	public Student getFeeData(String ordeno, String ATRN, String amount) throws Exception {
+		// TODO Auto-generated method stub
+		Double amount1 = Double.parseDouble(amount);
+		BigDecimal amt = BigDecimal.valueOf(amount1);
+		Float floatamt = Float.valueOf(amount);
+		Payment payment = null;
+		Student student=new Student();
+		String category="";
+		String Other_Details;
+		
+		
+		
+		
+		if (ATRN != "") {
+
+			payment = theSBIService.findPaymentByATRNAndAmount(ATRN, amt);
+		}
+		
+		if (ordeno != "" && payment ==null) {
+			
+			payment = theSBIService.findPaymentByByMerchantordernoAndAmount(ordeno, amt);
+
+		}
+
+		if (payment==null)
+			return null;
+			category=payment.getCategory();
+			Other_Details= payment.getOtherdetail();
+		    String OtherDetails_data[] = Other_Details.split("\\,");
+		    
+			
+			if (category.equalsIgnoreCase("CER"))
+				student = theSBIService.otherdetailforcertificate(student, OtherDetails_data);
+
+			if (category.equalsIgnoreCase("CON") || category.equalsIgnoreCase("newadm")
+					|| category.equalsIgnoreCase("appfee"))
+				
+			student = theSBIService.otherdetailforcontinue(student, OtherDetails_data);
+
+			student.setATRN(ATRN);
+			student.setMerchantorderno(payment.getMerchantorderno());
+			student.setCategory(payment.getCategory());
+			student.setAppfee(amt);
+			student.setMessage(payment.getTransaction_status());
+			student.setAmount(floatamt);
+			student.setTransactiondate(payment.getTransaction_date());
+			student.setBankReferenceNumber(payment.getBank_Reference_Number());
+			
+		
+		return student;
+
+	}
+
+
 
 }
