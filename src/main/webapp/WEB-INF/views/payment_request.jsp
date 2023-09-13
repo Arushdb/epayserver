@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>   
+
+<%@ page language="java" import="java.util.*" %> 
+<%@ page import = "java.util.ResourceBundle" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,10 +36,27 @@
     
 </style>
 
+<% ResourceBundle resource = ResourceBundle.getBundle("message");
+  String testepayUrl=resource.getString("testepayUrl");
+  String liveepayUrl=resource.getString("liveepayUrl");
+  String epayUrl;
+  
+  String paymentgatewaylive=resource.getString("paymentgatewaylive");
+  if(paymentgatewaylive.equalsIgnoreCase("no")){
+	  epayUrl=testepayUrl;
+  }else{
+	  epayUrl=liveepayUrl;
+  }
+  
+System.out.println("epay url"+epayUrl);	 
+  
+%>
 
 
 </head>
 <body onload="submitform()">
+
+
 
 <!--  
 <div class="flex-container">
@@ -61,7 +81,7 @@
 -->
     <div  style="text-align: center;">
         
-        <form:form id="form1"  action="https://test.sbiepay.sbi/secure/AggregatorHostedListener" method="post" modelAttribute="student">
+        <form:form id="form1"  action= "<%=epayUrl %>" method="post" modelAttribute="student">
              
             <form:input type="hidden"  path="EncryptTrans"/><br/>
           
