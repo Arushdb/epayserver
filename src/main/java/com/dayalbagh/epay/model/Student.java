@@ -55,6 +55,7 @@ public class Student {
 	private Payment payment;
 	private String defaulter;
 	private String  bankReferenceNumber;
+	private String  branchName;
 	
 	
 	
@@ -109,7 +110,7 @@ public class Student {
 	}
 	
 	public Student(String roll_number, String studentname, String programid, Character type, String programname,
-			String mode, String branchid, String specializationid,String entityid,String entityName) {
+			String mode, String branchid, String specializationid,String entityid,String entityName,String branchName) {
 		
 		this.roll_number = roll_number;
 		this.studentname = studentname;
@@ -121,6 +122,7 @@ public class Student {
 		this.specializationid = specializationid;
 		this.entityid=entityid ;
 		this.entityName=entityName;
+		this.branchName=branchName;
 	}
 	public Student(String roll_number, String programname) {
 		
@@ -389,6 +391,12 @@ public class Student {
 	}
 	public void setEntityName(String entityName) {
 		this.entityName = entityName;
+	}
+	public String getBranchName() {
+		return branchName;
+	}
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
 	}
 	
 	

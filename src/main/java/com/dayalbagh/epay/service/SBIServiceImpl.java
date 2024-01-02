@@ -87,6 +87,9 @@ public class SBIServiceImpl implements SBIService {
 
 	@Value("${testgatewayUrl}")
 	private String testgatewayUrl;
+	
+	@Value("${testdoubleverificationurl}")
+	private String testdoubleverificationurl;
 
 	@Value("${testSuccessURL}")
 	private String testSuccessURL;
@@ -107,6 +110,11 @@ public class SBIServiceImpl implements SBIService {
 
 	@Value("${livegatewayUrl}")
 	private String livegatewayUrl;
+	
+	@Value("${livedoubleverificationurl}")
+	private String livedoubleverificationurl;
+	
+	
 
 	@Value("${liveSuccessURL}")
 	private String liveSuccessURL;
@@ -138,6 +146,7 @@ public class SBIServiceImpl implements SBIService {
 	static String gatewayUrl;
 	static String key_Array;
 	static String aeskey;
+	static String doubleverificationurl;
 
 	@Autowired
 	private ServletContext context;
@@ -153,6 +162,8 @@ public class SBIServiceImpl implements SBIService {
 
 	@Autowired
 	DefaulterRepository theDefaulterRepository;
+	
+	
 
 //	public SBIServiceImpl(PaymentRepository paymentrepository) {
 //		
@@ -169,6 +180,7 @@ public class SBIServiceImpl implements SBIService {
 			gatewayUrl = testgatewayUrl;
 			key_Array = testkey_Array;
 			aeskey = testaeskey;
+			doubleverificationurl=testdoubleverificationurl;
 		}
 		if (paymentgatewaylive.equalsIgnoreCase("yes")) {
 			MerchantId = livemerchantid;
@@ -178,6 +190,7 @@ public class SBIServiceImpl implements SBIService {
 			gatewayUrl = livegatewayUrl;
 			key_Array = livekey_Array;
 			aeskey = liveaeskey;
+			doubleverificationurl=livedoubleverificationurl;
 		}
 
 	}
@@ -253,7 +266,8 @@ public class SBIServiceImpl implements SBIService {
 			params.put("aggregatorId", "SBIEPAY");
 			params.put("merchantId", MerchantId);
 
-			URL url = new URL(gatewayUrl);
+		//	URL url = new URL(gatewayUrl); Commented by Arush on 30-12-2023.Double verification is on different url in live
+			URL url = new URL(doubleverificationurl);
 
 			HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
 			httpConn.setDoInput(true); // true indicates the server returns response

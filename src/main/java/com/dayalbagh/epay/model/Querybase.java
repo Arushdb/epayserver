@@ -51,17 +51,18 @@ import javax.persistence.SqlResultSetMappings;
 		@NamedNativeQuery(name = "getstudentdetail", query = "select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid ,"
 
 				+ "	pm.program_type as type,program_name as programname,em.entity_type as mode,sp.branch_id as branchid ,sp.specialization_id as specializationid"
-				+ " , sp.entity_id as entityid ,em.entity_name as entityName from cms_live.student_program sp "
+				+ " , sp.entity_id as entityid ,em.entity_name as entityName,stt.component_description as branchname from cms_live.student_program sp "
 				+ " join cms_live.student_master sm on sm.enrollment_number = sp.enrollment_number "
 				+ "	 join cms_live.program_master pm on pm.program_id = sp.program_id "
 				+ "  join cms_live.entity_master em on em.entity_id = sp.entity_id "
-				+ "	 where roll_number =:rollno and program_status in ('ACT','PAS','FAL') " 
+				+ "  join cms_live.system_table_two stt on stt.component_code = sp.branch_id "
+				+ "	 where roll_number =:rollno and program_status in ('ACT','PAS','FAL') and stt.group_code = 'BRNCOD' " 
 				+ " order by sp.register_date desc "  , resultSetMapping = "getstudentdetailmap"),
 		
 		@NamedNativeQuery(name = "valid_roll_enrol_dob", query = "select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid ,"
 
 				+ "	pm.program_type as type,program_name as programname,em.entity_type as mode,sp.branch_id as branchid ,sp.specialization_id as specializationid"
-				+ " , sp.entity_id as entityid from cms_live.student_program sp "
+				+ " , sp.entity_id as entityid ,'' as branchname from cms_live.student_program sp "
 				+ " join cms_live.student_master sm on sm.enrollment_number = sp.enrollment_number "
 				+ "	 join cms_live.program_master pm on pm.program_id = sp.program_id "
 				+ "  join cms_live.entity_master em on em.entity_id = sp.entity_id "
@@ -70,7 +71,7 @@ import javax.persistence.SqlResultSetMappings;
 		@NamedNativeQuery(name = "valid_enrol_dob", query =" select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid, "
 								  
                 + " pm.program_type as type,pm.program_name as programname,'mode' as mode,sp.branch_id as branchid ,"
-                + " sp.specialization_id as specializationid ,sp.entity_id as entityid from cms_live.student_program sp "
+                + " sp.specialization_id as specializationid ,sp.entity_id as entityid,'' as branchname from cms_live.student_program sp "
                 + " join cms_live.student_master sm on sm.enrollment_number =:enrolno "
                 + " join cms_live.program_master pm on pm.program_id = sp.program_id "
                 + " and sm.date_of_birth=:dob "
@@ -198,7 +199,8 @@ import javax.persistence.SqlResultSetMappings;
 						@ColumnResult(name = "studentname"), @ColumnResult(name = "programid"),
 						@ColumnResult(name = "type"), @ColumnResult(name = "programname"), @ColumnResult(name = "mode"),
 						@ColumnResult(name = "branchid"), @ColumnResult(name = "specializationid"),
-						@ColumnResult(name = "entityid"),@ColumnResult(name = "entityName")
+						@ColumnResult(name = "entityid"),@ColumnResult(name = "entityName"),
+						@ColumnResult(name = "branchname")
 
 				}
 
