@@ -102,7 +102,7 @@ public class WebSecurityConfig  {
 		
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		corsConfiguration.setAllowCredentials(true);
-		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://test.sbiepay.sbi"));
+		corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200","https://test.sbiepay.sbi","https://www.sbiepay.sbi"));
 		
 		
 		
