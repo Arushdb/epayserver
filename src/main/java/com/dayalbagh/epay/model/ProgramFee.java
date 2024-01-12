@@ -32,6 +32,7 @@ public class ProgramFee {
 	private int lab;
 	@Column(name = "fee_type")
 	private String feetype ;
+	private int active;
 	
 	
 	public ProgramFee() {
@@ -87,6 +88,12 @@ public class ProgramFee {
 	}
 	public void setFeetype(String feetype) {
 		this.feetype = feetype;
+	}
+	public int getActive() {
+		return active;
+	}
+	public void setActive(int active) {
+		this.active = active;
 	}
 	
 	

@@ -12,17 +12,17 @@ import com.dayalbagh.epay.model.ProgramFee;
 @Repository
 public interface ProgramFeeRepository extends JpaRepository<ProgramFee, Integer> {
 	
-	List<ProgramFee>  findByProgramidAndSemestercodeAndBranchidAndSpecializationidAndMode
-	( String programid,String sem,String brn,String spc,String mode);
+	List<ProgramFee>  findByProgramidAndSemestercodeAndBranchidAndSpecializationidAndModeAndActive
+	( String programid,String sem,String brn,String spc,String mode,int act);
 	
-	List<ProgramFee>  findByProgramidAndSemestercodeAndBranchidAndMode
-	( String programid,String sem,String brn,String mode);
+	List<ProgramFee>  findByProgramidAndSemestercodeAndBranchidAndModeAndActive
+	( String programid,String sem,String brn,String mode,int act);
 	
-	List<ProgramFee>  findByProgramidAndSemestercodeAndMode
-	( String programid,String sem,String mode);
+	List<ProgramFee>  findByProgramidAndSemestercodeAndModeAndActive
+	( String programid,String sem,String mode,int act);
 	
-	List<ProgramFee>  findByProgramidAndMode
-	( String programid,String mode);
+	List<ProgramFee>  findByProgramidAndModeAndActive
+	( String programid,String mode,int act);
 
 	
 }

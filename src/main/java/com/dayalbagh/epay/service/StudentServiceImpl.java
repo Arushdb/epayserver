@@ -261,17 +261,17 @@ public class StudentServiceImpl implements StudentService {
 		Student studentfee = new Student();
 		float feeamount = 0;
 		List<ProgramFee> programfee = new ArrayList<ProgramFee>();
-		programfee = theprogramFeeRepository.findByProgramidAndSemestercodeAndBranchidAndSpecializationidAndMode(pgm,
-				sem, branch, spec, learningmode);
+		programfee = theprogramFeeRepository.findByProgramidAndSemestercodeAndBranchidAndSpecializationidAndModeAndActive(pgm,
+				sem, branch, spec, learningmode,1);
 		if (programfee.size() > 0) {
 
 		} else {
-			programfee = theprogramFeeRepository.findByProgramidAndSemestercodeAndBranchidAndMode(pgm, sem, branch,
-					learningmode);
+			programfee = theprogramFeeRepository.findByProgramidAndSemestercodeAndBranchidAndModeAndActive(pgm, sem, branch,
+					learningmode,1);
 			if (programfee.size() > 0) {
 
 			} else {
-				programfee = theprogramFeeRepository.findByProgramidAndSemestercodeAndMode(pgm, sem, learningmode);
+				programfee = theprogramFeeRepository.findByProgramidAndSemestercodeAndModeAndActive(pgm, sem, learningmode,1);
 				if (programfee.size() > 0) {
 
 				} else {
