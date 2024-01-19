@@ -256,79 +256,91 @@ public class PaymentController {
 		
 	}
 
-	@Transactional()
-	@Scheduled(fixedRateString = "${run-frquency.minutes}", timeUnit = TimeUnit.MINUTES)
-	public void processpendingpayment() {
-
-		String status = "success";
-		Payment payment = null;
-		String dvdata = "";
-		String[] dvdata_ary;
-		List<PendingPayment> pendingpayment = new ArrayList<>();
-		String data[] = new String[5];
-		System.out.println("in side process pending payment method ");
-
-		pendingpayment = thePendingPaymentRepository.findAllByTrxstatusNot(status);
-		if (pendingpayment.size() > 0) {
-
-			for (PendingPayment pending : pendingpayment) {
-				data[0] = pending.getMerchant_Order_Number();
-				data[1] = pending.getATRN();
-				data[3] = pending.getAmount().toString();
-				dvdata = sbiservice.verifyPayment(data);
-				dvdata_ary = dvdata.split("\\|");
-				String trxstatus = dvdata_ary[2];
-				String statusdesc = dvdata_ary[8];
-				pending.setTrxstatus(trxstatus);
-				pending.setModifiedBy("processpendingpayment");
-
-				pending.setModification_time(new Date());
-				// pending.setProcess_time(null);
-
-				thePendingPaymentRepository.save(pending);
-				payment = sbiservice.findPaymentByMerchantorderno(pending.getMerchant_Order_Number());
-				payment.setDv_status(trxstatus);
-				payment.setStatusdescription(statusdesc);
-				payment.setModifiedby("processpendingpayment");
-				payment.setModification_time(new Date());
-
-				sbiservice.updatePaymentstatus(payment);
-
-				// if double verification is success;
-
-				if (trxstatus.equalsIgnoreCase("Success")) {
-
-					Student student = sbiservice.ParseDVResponse(dvdata_ary);
-					student.setPayment(payment);
-					student.setMethod("processpendingpayment");
-
-					String category = student.getCategory();
-					if (category.equalsIgnoreCase("CON") || category.equalsIgnoreCase("newadm")) {
-
-						studentservice.savestudentfee(student);
-
-					}
-
-					// For Application Fee
-
-					if (category.equalsIgnoreCase("appfee")) {
-						studentservice.saveStudentAppfee(student);
-
-					}
-
-					if (category.equalsIgnoreCase("CER")) {
-						certificateService.savecertificateDetail(student);
-
-					}
-
-				} else {
-
-				}
-
-			}
-
-		}
-	}
+//	@Transactional()
+//	@Scheduled(fixedRateString = "${run-frquency.minutes}", timeUnit = TimeUnit.MINUTES)
+//	public void processpendingpayment() {
+//
+//		String status = "success";
+//		Payment payment = null;
+//		String dvdata = "";
+//		String[] dvdata_ary;
+//		List<PendingPayment> pendingpayment = new ArrayList<>();
+//		String data[] = new String[5];
+//		System.out.println("in side process pending payment method ");
+//
+//		pendingpayment = thePendingPaymentRepository.findAllByTrxstatusNot(status);
+//		if (pendingpayment.size() > 0) {
+//
+//			for (PendingPayment pending : pendingpayment) {
+//				data[0] = pending.getMerchant_Order_Number();
+//				data[1] = pending.getATRN();
+//				data[3] = pending.getAmount().toString();
+//				dvdata = sbiservice.verifyPayment(data);
+//				dvdata_ary = dvdata.split("\\|");
+//				String trxstatus = dvdata_ary[2];
+//				String statusdesc = dvdata_ary[8];
+//				pending.setTrxstatus(trxstatus);
+//				pending.setModifiedBy("processpendingpayment");
+//
+//				pending.setModification_time(new Date());
+//				// pending.setProcess_time(null);
+//
+//				thePendingPaymentRepository.save(pending);
+//				payment = sbiservice.findPaymentByMerchantorderno(pending.getMerchant_Order_Number());
+//				if(payment == null) {
+//					payment = new Payment();
+//					payment.setATRN(dvdata_ary[1]);
+//					payment.setMerchant_ID(dvdata_ary[0]);
+//					payment.setMerchantorderno(dvdata_ary[6]);
+//					payment.setAmount(dvdata_ary[7]);
+//					
+//					
+//				}
+//				
+//				
+//				payment.setDv_status(trxstatus);
+//				payment.setStatusdescription(statusdesc);
+//				payment.setModifiedby("processpendingpayment");
+//				payment.setModification_time(new Date());
+//
+//				sbiservice.updatePaymentstatus(payment);
+//				
+//
+//				// if double verification is success;
+//
+//				if (trxstatus.equalsIgnoreCase("Success")) {
+//
+//					Student student = sbiservice.ParseDVResponse(dvdata_ary);
+//					student.setPayment(payment);
+//					student.setMethod("processpendingpayment");
+//
+//					String category = student.getCategory();
+//					if (category.equalsIgnoreCase("CON") || category.equalsIgnoreCase("newadm")) {
+//
+//						studentservice.savestudentfee(student);
+//
+//					}
+//
+//					// For Application Fee
+//
+//					if (category.equalsIgnoreCase("appfee")) {
+//						studentservice.saveStudentAppfee(student);
+//
+//					}
+//
+//					if (category.equalsIgnoreCase("CER")) {
+//						certificateService.savecertificateDetail(student);
+//
+//					}
+//
+//				} else {
+//
+//				}
+//
+//			}
+//
+//		}
+//	}
 
 
 	@RequestMapping(path = "/download", method = RequestMethod.POST)

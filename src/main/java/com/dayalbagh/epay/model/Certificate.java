@@ -51,7 +51,7 @@ public class Certificate {
 	@OneToMany(mappedBy = "certificate")
 	private List<Certificatesemester> certificatesemester;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne
 	@JoinColumn(name = "payment_id", referencedColumnName = "id")
 	private Payment payment;
 

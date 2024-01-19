@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.crypto.BadPaddingException;
@@ -49,9 +50,9 @@ import org.hibernate.exception.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dayalbagh.epay.AES256Bit;
 
@@ -60,7 +61,7 @@ import com.dayalbagh.epay.model.Epayerrorlog;
 import com.dayalbagh.epay.model.Payment;
 import com.dayalbagh.epay.model.PendingPayment;
 import com.dayalbagh.epay.model.Student;
-
+import com.dayalbagh.epay.model.Studentfeereceipt;
 import com.dayalbagh.epay.repository.DefaulterRepository;
 import com.dayalbagh.epay.repository.EpayExceptionRepository;
 
@@ -162,6 +163,13 @@ public class SBIServiceImpl implements SBIService {
 
 	@Autowired
 	DefaulterRepository theDefaulterRepository;
+	
+	@Autowired
+	private StudentService studentservice;
+
+	@Autowired
+	private CertificateService certificateService;
+
 	
 	
 
@@ -400,11 +408,28 @@ public class SBIServiceImpl implements SBIService {
 		String ATRN = resdata[1];
 
 		String Amount = resdata[3];
+		String status_ary [];
 		System.out.println("in side verify payment");
 
 		String queryRequest = ATRN + "|" + MerchantId + "|" + Merchant_Order_Number + "|" + Amount;
-
+		
+        
 		String status = DoubleVerification(queryRequest);
+		
+		
+		// if with ATRN DV is not found ,try without ATRN
+		
+		status_ary = status.split("\\|");
+		status_ary[2] = status_ary[2].replaceAll(" ", "");
+		
+		
+		if(status_ary[2].equalsIgnoreCase("NoRecordsFound")) {
+			queryRequest =  "|" + MerchantId + "|" + Merchant_Order_Number + "|" + Amount;
+			
+			
+			 status = DoubleVerification(queryRequest);
+		}
+		
 
 		return status;
 	}
@@ -584,7 +609,7 @@ public class SBIServiceImpl implements SBIService {
 			// if transaction is not successful make an entry into pending payments
 			// So that later on double verification can update Payment status based on
 			// pending payments
-			if ((dvstatus.equalsIgnoreCase("PENDING"))) {
+			if ((dvstatus.equalsIgnoreCase("PENDING")||dvstatus.equalsIgnoreCase("BOOKED"))) {
 
 				PendingPayment pendingPayment = new PendingPayment();
 				pendingPayment.setATRN(ATRN);
@@ -643,6 +668,10 @@ public class SBIServiceImpl implements SBIService {
 		student.setStatus(insertstatus); // payment file insertion status
 		return student;
 	}
+	
+	
+	
+	
 
 	@Override
 	public boolean isNumeric(String strNum) {
@@ -656,6 +685,9 @@ public class SBIServiceImpl implements SBIService {
 		}
 		return true;
 	}
+	
+	
+	
 
 	@Override
 	public Payment findPaymentByATRN(String ATRN) {
@@ -919,7 +951,7 @@ public class SBIServiceImpl implements SBIService {
 			feepending = resdata[11];
 
 			feetype = resdata[12];
-			defaulter = resdata[13];
+			//defaulter = resdata[13];
 
 			if (isNumeric(latefee)) {
 				latefeeamt = Float.parseFloat(latefee);
@@ -940,7 +972,7 @@ public class SBIServiceImpl implements SBIService {
 			student.setSemestercode(semester);
 			student.setFeepending(feepending);
 			student.setFeetype(feetype);
-			student.setDefaulter(defaulter);
+	//		student.setDefaulter(defaulter);
 
 			student.setStatus("success");
 
@@ -1117,5 +1149,167 @@ public class SBIServiceImpl implements SBIService {
 		// TODO Auto-generated method stub
 		return thepaymentrepository.findByATRNAndAmount(atrn, amount);
 	}
+	
+	@Transactional()
+	@Scheduled(fixedRateString = "${run-frquency.minutes}", timeUnit = TimeUnit.MINUTES)
+	public void processpendingpaymentnew() {
+
+		String status = "success";
+		Payment payment = null;
+		String dvdata = "";
+		String[] dvdata_ary;
+		Double trxamt = 0.0;
+		String Amount = "";
+		String sts="";
+		List<PendingPayment> pendingpayment = new ArrayList<>();
+		String data[] = new String[5];
+		Timestamp timestamp = new Timestamp(0);
+		System.out.println("in side process pending payment method ");
+
+		pendingpayment = thePendingPaymentRepository.findAllByTrxstatusNot(status);
+		if (pendingpayment.size() > 0) {
+
+			for (PendingPayment pending : pendingpayment) {
+				data[0] = pending.getMerchant_Order_Number();
+				data[1] = pending.getATRN();
+				data[3] = pending.getAmount().toString();
+				dvdata = verifyPayment(data);
+				dvdata_ary = dvdata.split("\\|");
+				String trxstatus = dvdata_ary[2];
+				sts  = dvdata_ary[2].replaceAll(" ", "");
+				if(sts.equalsIgnoreCase("NoRecordsFound)"))
+						continue;
+				String statusdesc = dvdata_ary[8];
+				pending.setTrxstatus(trxstatus);
+				pending.setModifiedBy("processpendingpayment");
+
+				pending.setModification_time(new Date());
+				// pending.setProcess_time(null);
+
+			
+				payment = findPaymentByMerchantorderno(pending.getMerchant_Order_Number());
+				if(payment == null) {
+					payment = new Payment();
+					
+					payment.setMerchant_ID(dvdata_ary[0]);
+					payment.setATRN(dvdata_ary[1]);
+					payment.setTransaction_status(dvdata_ary[2]);
+					
+					payment.setCountry(dvdata_ary[3]);
+					payment.setCurrency(dvdata_ary[4]);
+					payment.setOtherdetail(dvdata_ary[5]);
+					payment.setMerchantorderno(dvdata_ary[6]);
+					if (isNumeric(dvdata_ary[7])) {
+					
+						payment.setAmount(BigDecimal.valueOf(trxamt));
+					} else {
+						payment.setAmount(BigDecimal.valueOf(0));
+					}
+					
+					payment.setStatusdescription(dvdata_ary[8]);
+					payment.setBank_code(dvdata_ary[9]);
+					payment.setBank_Reference_Number(dvdata_ary[10]);
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+					Date parsedDate = null;
+					try {
+						parsedDate = formatter.parse(dvdata_ary[11]);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					timestamp = new java.sql.Timestamp(parsedDate.getTime());
+
+					payment.setTransaction_date(timestamp);
+					
+					payment.setPayment_mode(dvdata_ary[12]);
+					payment.setCIN(dvdata_ary[13]);
+					Amount = dvdata_ary[14];
+					
+					if (isNumeric(Amount)) {
+						trxamt = Double.parseDouble(Amount);
+						payment.setAmount(BigDecimal.valueOf(trxamt));
+					} else {
+						payment.setAmount(null);
+					}
+					Amount=dvdata_ary[14];// total fee GST
+					if (isNumeric(dvdata_ary[14])) {
+						trxamt = Double.parseDouble(Amount);
+						
+						payment.setTotal_Fee_GST(BigDecimal.valueOf(trxamt));
+					} else {
+						payment.setAmount(BigDecimal.valueOf(0));
+					}
+				payment.setCreatedby("processpendingpayment");
+				payment.setInsert_time(new Date());
+					
+			
+					
+					
+				}
+				else {
+					payment.setModifiedby("processpendingpayment");
+					payment.setModification_time(new Date());	
+				}
+				
+				
+				payment.setDv_status(trxstatus);
+				payment.setStatusdescription(statusdesc);
+				
+
+				
+				
+
+				// if double verification is success;
+
+				if (trxstatus.equalsIgnoreCase("Success")) {
+
+					Student student = ParseDVResponse(dvdata_ary);
+					student.setPayment(payment);
+					student.setMethod("processpendingpayment");
+
+					String category = student.getCategory();
+					if (category.equalsIgnoreCase("CON") || category.equalsIgnoreCase("newadm")) {
+
+						Studentfeereceipt feereceipt=     studentservice.getstudentfeereceipt(student);
+						payment.setFeereceipt(feereceipt);
+						payment.setRefnumber(student.getRoll_number());
+						payment.setCategory(student.getCategory());
+						payment.setType(student.getReftype());
+						
+					
+						updatePaymentstatus(payment);
+						
+
+					}
+
+					// For Application Fee
+
+					if (category.equalsIgnoreCase("appfee")) {
+						studentservice.saveStudentAppfee(student);
+
+					}
+
+					if (category.equalsIgnoreCase("CER")) {
+						certificateService.savecertificateDetail(student);
+
+					}
+				
+					
+				} else {
+					
+					
+
+				}
+				
+				
+				Payment paymentpending=thepaymentrepository.findByATRN(payment.getATRN());
+				pending.setPayment(paymentpending);
+				thePendingPaymentRepository.save(pending);
+				
+			}
+
+		}
+	}
+
 
 }

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -66,12 +67,14 @@ public class Payment {
 	private String statusdescription;
 	
 	
-	@OneToOne(mappedBy = "payment")
+	@OneToOne(mappedBy = "payment",cascade = CascadeType.ALL)
 	private Studentfeereceipt feereceipt;
 	
-	@OneToOne(mappedBy = "payment")
+	@OneToOne(mappedBy = "payment",cascade = CascadeType.ALL)
 	private Certificate certificate;
 	
+	@OneToOne(mappedBy = "payment",cascade = CascadeType.ALL)
+	private PendingPayment pendingPayment ;
 	
 	@Column(name = "insert_time" ,columnDefinition = "insert_time")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -334,6 +337,14 @@ public class Payment {
 
 	public void setModifiedby(String modifiedby) {
 		this.modifiedby = modifiedby;
+	}
+
+	public PendingPayment getPendingPayment() {
+		return pendingPayment;
+	}
+
+	public void setPendingPayment(PendingPayment pendingPayment) {
+		this.pendingPayment = pendingPayment;
 	}
 	
 	

@@ -51,6 +51,8 @@ public interface StudentService {
 	boolean isSemregistered(String rollno, String sem,java.sql.Date semesterstartdate,
 			java.sql.Date semesterenddate);
 
+	Studentfeereceipt getstudentfeereceipt(Student student);
+
 	
 	
 	

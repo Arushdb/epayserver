@@ -649,7 +649,61 @@ public class StudentServiceImpl implements StudentService {
 		
 	}
 
+	@Override
+	public Studentfeereceipt getstudentfeereceipt(Student student)  {
+		Studentfeereceipt sfr = null;
+		
+		try {
 
+			
+		int paymentid =student.getPayment().getId();
+		sfr =thefeereceiptRepository.findByPayment_id(paymentid);
+		
+		if( sfr==null) {
+			
+			Date  now =  new Date();
+			Timestamp timestamp = new Timestamp(now.getTime());
+			sfr = new Studentfeereceipt();
+			sfr.setInsert_time(timestamp);
+			sfr.setCreatedby(student.getMethod());
+		}else {
+			Date  now =  new Date();
+			Timestamp timestamp = new Timestamp(now.getTime());
+			sfr.setModification_time(timestamp);
+			sfr.setModifiedby(student.getMethod());
+		}
+			
+		sfr.setProgramid(student.getProgramid());
+		sfr.setRollnumber(student.getRoll_number());
+		sfr.setReftype(student.getReftype());
+		sfr.setSemester(student.getSemestercode());
+		sfr.setPayment(student.getPayment());
+		sfr.setSemesterstartdate(student.getSemesterstartdate());
+		sfr.setSemesterenddate(student.getSemesterenddate());
+		sfr.setEntityid(student.getEntityid());
+		sfr.setLatefee(BigDecimal.valueOf(student.getLatefee()));
+		sfr.setAmount( BigDecimal.valueOf(student.getAmount())  );
+		sfr.setFeetype(student.getFeetype());
+		
+		
+		
+		
+		
+		//thefeereceiptRepository.save(sfr);
+
+				
+		}
+		catch(Exception e) {
+			sbiservice.logerror(student.getATRN(), student.getMerchantorderno(), String.valueOf(student.getAmount()),  e.getMessage(),"savestudentfee");
+  			return null;
+		}
+		
+				 
+		return sfr;
+		
+	}
+	
+	
 
 
 	

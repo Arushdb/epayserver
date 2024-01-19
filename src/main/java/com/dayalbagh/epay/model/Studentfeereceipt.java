@@ -34,7 +34,7 @@ public class Studentfeereceipt {
 	@Temporal(TemporalType.DATE)
 	private Date semesterenddate;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne
 	@JoinColumn(name = "payment_id", referencedColumnName = "id")
 	private Payment payment;
 
