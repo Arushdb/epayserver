@@ -114,6 +114,9 @@ public class StudentController {
 			defaulter.forEach(rec -> {
 				rec.setStudentname(thestudent.get(0).getStudentname());
 				rec.setFeepending("D"); // D for  defaulter
+				rec.setBranchName(thestudent.get(0).getBranchName());
+				rec.setEntityName(thestudent.get(0).getEntityName());
+				rec.setBranchid(thestudent.get(0).getEntityid());
 
 			});
 			
