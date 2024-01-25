@@ -116,7 +116,7 @@ public class StudentController {
 				rec.setFeepending("D"); // D for  defaulter
 				rec.setBranchName(thestudent.get(0).getBranchName());
 				rec.setEntityName(thestudent.get(0).getEntityName());
-				rec.setBranchid(thestudent.get(0).getEntityid());
+				rec.setBranchid(thestudent.get(0).getBranchid());
 
 			});
 			
@@ -154,6 +154,7 @@ public class StudentController {
 			thestudent.get(0).setSpecializationid(thependingfee.get(0).getSpecializationid());
 			thestudent.get(0).setEntityid(thependingfee.get(0).getEntityid());
 			thestudent.get(0).setFeetype(studentfee.getFeetype());
+			thestudent.get(0).setDefaulter("N");
 			//Student std = sbiservice.encrypt(thestudent.get(0));
 			//thestudent.get(0).setSbistr(std.getSbistr());
 			
@@ -222,6 +223,7 @@ public class StudentController {
 				thestudent.get(0).setSemesterenddate(semesterenddate)	;
 				thestudent.get(0).setSemestercode(semestercode);
 				thestudent.get(0).setFeetype(studentfee.getFeetype());
+				thestudent.get(0).setDefaulter("N");
 			
 			}else {
 				throw new Exception("Semester:"+semestercode+" is invalid for current period");

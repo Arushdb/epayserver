@@ -1199,12 +1199,17 @@ public class SBIServiceImpl implements SBIService {
 					payment.setCurrency(dvdata_ary[4]);
 					payment.setOtherdetail(dvdata_ary[5]);
 					payment.setMerchantorderno(dvdata_ary[6]);
-					if (isNumeric(dvdata_ary[7])) {
+					Amount = dvdata_ary[7];
 					
-						payment.setAmount(BigDecimal.valueOf(trxamt));
+					if (isNumeric(Amount)) {
+						trxamt = Double.parseDouble(Amount);
+					
 					} else {
-						payment.setAmount(BigDecimal.valueOf(0));
+						trxamt = 0.0;
 					}
+								
+					payment.setAmount(BigDecimal.valueOf(trxamt));
+				
 					
 					payment.setStatusdescription(dvdata_ary[8]);
 					payment.setBank_code(dvdata_ary[9]);
@@ -1223,28 +1228,19 @@ public class SBIServiceImpl implements SBIService {
 					
 					payment.setPayment_mode(dvdata_ary[12]);
 					payment.setCIN(dvdata_ary[13]);
-					Amount = dvdata_ary[14];
 					
+					Amount=dvdata_ary[15];// total fee GST
 					if (isNumeric(Amount)) {
-						trxamt = Double.parseDouble(Amount);
-						payment.setAmount(BigDecimal.valueOf(trxamt));
-					} else {
-						payment.setAmount(null);
-					}
-					Amount=dvdata_ary[14];// total fee GST
-					if (isNumeric(dvdata_ary[14])) {
 						trxamt = Double.parseDouble(Amount);
 						
 						payment.setTotal_Fee_GST(BigDecimal.valueOf(trxamt));
 					} else {
-						payment.setAmount(BigDecimal.valueOf(0));
+						payment.setTotal_Fee_GST(BigDecimal.valueOf(0));
 					}
 				payment.setCreatedby("processpendingpayment");
 				payment.setInsert_time(new Date());
 					
-			
-					
-					
+								
 				}
 				else {
 					payment.setModifiedby("processpendingpayment");
@@ -1304,6 +1300,8 @@ public class SBIServiceImpl implements SBIService {
 				
 				Payment paymentpending=thepaymentrepository.findByATRN(payment.getATRN());
 				pending.setPayment(paymentpending);
+				
+				pending.setProcess_time(new Date());
 				thePendingPaymentRepository.save(pending);
 				
 			}
