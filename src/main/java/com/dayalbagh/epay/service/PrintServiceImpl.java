@@ -220,12 +220,13 @@ public class PrintServiceImpl implements PrintService {
 		file.mkdirs();
         String category = student.getCategory();
         String filename="";
-        if ((category.equalsIgnoreCase("con")||
-        		(category.equalsIgnoreCase("CER")))){
-        			filename = student.getRoll_number();
-        		}else {
-        			filename = student.getApplicationnumber();	
-        		}
+        filename = student.getRoll_number();
+//        if ((category.equalsIgnoreCase("con")||
+//        		(category.equalsIgnoreCase("CER")))){
+//        			filename = student.getRoll_number();
+//        		}else {
+//        			filename = student.getRoll_number();	
+//        		}
         		
 
 		Document document = new Document(PageSize.A4);
@@ -398,7 +399,8 @@ public class PrintServiceImpl implements PrintService {
 //
 //			studentdetail.addCell(cell);
 //			
-			setcategorywisereceipt(studentdetail,student);
+			PdfPTable headertable = new PdfPTable(1);
+			setcategorywisereceipt(studentdetail,student,headertable);
 			// Category  continue End Specific
 						
 
@@ -464,30 +466,33 @@ public class PrintServiceImpl implements PrintService {
 
 			studentdetail.addCell(cell);
 
+			// Start Header as per category
+//			PdfPTable headertable = new PdfPTable(1);
+//			
+//			
+//
+//			cell = new PdfPCell(new Phrase("e-receipt for DEI epayment "));
+//			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+//			cell.setBorder(0);
+//			cell.setFixedHeight(30);
+//			// h1.setAlignment(Cell.ALIGN_CENTER);
+//			headertable.addCell(cell);
+//			String semester = dateFormat.format(student.getSemesterstartdate());
+//			cell = new PdfPCell(new Phrase("Continue Student-" + semester));
+//			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+//			cell.setBorder(0);
+//			cell.setFixedHeight(30);
+//			headertable.addCell(cell);
+//
+//			cell = new PdfPCell(new Phrase(" "));
+//
+//			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+//			cell.setBorder(0);
+//
+//			headertable.addCell(cell);
 			
-			PdfPTable headertable = new PdfPTable(1);
+			// end Header as per category
 			
-			
-
-			cell = new PdfPCell(new Phrase("e-receipt for DEI epayment "));
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setBorder(0);
-			cell.setFixedHeight(30);
-			// h1.setAlignment(Cell.ALIGN_CENTER);
-			headertable.addCell(cell);
-			String semester = dateFormat.format(student.getSemesterstartdate());
-			cell = new PdfPCell(new Phrase("Continue Student-" + semester));
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setBorder(0);
-			cell.setFixedHeight(30);
-			headertable.addCell(cell);
-
-			cell = new PdfPCell(new Phrase(" "));
-
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setBorder(0);
-
-			headertable.addCell(cell);
 			
 
 			document.add(headerimg);
@@ -521,7 +526,7 @@ public class PrintServiceImpl implements PrintService {
 	
 	
 	
-	public void  setcategorywisereceipt(PdfPTable studentdetail ,Student student) {
+	public void  setcategorywisereceipt(PdfPTable studentdetail ,Student student,PdfPTable headertable ) {
 		
 		String category = student.getCategory().toLowerCase();
 		String rectype = "" ; 
@@ -613,6 +618,30 @@ public class PrintServiceImpl implements PrintService {
 			cell.setPadding(5);
 
 			studentdetail.addCell(cell);
+			
+			// Adding header information
+			
+			SimpleDateFormat dateFormat = new SimpleDateFormat("MMM-yyyy");
+
+			cell = new PdfPCell(new Phrase("e-receipt for DEI epayment "));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorder(0);
+			cell.setFixedHeight(30);
+			// h1.setAlignment(Cell.ALIGN_CENTER);
+			headertable.addCell(cell);
+			String semester = dateFormat.format(student.getSemesterstartdate());
+			cell = new PdfPCell(new Phrase("Continue Student-" + semester));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorder(0);
+			cell.setFixedHeight(30);
+			headertable.addCell(cell);
+
+			cell = new PdfPCell(new Phrase(" "));
+
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorder(0);
+
+			headertable.addCell(cell);
 
 			break;
 
@@ -630,6 +659,31 @@ public class PrintServiceImpl implements PrintService {
 			cell.setPadding(5);
 
 			studentdetail.addCell(cell);
+			
+			
+		
+
+			cell = new PdfPCell(new Phrase("e-receipt for DEI epayment "));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorder(0);
+			cell.setFixedHeight(30);
+			// h1.setAlignment(Cell.ALIGN_CENTER);
+			headertable.addCell(cell);
+			
+			dateFormat = new SimpleDateFormat("yyyy");
+			 semester = dateFormat.format(student.getSemesterstartdate());
+			cell = new PdfPCell(new Phrase("Application Fee-" + semester));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorder(0);
+			cell.setFixedHeight(30);
+			headertable.addCell(cell);
+
+			cell = new PdfPCell(new Phrase(" "));
+
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorder(0);
+
+			headertable.addCell(cell);
 
 			break;
 
