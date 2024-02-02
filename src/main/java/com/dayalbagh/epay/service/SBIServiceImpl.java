@@ -629,7 +629,11 @@ public class SBIServiceImpl implements SBIService {
 			} else {
 
 				// update defaulter status
-				if (student.getDefaulter().equalsIgnoreCase("Y")&& (dvstatus.equalsIgnoreCase("SUCCESS"))) {
+				if (student.getDefaulter().equalsIgnoreCase("Y")&& (dvstatus.equalsIgnoreCase("SUCCESS")
+						
+						&& Category.equalsIgnoreCase("CON")
+				
+						)) {
 
 					Defaulters def = theDefaulterRepository.findByRollnumberAndSemestercode(student.getRoll_number(),
 							student.getSemestercode());

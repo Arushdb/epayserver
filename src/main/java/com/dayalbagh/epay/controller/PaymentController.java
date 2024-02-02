@@ -347,9 +347,11 @@ public class PaymentController {
 	public void download(Student student,HttpServletResponse response) throws IOException {
 	
 		String filepath="";
-		if (student.getCategory().equalsIgnoreCase("con")) {
+		
 			filepath = printService.exportContinuePDF(student);
-		}
+		
+		
+		
 		
 		
 		

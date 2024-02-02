@@ -349,49 +349,58 @@ public class PrintServiceImpl implements PrintService {
 			cell.setVerticalAlignment(Element.ALIGN_CENTER);
 			cell.setPadding(5);
 			studentdetail.addCell(cell);
+			
+			
+			// Category  Student continue  Specific
+						//*     
 
-			cell = new PdfPCell(new Phrase("Roll No."));
-			cell.setBorderWidth(1);
-			cell.setFixedHeight(30);
-			cell.setPadding(5);
-
-			studentdetail.addCell(cell);
-
-			cell = new PdfPCell(new Phrase(student.getRoll_number()));
-			cell.setBorderWidth(1);
-			cell.setFixedHeight(30);
-			cell.setPadding(5);
-
-			studentdetail.addCell(cell);
-
-			cell = new PdfPCell(new Phrase("Course"));
-			cell.setBorderWidth(1);
-			cell.setFixedHeight(30);
-			cell.setPadding(5);
-
-			studentdetail.addCell(cell);
-
-			cell = new PdfPCell(new Phrase(student.getProgramname()));
-			cell.setBorderWidth(1);
-			cell.setFixedHeight(30);
-			cell.setPadding(5);
-
-			studentdetail.addCell(cell);
-
-			cell = new PdfPCell(new Phrase("Semester"));
-
-			cell.setBorderWidth(1);
-			cell.setFixedHeight(30);
-			cell.setPadding(5);
-
-			studentdetail.addCell(cell);
-
-			cell = new PdfPCell(new Phrase(student.getSemestercode()));
-			cell.setBorderWidth(1);
-			cell.setFixedHeight(30);
-			cell.setPadding(5);
-
-			studentdetail.addCell(cell);
+//			cell = new PdfPCell(new Phrase("Roll No."));
+//			cell.setBorderWidth(1);
+//			cell.setFixedHeight(30);
+//			cell.setPadding(5);
+//
+//			studentdetail.addCell(cell);
+//
+//			cell = new PdfPCell(new Phrase(student.getRoll_number()));
+//			cell.setBorderWidth(1);
+//			cell.setFixedHeight(30);
+//			cell.setPadding(5);
+//
+//			studentdetail.addCell(cell);
+//
+//			
+//			cell = new PdfPCell(new Phrase("Course"));
+//			cell.setBorderWidth(1);
+//			cell.setFixedHeight(30);
+//			cell.setPadding(5);
+//
+//			studentdetail.addCell(cell);
+//
+//			cell = new PdfPCell(new Phrase(student.getProgramname()));
+//			cell.setBorderWidth(1);
+//			cell.setFixedHeight(30);
+//			cell.setPadding(5);
+//
+//			studentdetail.addCell(cell);
+//
+//			cell = new PdfPCell(new Phrase("Semester"));
+//
+//			cell.setBorderWidth(1);
+//			cell.setFixedHeight(30);
+//			cell.setPadding(5);
+//
+//			studentdetail.addCell(cell);
+//
+//			cell = new PdfPCell(new Phrase(student.getSemestercode()));
+//			cell.setBorderWidth(1);
+//			cell.setFixedHeight(30);
+//			cell.setPadding(5);
+//
+//			studentdetail.addCell(cell);
+//			
+			setcategorywisereceipt(studentdetail,student);
+			// Category  continue End Specific
+						
 
 			cell = new PdfPCell(new Phrase("Date of Payment"));
 			cell.setBorderWidth(1);
@@ -509,7 +518,131 @@ public class PrintServiceImpl implements PrintService {
 
 		return filepath;
 	}
+	
+	
+	
+	public void  setcategorywisereceipt(PdfPTable studentdetail ,Student student) {
+		
+		String category = student.getCategory().toLowerCase();
+		String rectype = "" ; 
+		
+		if (
+				category.equalsIgnoreCase("con") ||
+				category.equalsIgnoreCase("newadm") 
+				
+				) {
+			rectype= "student";
+		}
+		
 
+		if (
+				category.equalsIgnoreCase("appfee") ||
+				category.equalsIgnoreCase("POS") 
+				
+				) {
+			rectype= "applicant";
+		}
+		
+		if (
+				category.equalsIgnoreCase("HOS") 
+				
+				
+				) {
+			rectype= "hosteler";
+		}
+		
+		if (
+				category.equalsIgnoreCase("CER") 
+				
+				
+				) {
+			rectype= "exstudent";
+		}
+			
+		//con ,newadm ,CER,HOS,POS,appfee
+		
+		
+		PdfPCell cell;
+		switch (rectype) {
+		case ("student"):
+			
+		if (category.equalsIgnoreCase("con"))
+			cell = new PdfPCell(new Phrase("Roll No."));
+		else 
+			cell = new PdfPCell(new Phrase("Application Number"));
+		
+			cell.setBorderWidth(1);
+			cell.setFixedHeight(30);
+			cell.setPadding(5);
+
+			studentdetail.addCell(cell);
+
+			cell = new PdfPCell(new Phrase(student.getRoll_number()));
+			cell.setBorderWidth(1);
+			cell.setFixedHeight(30);
+			cell.setPadding(5);
+
+			studentdetail.addCell(cell);
+
+			
+			cell = new PdfPCell(new Phrase("Course"));
+			cell.setBorderWidth(1);
+			cell.setFixedHeight(30);
+			cell.setPadding(5);
+
+			studentdetail.addCell(cell);
+
+			cell = new PdfPCell(new Phrase(student.getProgramname()));
+			cell.setBorderWidth(1);
+			cell.setFixedHeight(30);
+			cell.setPadding(5);
+
+			studentdetail.addCell(cell);
+
+			cell = new PdfPCell(new Phrase("Semester"));
+
+			cell.setBorderWidth(1);
+			cell.setFixedHeight(30);
+			cell.setPadding(5);
+
+			studentdetail.addCell(cell);
+
+			cell = new PdfPCell(new Phrase(student.getSemestercode()));
+			cell.setBorderWidth(1);
+			cell.setFixedHeight(30);
+			cell.setPadding(5);
+
+			studentdetail.addCell(cell);
+
+			break;
+
+		case ("applicant"):
+			cell = new PdfPCell(new Phrase("Application Number"));
+			cell.setBorderWidth(1);
+			cell.setFixedHeight(30);
+			cell.setPadding(5);
+
+			studentdetail.addCell(cell);
+
+			cell = new PdfPCell(new Phrase(student.getRoll_number()));
+			cell.setBorderWidth(1);
+			cell.setFixedHeight(30);
+			cell.setPadding(5);
+
+			studentdetail.addCell(cell);
+
+			break;
+
+			
+			
+			
+		}
+		
+		
+	}
+
+	
+		
 	@Override
 	public Student getFeeData(String ordeno, String ATRN, String amount) throws Exception {
 		// TODO Auto-generated method stub

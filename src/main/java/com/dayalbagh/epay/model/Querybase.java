@@ -62,7 +62,7 @@ import javax.persistence.SqlResultSetMappings;
 		@NamedNativeQuery(name = "valid_roll_enrol_dob", query = "select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid ,"
 
 				+ "	pm.program_type as type,program_name as programname,em.entity_type as mode,sp.branch_id as branchid ,sp.specialization_id as specializationid"
-				+ " , sp.entity_id as entityid ,'' as branchname from cms_live.student_program sp "
+				+ " , sp.entity_id as entityid ,'' as entityName ,'' as branchname from cms_live.student_program sp "
 				+ " join cms_live.student_master sm on sm.enrollment_number = sp.enrollment_number "
 				+ "	 join cms_live.program_master pm on pm.program_id = sp.program_id "
 				+ "  join cms_live.entity_master em on em.entity_id = sp.entity_id "
@@ -71,7 +71,7 @@ import javax.persistence.SqlResultSetMappings;
 		@NamedNativeQuery(name = "valid_enrol_dob", query =" select sp.roll_number as roll_number ,student_first_name as studentname,sp.program_id as programid, "
 								  
                 + " pm.program_type as type,pm.program_name as programname,'mode' as mode,sp.branch_id as branchid ,"
-                + " sp.specialization_id as specializationid ,sp.entity_id as entityid,'' as branchname from cms_live.student_program sp "
+                + " sp.specialization_id as specializationid ,sp.entity_id as entityid,'' as entityName ,'' as branchname from cms_live.student_program sp "
                 + " join cms_live.student_master sm on sm.enrollment_number =:enrolno "
                 + " join cms_live.program_master pm on pm.program_id = sp.program_id "
                 + " and sm.date_of_birth=:dob "
@@ -158,7 +158,7 @@ import javax.persistence.SqlResultSetMappings;
 		
 		@NamedNativeQuery(name="updatestudentappfee",
 		query = " 	update admissionform_live.student_application_status set  actual_deposited_fee=?,"
-				+ "	fee_verification_time=now(),fee_verified_by=? ,verification_status='rec' ,"
+				+ "	fee_verification_time=now(),fee_verified_by=? ,verification_status='REC' ,"
 				+ " ATRN=?,merchant_order_number=? "
 				+ "      where application_number=?"
 				+ "      and session_start_date =?"
