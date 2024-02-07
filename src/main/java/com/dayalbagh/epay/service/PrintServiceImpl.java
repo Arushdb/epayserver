@@ -208,8 +208,11 @@ public class PrintServiceImpl implements PrintService {
 
 	}
 
-	public String exportContinuePDF(Student student) throws MalformedURLException, IOException {
+	public String exportContinuePDF(Student student) throws Exception {
 
+	
+		
+		
 		String sep = System.getProperty("file.separator");
 
 		String directory = context.getRealPath("/") + "REPORTS";
@@ -500,15 +503,18 @@ public class PrintServiceImpl implements PrintService {
 			// document.add(footer);
 			document.close();
 //			
-
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+//
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			throw (new FileNotFoundException(e.getMessage()) );
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			throw (new IOException(e.getMessage()) );
+		} catch(Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
+			throw(new Exception(e.getMessage()));
 		}
 
 		// PdfWriter writer = PdfWriter.getInstance(document, new

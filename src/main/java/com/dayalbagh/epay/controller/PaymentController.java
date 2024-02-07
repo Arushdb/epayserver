@@ -344,9 +344,21 @@ public class PaymentController {
 
 
 	@RequestMapping(path = "/download", method = RequestMethod.POST)
-	public void download(Student student,HttpServletResponse response) throws IOException {
+	public void download(Student student,HttpServletResponse response) throws Exception {
 	
 		String filepath="";
+		
+//		Student s1 = new Student();
+//		s1.setAddress("My Address for testing");
+//		s1.setRoll_number("123456");
+//		s1.setEnrolno("7890123");
+//		s1.setBypost("by post");
+//		s1.setCategory("cer");
+//		s1.setAmount(120);
+//		s1.setCertificatetype("mig");
+//		s1.setMerchantorderno("12345");
+	
+		
 		
 			filepath = printService.exportContinuePDF(student);
 		
