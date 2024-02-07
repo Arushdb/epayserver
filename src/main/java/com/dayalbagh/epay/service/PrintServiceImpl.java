@@ -167,7 +167,7 @@ public class PrintServiceImpl implements PrintService {
 
 	@Autowired
 	PaymentRepository thepaymentrepository;
-	
+
 	@Autowired
 	SBIService theSBIService;
 
@@ -218,16 +218,15 @@ public class PrintServiceImpl implements PrintService {
 		File file = new File(directory);
 
 		file.mkdirs();
-        String category = student.getCategory();
-        String filename="";
-        filename = student.getRoll_number();
+		String category = student.getCategory();
+		String filename = "";
+		filename = student.getRoll_number();
 //        if ((category.equalsIgnoreCase("con")||
 //        		(category.equalsIgnoreCase("CER")))){
 //        			filename = student.getRoll_number();
 //        		}else {
 //        			filename = student.getRoll_number();	
 //        		}
-        		
 
 		Document document = new Document(PageSize.A4);
 
@@ -238,8 +237,9 @@ public class PrintServiceImpl implements PrintService {
 			PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(filepath));
 
 			document.open();
-             // for window enviornment
-			//String imgpath = context.getRealPath("/") + "\\WEB-INF\\classes\\images\\deiNewLogo.jpg";
+			// for window enviornment
+			// String imgpath = context.getRealPath("/") +
+			// "\\WEB-INF\\classes\\images\\deiNewLogo.jpg";
 			String imgpath = context.getRealPath("/") + "//WEB-INF//classes//images//deiNewLogo.jpg";
 			URL url = ResourceUtils.getURL(imgpath);
 
@@ -262,20 +262,19 @@ public class PrintServiceImpl implements PrintService {
 			// studentdetail = new PdfPTable(new float[] { 0.5f, 3, 2, 3, 2, 2, 2 });
 
 			studentdetail = new PdfPTable(new float[] { 3, 3 });
-			//PdfPTable deiheadertable = new PdfPTable(new float[] { 1, 5 });
+			// PdfPTable deiheadertable = new PdfPTable(new float[] { 1, 5 });
 			PdfPTable deiheadertable = new PdfPTable(1);
-			
-			 cell = new PdfPCell(new Phrase("Dayalbagh Educational Institute"));
-			 cell.setBorder(0);
-			 cell.setHorizontalAlignment(Cell.ALIGN_CENTER);
-			 deiheadertable.addCell(cell);
-			 
-			 
-			 cell = new PdfPCell(new Phrase("Dayalbagh, Agra UP - 282005"));
-			 cell.setBorder(0);
-			 
-			 cell.setHorizontalAlignment(Cell.ALIGN_CENTER);
-			 deiheadertable.addCell(cell);
+
+			cell = new PdfPCell(new Phrase("Dayalbagh Educational Institute"));
+			cell.setBorder(0);
+			cell.setHorizontalAlignment(Cell.ALIGN_CENTER);
+			deiheadertable.addCell(cell);
+
+			cell = new PdfPCell(new Phrase("Dayalbagh, Agra UP - 282005"));
+			cell.setBorder(0);
+
+			cell.setHorizontalAlignment(Cell.ALIGN_CENTER);
+			deiheadertable.addCell(cell);
 			deiheadertable.setSpacingBefore(20);
 
 			cell = new PdfPCell(new Phrase("Payment Status"));
@@ -292,7 +291,7 @@ public class PrintServiceImpl implements PrintService {
 			cell.setPadding(5);
 
 			studentdetail.addCell(cell);
-			
+
 			cell = new PdfPCell(new Phrase("SBIePay Reference ID "));
 
 			cell.setBorderWidth(1);
@@ -307,7 +306,7 @@ public class PrintServiceImpl implements PrintService {
 			cell.setPadding(5);
 
 			studentdetail.addCell(cell);
-			
+
 			cell = new PdfPCell(new Phrase("Merchant Order No"));
 			cell.setBorderWidth(1);
 			cell.setFixedHeight(30);
@@ -350,10 +349,9 @@ public class PrintServiceImpl implements PrintService {
 			cell.setVerticalAlignment(Element.ALIGN_CENTER);
 			cell.setPadding(5);
 			studentdetail.addCell(cell);
-			
-			
-			// Category  Student continue  Specific
-						//*     
+
+			// Category Student continue Specific
+			// *
 
 //			cell = new PdfPCell(new Phrase("Roll No."));
 //			cell.setBorderWidth(1);
@@ -400,9 +398,8 @@ public class PrintServiceImpl implements PrintService {
 //			studentdetail.addCell(cell);
 //			
 			PdfPTable headertable = new PdfPTable(1);
-			setcategorywisereceipt(studentdetail,student,headertable);
-			// Category  continue End Specific
-						
+			setcategorywisereceipt(studentdetail, student, headertable);
+			// Category continue End Specific
 
 			cell = new PdfPCell(new Phrase("Date of Payment"));
 			cell.setBorderWidth(1);
@@ -419,8 +416,6 @@ public class PrintServiceImpl implements PrintService {
 			cell.setPadding(5);
 
 			studentdetail.addCell(cell);
-
-			
 
 			cell = new PdfPCell(new Phrase("Institute Contact Number"));
 			cell.setBorderWidth(1);
@@ -490,15 +485,13 @@ public class PrintServiceImpl implements PrintService {
 //			cell.setBorder(0);
 //
 //			headertable.addCell(cell);
-			
+
 			// end Header as per category
-			
-			
 
 			document.add(headerimg);
 			document.add(deiheadertable);
 			headertable.setSpacingBefore(50);
-		//	document.add(headertable1);
+			// document.add(headertable1);
 			document.add(headertable);
 
 			studentdetail.setSpacingBefore(10);
@@ -523,59 +516,47 @@ public class PrintServiceImpl implements PrintService {
 
 		return filepath;
 	}
-	
-	
-	
-	public void  setcategorywisereceipt(PdfPTable studentdetail ,Student student,PdfPTable headertable ) {
-		
-		String category = student.getCategory().toLowerCase();
-		String rectype = "" ; 
-		
-		if (
-				category.equalsIgnoreCase("con") ||
-				category.equalsIgnoreCase("newadm") 
-				
-				) {
-			rectype= "student";
-		}
-		
 
-		if (
-				category.equalsIgnoreCase("appfee") ||
-				category.equalsIgnoreCase("POS") 
-				
-				) {
-			rectype= "applicant";
+	public void setcategorywisereceipt(PdfPTable studentdetail, Student student, PdfPTable headertable) {
+
+		String category = student.getCategory().toLowerCase();
+		String rectype = "";
+
+		if (category.equalsIgnoreCase("con") || category.equalsIgnoreCase("newadm")
+
+		) {
+			rectype = "student";
 		}
-		
-		if (
-				category.equalsIgnoreCase("HOS") 
-				
-				
-				) {
-			rectype= "hosteler";
+
+		if (category.equalsIgnoreCase("appfee") || category.equalsIgnoreCase("POS")
+
+		) {
+			rectype = "applicant";
 		}
-		
-		if (
-				category.equalsIgnoreCase("CER") 
-				
-				
-				) {
-			rectype= "exstudent";
+
+		if (category.equalsIgnoreCase("HOS")
+
+		) {
+			rectype = "hosteler";
 		}
-			
-		//con ,newadm ,CER,HOS,POS,appfee
-		
-		
+
+		if (category.equalsIgnoreCase("CER")
+
+		) {
+			rectype = "exstudent";
+		}
+
+		// con ,newadm ,CER,HOS,POS,appfee
+
 		PdfPCell cell;
 		switch (rectype) {
 		case ("student"):
-			
-		if (category.equalsIgnoreCase("con"))
-			cell = new PdfPCell(new Phrase("Roll No."));
-		else 
-			cell = new PdfPCell(new Phrase("Application Number"));
-		
+
+			if (category.equalsIgnoreCase("con"))
+				cell = new PdfPCell(new Phrase("Roll No."));
+			else
+				cell = new PdfPCell(new Phrase("Application Number"));
+
 			cell.setBorderWidth(1);
 			cell.setFixedHeight(30);
 			cell.setPadding(5);
@@ -589,7 +570,6 @@ public class PrintServiceImpl implements PrintService {
 
 			studentdetail.addCell(cell);
 
-			
 			cell = new PdfPCell(new Phrase("Course"));
 			cell.setBorderWidth(1);
 			cell.setFixedHeight(30);
@@ -618,9 +598,9 @@ public class PrintServiceImpl implements PrintService {
 			cell.setPadding(5);
 
 			studentdetail.addCell(cell);
-			
+
 			// Adding header information
-			
+
 			SimpleDateFormat dateFormat = new SimpleDateFormat("MMM-yyyy");
 
 			cell = new PdfPCell(new Phrase("e-receipt for DEI epayment "));
@@ -659,9 +639,6 @@ public class PrintServiceImpl implements PrintService {
 			cell.setPadding(5);
 
 			studentdetail.addCell(cell);
-			
-			
-		
 
 			cell = new PdfPCell(new Phrase("e-receipt for DEI epayment "));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -669,9 +646,9 @@ public class PrintServiceImpl implements PrintService {
 			cell.setFixedHeight(30);
 			// h1.setAlignment(Cell.ALIGN_CENTER);
 			headertable.addCell(cell);
-			
+
 			dateFormat = new SimpleDateFormat("yyyy");
-			 semester = dateFormat.format(student.getSemesterstartdate());
+			semester = dateFormat.format(student.getSemesterstartdate());
 			cell = new PdfPCell(new Phrase("Application Fee-" + semester));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
@@ -687,16 +664,96 @@ public class PrintServiceImpl implements PrintService {
 
 			break;
 
+		case ("exstudent"):
+
+			String text = "";
+
+			if (student.getCertificatetype().equalsIgnoreCase("trn")
+					|| student.getCertificatetype().equalsIgnoreCase("mig"))
+				text = "Enrolment Number";
+			else
+				text = "Roll Number";
+
+			cell = new PdfPCell(new Phrase(text));
+
+			cell.setBorderWidth(1);
+			cell.setFixedHeight(30);
+			cell.setPadding(5);
+
+			studentdetail.addCell(cell);
+
+			cell = new PdfPCell(new Phrase(student.getRoll_number()));
+			cell.setBorderWidth(1);
+			cell.setFixedHeight(30);
+			cell.setPadding(5);
+
+			studentdetail.addCell(cell);
+			
+		 if (student.getCertificatetype().equalsIgnoreCase("res")){
+				text = "Semesters";
+
+				cell = new PdfPCell(new Phrase(text));
+
+				cell.setBorderWidth(1);
+				cell.setFixedHeight(30);
+				cell.setPadding(5);
+
+				studentdetail.addCell(cell);
+				
+				cell = new PdfPCell(new Phrase(student.getSemestercode()));
+				cell.setBorderWidth(1);
+				cell.setFixedHeight(30);
+				cell.setPadding(5);
+
+				studentdetail.addCell(cell);
+
+			 
+		 }
 			
 			
 			
+			// Header Information for certificate
+
+			cell = new PdfPCell(new Phrase("e-receipt for DEI epayment "));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorder(0);
+			cell.setFixedHeight(30);
+			// h1.setAlignment(Cell.ALIGN_CENTER);
+			headertable.addCell(cell);
+
+			dateFormat = new SimpleDateFormat("yyyy");
+			String year = dateFormat.format(new Date());
+			
+			if (student.getCertificatetype().equalsIgnoreCase("mig"))
+				text = "Migration Certificate Fee :"+year ;
+			if (student.getCertificatetype().equalsIgnoreCase("trn"))
+				text = "Transscript Certificate Fee :"+year ;
+			if (student.getCertificatetype().equalsIgnoreCase("deg"))
+				text = "Duplicate Degree/Diploma Certificate Fee :"+year ;
+			if (student.getCertificatetype().equalsIgnoreCase("pro"))
+				text = "Provisional Certificate Fee:"+year ;
+			if (student.getCertificatetype().equalsIgnoreCase("res"))
+				text = "Duplicate Result Card Fee :"+year ;
+								
+			cell = new PdfPCell(new Phrase(text));
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorder(0);
+			cell.setFixedHeight(30);
+			headertable.addCell(cell);
+
+			cell = new PdfPCell(new Phrase(" "));
+
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBorder(0);
+
+			headertable.addCell(cell);
+
+			break;
+
 		}
-		
-		
+
 	}
 
-	
-		
 	@Override
 	public Student getFeeData(String ordeno, String ATRN, String amount) throws Exception {
 		// TODO Auto-generated method stub
@@ -704,53 +761,46 @@ public class PrintServiceImpl implements PrintService {
 		BigDecimal amt = BigDecimal.valueOf(amount1);
 		Float floatamt = Float.valueOf(amount);
 		Payment payment = null;
-		Student student=new Student();
-		String category="";
+		Student student = new Student();
+		String category = "";
 		String Other_Details;
-		
-		
-		
-		
+
 		if (ATRN != "") {
 
 			payment = theSBIService.findPaymentByATRNAndAmount(ATRN, amt);
 		}
-		
-		if (ordeno != "" && payment ==null) {
-			
+
+		if (ordeno != "" && payment == null) {
+
 			payment = theSBIService.findPaymentByByMerchantordernoAndAmount(ordeno, amt);
 
 		}
 
-		if (payment==null)
+		if (payment == null)
 			return null;
-			category=payment.getCategory();
-			Other_Details= payment.getOtherdetail();
-		    String OtherDetails_data[] = Other_Details.split("\\,");
-		    
-			
-			if (category.equalsIgnoreCase("CER"))
-				student = theSBIService.otherdetailforcertificate(student, OtherDetails_data);
+		category = payment.getCategory();
+		Other_Details = payment.getOtherdetail();
+		String OtherDetails_data[] = Other_Details.split("\\,");
 
-			if (category.equalsIgnoreCase("CON") || category.equalsIgnoreCase("newadm")
-					|| category.equalsIgnoreCase("appfee"))
-				
+		if (category.equalsIgnoreCase("CER"))
+			student = theSBIService.otherdetailforcertificate(student, OtherDetails_data);
+
+		if (category.equalsIgnoreCase("CON") || category.equalsIgnoreCase("newadm")
+				|| category.equalsIgnoreCase("appfee"))
+
 			student = theSBIService.otherdetailforcontinue(student, OtherDetails_data);
 
-			student.setATRN(ATRN);
-			student.setMerchantorderno(payment.getMerchantorderno());
-			student.setCategory(payment.getCategory());
-			student.setAppfee(amt);
-			student.setMessage(payment.getTransaction_status());
-			student.setAmount(floatamt);
-			student.setTransactiondate(payment.getTransaction_date());
-			student.setBankReferenceNumber(payment.getBank_Reference_Number());
-			
-		
+		student.setATRN(ATRN);
+		student.setMerchantorderno(payment.getMerchantorderno());
+		student.setCategory(payment.getCategory());
+		student.setAppfee(amt);
+		student.setMessage(payment.getTransaction_status());
+		student.setAmount(floatamt);
+		student.setTransactiondate(payment.getTransaction_date());
+		student.setBankReferenceNumber(payment.getBank_Reference_Number());
+
 		return student;
 
 	}
-
-
 
 }
