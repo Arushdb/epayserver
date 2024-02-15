@@ -136,6 +136,7 @@ h2 {
 			<form:input type ="hidden"  path="semestercode" />
 		
 			<form:input type ="hidden"  path="bankReferenceNumber"  />
+			<form:input type ="hidden"  path="certificatetype"  />
 			
 
 			<form:button id="btn" class="mybutton"  type="submit"   >Download</form:button>
