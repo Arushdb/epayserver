@@ -134,6 +134,7 @@ h2 {
 			<form:input type ="hidden"  path="transactiondate"  />
 			<form:input type ="hidden"  path="programname" />
 			<form:input type ="hidden"  path="semestercode" />
+			<form:input type ="hidden"  path="enrolno" />
 		
 			<form:input type ="hidden"  path="bankReferenceNumber"  />
 			<form:input type ="hidden"  path="certificatetype"  />
