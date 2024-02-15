@@ -1,52 +1,21 @@
 package com.dayalbagh.epay.service;
 
-import java.awt.Color;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.security.DigestException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
 
-import java.text.ParseException;
+import java.io.FileOutputStream;
+
+import java.math.BigDecimal;
+
+import java.net.URL;
+
 import java.text.SimpleDateFormat;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+
 import javax.servlet.ServletContext;
 
-import org.hibernate.exception.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -54,12 +23,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
-import com.dayalbagh.epay.AES256Bit;
-
-import com.dayalbagh.epay.model.Defaulters;
-import com.dayalbagh.epay.model.Epayerrorlog;
 import com.dayalbagh.epay.model.Payment;
-import com.dayalbagh.epay.model.PendingPayment;
+
 import com.dayalbagh.epay.model.Student;
 
 import com.dayalbagh.epay.repository.DefaulterRepository;
@@ -68,12 +33,11 @@ import com.dayalbagh.epay.repository.EpayExceptionRepository;
 import com.dayalbagh.epay.repository.PaymentRepository;
 import com.dayalbagh.epay.repository.PendingPaymentRepository;
 import com.lowagie.text.Cell;
-import com.lowagie.text.Chunk;
+
 import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
+
 import com.lowagie.text.Element;
 
-import com.lowagie.text.HeaderFooter;
 import com.lowagie.text.Image;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
@@ -81,8 +45,14 @@ import com.lowagie.text.Phrase;
 
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfPageEventHelper;
+
 import com.lowagie.text.pdf.PdfWriter;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
+
+
 
 @PropertySource("classpath:message.properties")
 @Service
@@ -92,6 +62,8 @@ public class PrintServiceImpl implements PrintService {
 	// static String gatewayUrl =
 	// "https://test.sbiepay.sbi/payagg/statusQuery/getStatusQuery" ;
 	// static String Merchant_ID = "1000112";
+	
+	//Logger logger = LogManager.getLogger(LoggingController.class);
 
 	@Value("${paymentgatewaylive}")
 	private String paymentgatewaylive;
@@ -210,9 +182,6 @@ public class PrintServiceImpl implements PrintService {
 
 	public String exportContinuePDF(Student student) throws Exception {
 
-	
-		
-		
 		String sep = System.getProperty("file.separator");
 
 		String directory = context.getRealPath("/") + "REPORTS";
@@ -224,6 +193,9 @@ public class PrintServiceImpl implements PrintService {
 		String category = student.getCategory();
 		String filename = "";
 		filename = student.getRoll_number();
+		if (filename.equalsIgnoreCase(""))
+			filename = student.getEnrolno();
+		
 //        if ((category.equalsIgnoreCase("con")||
 //        		(category.equalsIgnoreCase("CER")))){
 //        			filename = student.getRoll_number();
@@ -512,9 +484,10 @@ public class PrintServiceImpl implements PrintService {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //			throw (new IOException(e.getMessage()) );
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			throw(new Exception(e.getMessage()));
+
+			throw (new Exception(e.getMessage()));
 		}
 
 		// PdfWriter writer = PdfWriter.getInstance(document, new
@@ -687,15 +660,21 @@ public class PrintServiceImpl implements PrintService {
 			cell.setPadding(5);
 
 			studentdetail.addCell(cell);
+			
+			if (student.getCertificatetype().equalsIgnoreCase("trn")
+					|| student.getCertificatetype().equalsIgnoreCase("mig"))
+				cell = new PdfPCell(new Phrase(student.getEnrolno()));
+			else
+				cell = new PdfPCell(new Phrase(student.getRoll_number()));
 
-			cell = new PdfPCell(new Phrase(student.getRoll_number()));
+			
 			cell.setBorderWidth(1);
 			cell.setFixedHeight(30);
 			cell.setPadding(5);
 
 			studentdetail.addCell(cell);
-			
-		 if (student.getCertificatetype().equalsIgnoreCase("res")){
+
+			if (student.getCertificatetype().equalsIgnoreCase("res")) {
 				text = "Semesters";
 
 				cell = new PdfPCell(new Phrase(text));
@@ -705,7 +684,7 @@ public class PrintServiceImpl implements PrintService {
 				cell.setPadding(5);
 
 				studentdetail.addCell(cell);
-				
+
 				cell = new PdfPCell(new Phrase(student.getSemestercode()));
 				cell.setBorderWidth(1);
 				cell.setFixedHeight(30);
@@ -713,11 +692,8 @@ public class PrintServiceImpl implements PrintService {
 
 				studentdetail.addCell(cell);
 
-			 
-		 }
-			
-			
-			
+			}
+
 			// Header Information for certificate
 
 			cell = new PdfPCell(new Phrase("e-receipt for DEI epayment "));
@@ -729,18 +705,18 @@ public class PrintServiceImpl implements PrintService {
 
 			dateFormat = new SimpleDateFormat("yyyy");
 			String year = dateFormat.format(new Date());
-			
+
 			if (student.getCertificatetype().equalsIgnoreCase("mig"))
-				text = "Migration Certificate Fee :"+year ;
+				text = "Migration Certificate Fee :" + year;
 			if (student.getCertificatetype().equalsIgnoreCase("trn"))
-				text = "Transscript Certificate Fee :"+year ;
+				text = "Transscript Certificate Fee :" + year;
 			if (student.getCertificatetype().equalsIgnoreCase("deg"))
-				text = "Duplicate Degree/Diploma Certificate Fee :"+year ;
+				text = "Duplicate Degree/Diploma Certificate Fee :" + year;
 			if (student.getCertificatetype().equalsIgnoreCase("pro"))
-				text = "Provisional Certificate Fee:"+year ;
+				text = "Provisional Certificate Fee:" + year;
 			if (student.getCertificatetype().equalsIgnoreCase("res"))
-				text = "Duplicate Result Card Fee :"+year ;
-								
+				text = "Duplicate Result Card Fee :" + year;
+
 			cell = new PdfPCell(new Phrase(text));
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setBorder(0);
