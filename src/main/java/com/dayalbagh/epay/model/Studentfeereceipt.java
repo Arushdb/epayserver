@@ -46,7 +46,8 @@ public class Studentfeereceipt {
 	private String semester;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date insert_time;
+	@Column(name = "insert_time")
+	private Date inserttime;
 	
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -119,9 +120,7 @@ public class Studentfeereceipt {
 		return semester;
 	}
 
-	public Date getInsert_time() {
-		return insert_time;
-	}
+	
 
 	public void setProgramid(String programid) {
 		this.programid = programid;
@@ -131,9 +130,7 @@ public class Studentfeereceipt {
 		this.semester = semester;
 	}
 
-	public void setInsert_time(Date insert_time) {
-		this.insert_time = insert_time;
-	}
+	
 
 	public String getReftype() {
 		return reftype;
@@ -197,6 +194,14 @@ public class Studentfeereceipt {
 
 	public void setModifiedby(String modifiedby) {
 		this.modifiedby = modifiedby;
+	}
+
+	public Date getInserttime() {
+		return inserttime;
+	}
+
+	public void setInserttime(Date inserttime) {
+		this.inserttime = inserttime;
 	}
 	
 	

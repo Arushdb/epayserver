@@ -171,6 +171,13 @@ import javax.persistence.SqlResultSetMappings;
 				+ " and session_start_date =:ssd and session_end_date =:sed "
 						
 				
+				),
+		@NamedNativeQuery(name = "isDobValid",
+		query = " select if(count(*)>0,true,false) from cms_live.student_program sp"
+				+ " join cms_live.student_master sm on sm.enrollment_number=sp.enrollment_number"
+				+ " where roll_number =:rollno and sm.date_of_birth =:dob "
+						
+				
 				)
 				
 }

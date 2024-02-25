@@ -128,7 +128,6 @@ public class PaymentController {
 
 		if (method.equalsIgnoreCase(""))
 			method = "browserResponse";
-		
 
 		System.out.println("encData :" + method + encData);
 
@@ -165,9 +164,8 @@ public class PaymentController {
 		// if double verification is success;
 		System.out.println("payment success encrypted Data:" + encData);
 		System.out.println("payment success Decrypted String:" + resdata);
-       
+
 		model.addAttribute("trxstatus", trxstatus.toUpperCase());
-		
 
 		model.addAttribute("student", student);
 
@@ -178,7 +176,7 @@ public class PaymentController {
 				String studentfeestatus = studentservice.savestudentfee(student);
 				if (studentfeestatus.equalsIgnoreCase("error"))
 					return "payment_failure";
-				
+
 			}
 
 			// For Application Fee
@@ -196,11 +194,11 @@ public class PaymentController {
 			}
 
 		}
-		
-		if (student.getMethod().equalsIgnoreCase("browserResponse")  ||
-				student.getMethod().equalsIgnoreCase("paymentFailure")
-				
-				)
+
+		if (student.getMethod().equalsIgnoreCase("browserResponse")
+				|| student.getMethod().equalsIgnoreCase("paymentFailure")
+
+		)
 			return "con_payment_success";
 //		String category = student.getCategory();
 //		if (category.equalsIgnoreCase("CON") || category.equalsIgnoreCase("newadm")) {
@@ -233,11 +231,9 @@ public class PaymentController {
 	}
 
 	@PostMapping("/paymentfailure")
-	public ModelAndView paymentFailure(HttpServletRequest request,@ModelAttribute("encData") String encData,
-			@ModelAttribute("merchIdVal") String merchIdVal, 
-			@ModelAttribute("Bank_Code") String Bank_Code,
-			Model model,
-			 RedirectAttributes redirectAttributes) {
+	public ModelAndView paymentFailure(HttpServletRequest request, @ModelAttribute("encData") String encData,
+			@ModelAttribute("merchIdVal") String merchIdVal, @ModelAttribute("Bank_Code") String Bank_Code, Model model,
+			RedirectAttributes redirectAttributes) {
 
 		System.out.print("inside payment failure");
 		System.out.println("encrypted Data:" + encData);
@@ -251,9 +247,7 @@ public class PaymentController {
 		redirectAttributes.addAttribute("method", "paymentFailure");
 		System.out.println("in side push response");
 		return new ModelAndView("redirect:/paymentsuccess");
-		
 
-		
 	}
 
 //	@Transactional()
@@ -342,12 +336,11 @@ public class PaymentController {
 //		}
 //	}
 
-
 	@RequestMapping(path = "/download", method = RequestMethod.POST)
-	public void download(Student student,HttpServletResponse response) throws Exception {
-	
-		String filepath="";
-		
+	public void download(Student student, HttpServletResponse response) throws Exception {
+
+		String filepath = "";
+
 //		Student s1 = new Student();
 //		s1.setAddress("My Address for testing");
 //		s1.setRoll_number("123456");
@@ -357,66 +350,90 @@ public class PaymentController {
 //		s1.setAmount(120);
 //		s1.setCertificatetype("mig");
 //		s1.setMerchantorderno("12345");
-	
-		
-		
-			filepath = printService.exportContinuePDF(student);
-		
-		
-		
-		
-		
-		
-		 File file = new File(filepath);
-		
-		
-		    response.setContentType("application/vnd.ms-excel");
-		    response.setHeader("Content-disposition", "attachment; filename=" + file.getName()
-		    	+";Pragma="+ "no-cache"	
-		    		);
 
+		filepath = printService.exportContinuePDF(student);
 
-		    OutputStream out = response.getOutputStream();
-		    FileInputStream in = new FileInputStream(file);
+		File file = new File(filepath);
 
-		    // copy from in to out
-		    IOUtils.copy(in,out);
+		response.setContentType("application/vnd.ms-excel");
+		response.setHeader("Content-disposition", "attachment; filename=" + file.getName() + ";Pragma=" + "no-cache");
 
-		    out.close();
-		    in.close();
-		    file.delete();
-	
-	
+		OutputStream out = response.getOutputStream();
+		FileInputStream in = new FileInputStream(file);
+
+		// copy from in to out
+		IOUtils.copy(in, out);
+
+		out.close();
+		in.close();
+		file.delete();
+
 	}
-	
+
 	@GetMapping("/viewfeestatus")
-	public String viewfeestatus(Model model, HttpServletRequest request)  {
+	public String viewfeestatus(Model model, HttpServletRequest request) {
 		Student student = null;
-		String ordeno = request.getParameter("merchantorderno");
-		String ATRN = request.getParameter("ATRN");
-		String amount = request.getParameter("feeamount");
-		
-	try {
-		student=	printService.getFeeData(ordeno, ATRN, amount);
-	} catch (Exception e) {
-		
-		e.printStackTrace();
-		return "payment_not_found";
-		
-	}
-	
-	if(student==null)
-		return "payment_not_found";
-	
-	
-	model.addAttribute("trxstatus", student.getMessage().toUpperCase());
-	model.addAttribute("student", student);
-	return "con_payment_success";
+		String ordeno = "";
+		String ATRN = "";
+		String amount = "";
+		String rollno = "";
+		String dob = "";
+		String startdate = "";
+		String enddate = "";
 
-		
+		try {
+			String selectedoption = request.getParameter("selectedOption");
+			// selectedoption =(String)request.getAttribute("selectedOption");
+			if (selectedoption.equalsIgnoreCase("1")) {
+
+				rollno = request.getParameter("rollno");
+				dob = request.getParameter("dob");
+				
+				if(!studentservice.isDobValid(rollno, dob))
+					return "payment_not_found";
+				
+				startdate = request.getParameter("startdate");
+				enddate = request.getParameter("enddate");
+				List<Studentfeereceipt> list = studentservice.getreceiptsbetweendates(rollno, startdate, enddate);
+				if (list.size() > 0) {
+
+					for (Studentfeereceipt item : list) {
+
+						ATRN = item.getPayment().getATRN();
+						amount = item.getPayment().getAmount().toString();
+						student = printService.getFeeData(ordeno, ATRN);
+						model.addAttribute("trxstatus", student.getMessage().toUpperCase());
+						model.addAttribute("student", student);
+						return "con_payment_success";
+
+					}
+				} else {
+					return "payment_not_found";
+				}
+
 			}
 
+			if (selectedoption.equalsIgnoreCase("2")) {
+				ordeno = request.getParameter("merchantorderno");
+				ATRN = request.getParameter("ATRN");
+				student = printService.getFeeData(ordeno, ATRN);
 
+				if (student == null)
+					return "payment_not_found";
 
-	
+				model.addAttribute("trxstatus", student.getMessage().toUpperCase());
+				model.addAttribute("student", student);
+				return "con_payment_success";
+
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			return "payment_not_found";
+
+		}
+		return "payment_not_found";
+	}
+
 }

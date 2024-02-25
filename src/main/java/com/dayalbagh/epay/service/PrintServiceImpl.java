@@ -192,7 +192,7 @@ public class PrintServiceImpl implements PrintService {
 		file.mkdirs();
 		String category = student.getCategory();
 		String filename = "";
-		filename = student.getRoll_number();
+		filename = student.getRoll_number()+"_"+student.getATRN();
 		if (filename.equalsIgnoreCase(""))
 			filename = student.getEnrolno();
 		
@@ -737,11 +737,11 @@ public class PrintServiceImpl implements PrintService {
 	}
 
 	@Override
-	public Student getFeeData(String ordeno, String ATRN, String amount) throws Exception {
+	public Student getFeeData(String ordeno, String ATRN) throws Exception {
 		// TODO Auto-generated method stub
-		Double amount1 = Double.parseDouble(amount);
-		BigDecimal amt = BigDecimal.valueOf(amount1);
-		Float floatamt = Float.valueOf(amount);
+//		Double amount1 = Double.parseDouble(amount);
+//		BigDecimal amt = BigDecimal.valueOf(amount1);
+//		Float floatamt = Float.valueOf(amount);
 		Payment payment = null;
 		Student student = new Student();
 		String category = "";
@@ -749,12 +749,12 @@ public class PrintServiceImpl implements PrintService {
 
 		if (ATRN != "") {
 
-			payment = theSBIService.findPaymentByATRNAndAmount(ATRN, amt);
+			payment = theSBIService.findPaymentByATRN(ATRN);
 		}
 
 		if (ordeno != "" && payment == null) {
 
-			payment = theSBIService.findPaymentByByMerchantordernoAndAmount(ordeno, amt);
+			payment = theSBIService.findPaymentByMerchantorderno(ordeno);
 
 		}
 
@@ -775,9 +775,9 @@ public class PrintServiceImpl implements PrintService {
 		student.setATRN(ATRN);
 		student.setMerchantorderno(payment.getMerchantorderno());
 		student.setCategory(payment.getCategory());
-		student.setAppfee(amt);
+		student.setAppfee(payment.getAmount());
 		student.setMessage(payment.getTransaction_status());
-		student.setAmount(floatamt);
+		student.setAmount(payment.getAmount().floatValue());
 		student.setTransactiondate(payment.getTransaction_date());
 		student.setBankReferenceNumber(payment.getBank_Reference_Number());
 

@@ -52,6 +52,12 @@ public interface StudentService {
 			java.sql.Date semesterenddate);
 
 	Studentfeereceipt getstudentfeereceipt(Student student);
+	
+	List<Studentfeereceipt> getreceiptsbetweendates(String rollno,String startdate,String endDate );
+
+	
+
+	boolean isDobValid(String rollno, String dob);
 
 	
 	

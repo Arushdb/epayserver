@@ -14,7 +14,7 @@ public interface PrintService {
 
 		public String exportContinuePDF(Student student) throws  Exception ;
 
-		public Student getFeeData(String ordeno, String aTRN, String amount) throws Exception;
+		public Student getFeeData(String ordeno, String aTRN) throws Exception;
 		
 		
 

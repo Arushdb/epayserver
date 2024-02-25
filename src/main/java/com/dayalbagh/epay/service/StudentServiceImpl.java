@@ -432,7 +432,7 @@ public class StudentServiceImpl implements StudentService {
 			Date  now =  new Date();
 			Timestamp timestamp = new Timestamp(now.getTime());
 			sfr = new Studentfeereceipt();
-			sfr.setInsert_time(timestamp);
+			sfr.setInserttime(timestamp);
 			sfr.setCreatedby(student.getMethod());
 		}else {
 			Date  now =  new Date();
@@ -564,7 +564,7 @@ public class StudentServiceImpl implements StudentService {
 		Date  now =  new Date();
 		Timestamp timestamp = new Timestamp(now.getTime());
 
-		sfr.setInsert_time(timestamp);
+		sfr.setInserttime(timestamp);
 		
 		
 		thefeereceiptRepository.save(sfr);
@@ -648,6 +648,46 @@ public class StudentServiceImpl implements StudentService {
 		
 		
 	}
+	
+	@Override
+	public boolean isDobValid(String rollno,
+			String dob) {
+		
+		SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd");
+		String dtymd="";
+		try {
+			Date dtmdy= df.parse(dob);
+			
+			
+			dtymd=  output.format(dtmdy);
+			
+			
+			
+			  
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		java.sql.Date dobymd = java.sql.Date.valueOf(dtymd);
+
+			
+		
+	String count= em.createNamedQuery("isDobValid")
+			.setParameter("rollno", rollno)
+			
+			.setParameter("dob", dtymd)
+			.getSingleResult().toString();
+	
+	
+	if(count.equalsIgnoreCase("0"))
+		return false;
+	else
+		return true;
+		
+		
+	}
 
 	@Override
 	public Studentfeereceipt getstudentfeereceipt(Student student)  {
@@ -664,7 +704,7 @@ public class StudentServiceImpl implements StudentService {
 			Date  now =  new Date();
 			Timestamp timestamp = new Timestamp(now.getTime());
 			sfr = new Studentfeereceipt();
-			sfr.setInsert_time(timestamp);
+			sfr.setInserttime(timestamp);
 			sfr.setCreatedby(student.getMethod());
 		}else {
 			Date  now =  new Date();
@@ -701,6 +741,36 @@ public class StudentServiceImpl implements StudentService {
 				 
 		return sfr;
 		
+	}
+
+	@Override
+	public List<Studentfeereceipt> getreceiptsbetweendates(String rollno, String  startdate, String endDate) {
+		// TODO Auto-generated method stub
+		SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd");
+//		String today = df.format(new Date());
+//		String year = today.substring(0, 4);
+//
+//		dt = year + '-' + dt;
+		try {
+			Date start =df.parse(startdate);
+			Date end =df.parse(endDate);
+			
+			startdate=  output.format(start);
+			endDate=output.format(end);
+			
+			
+			  
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		java.sql.Date sdate = java.sql.Date.valueOf(startdate);
+		java.sql.Date edate = java.sql.Date.valueOf(endDate);
+		
+		List<Studentfeereceipt> list= thefeereceiptRepository.findAllByRollnumberAndInserttimeLessThanEqualAndInserttimeGreaterThanEqualOrderByInserttimeDesc(rollno, edate ,sdate);
+	return list;
 	}
 	
 	

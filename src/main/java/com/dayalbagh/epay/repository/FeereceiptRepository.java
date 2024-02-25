@@ -20,5 +20,7 @@ public interface FeereceiptRepository extends JpaRepository<Studentfeereceipt, I
 	
 	Studentfeereceipt findByPayment_id(int id);
 	
+	List <Studentfeereceipt> findAllByRollnumberAndInserttimeLessThanEqualAndInserttimeGreaterThanEqualOrderByInserttimeDesc  
+	(String roll_number,Date enddate,Date startdate);
 	
 }
