@@ -955,7 +955,7 @@ public class SBIServiceImpl implements SBIService {
 			feepending = resdata[11];
 
 			feetype = resdata[12];
-			//defaulter = resdata[13];
+			defaulter = resdata[13];
 
 			if (isNumeric(latefee)) {
 				latefeeamt = Float.parseFloat(latefee);
