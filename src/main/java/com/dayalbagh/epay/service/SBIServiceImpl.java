@@ -976,7 +976,7 @@ public class SBIServiceImpl implements SBIService {
 			student.setSemestercode(semester);
 			student.setFeepending(feepending);
 			student.setFeetype(feetype);
-	//		student.setDefaulter(defaulter);
+	    	student.setDefaulter(defaulter);
 
 			student.setStatus("success");
 
