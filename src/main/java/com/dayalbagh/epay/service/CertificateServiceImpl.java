@@ -8,16 +8,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transaction;
+import javax.transaction.Transactional;
 
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.stereotype.Service;
 
 import com.dayalbagh.epay.exception.ResourceNotFoundException;
@@ -25,6 +30,7 @@ import com.dayalbagh.epay.model.Admfeedates;
 import com.dayalbagh.epay.model.Certificate;
 import com.dayalbagh.epay.model.Certificatesemester;
 import com.dayalbagh.epay.model.Defaulters;
+import com.dayalbagh.epay.model.Migration;
 import com.dayalbagh.epay.model.Payment;
 import com.dayalbagh.epay.model.ProgramFee;
 import com.dayalbagh.epay.model.Programfeedates;
@@ -45,13 +51,13 @@ public class CertificateServiceImpl implements CertificateService {
 	@Autowired
 	EntityManager em;
 	@Autowired
-	SBIService  sbiservice;
-	
-	 @Autowired
-	 CertificateRepository   theCertificateRepository;
-	 @Autowired
-	 CertificateSemesterRepository theCertificateSemesterRepository;
-	
+	SBIService sbiservice;
+
+	@Autowired
+	CertificateRepository theCertificateRepository;
+	@Autowired
+	CertificateSemesterRepository theCertificateSemesterRepository;
+
 	@Value("${migrationcertificatefee}")
 	private int migrationcertificatefee;
 	@Value("${triplicatemigrationcertificatefee}")
@@ -67,24 +73,28 @@ public class CertificateServiceImpl implements CertificateService {
 	private int provisional;
 	@Value("${resultcard}")
 	private int resultcard;
+	
+	@Value("${maxmigration}")
+	private int maxmig;
 
-	
-
-	
-	
 	@Override
-	public List<Student> getcertificatedetail(String rollno, String mode, String type,String dob,String enrolno,String semesters) throws Exception {
+	public List<Student> getcertificatedetail(String rollno, String mode, String type, String dob, String enrolno,
+			String semesters) throws Exception {
 
 		List<Student> student = new ArrayList<Student>();
-		
-		
-		student =validateStudent(rollno,dob,enrolno,type);
+
+		student = validateStudent(rollno, dob, enrolno, type);
 		int feeamount = 0;
+		String seqno="";
 		switch (type) {
-		case "mig": 
-			
-			feeamount = getmigrationamount(student.get(0).getRoll_number(), mode);
-			break;
+		case "mig":
+           seqno= getsequenceno(enrolno) ;
+           if(Integer.parseInt(seqno)<=maxmig)
+			feeamount = getmigrationamount(student.get(0).getRoll_number(), mode,seqno);
+           else
+        	   throw new Exception("Maximum limit of "+ String.valueOf(maxmig)+" migration certificate reached.No further migration certificate allowed.");
+        	   
+           break;
 		case "trn":
 			feeamount = transcript;
 			if (mode.equalsIgnoreCase("bypost"))
@@ -105,9 +115,9 @@ public class CertificateServiceImpl implements CertificateService {
 
 		case "res":
 			feeamount = resultcard;
-			String [] ary =semesters.split(",");
-			
-			feeamount=feeamount*ary.length;
+			String[] ary = semesters.split(",");
+
+			feeamount = feeamount * ary.length;
 			if (mode.equalsIgnoreCase("bypost"))
 				feeamount = feeamount + postalcharges;
 			break;
@@ -122,7 +132,7 @@ public class CertificateServiceImpl implements CertificateService {
 
 	}
 
-	private int getmigrationamount(String rollno, String mode) {
+	private int getmigrationamount(String rollno, String mode,String seq) {
 
 		String migcount = "";
 		int seqno = 0;
@@ -132,9 +142,8 @@ public class CertificateServiceImpl implements CertificateService {
 		int feemigration = 0;
 
 		Object obj = em.createNamedQuery("getmigrationdetail").setParameter("rollno", rollno).getSingleResult();
-		if(obj != null)
-			migcount=obj.toString();
-		
+		if (obj != null)
+			migcount = obj.toString();
 
 		if (mode.equalsIgnoreCase("bypost")) {
 
@@ -146,68 +155,58 @@ public class CertificateServiceImpl implements CertificateService {
 			feemigration = migrationcertificatefee;
 		}
 
-		if (!(migcount.equalsIgnoreCase("")))
-			seqno = Integer.parseInt(migcount);
-
-		seqno++;
-		if (seqno > 2)
+		if (Integer.parseInt(seq) > 2)
 			return feetripamount;
 
 		else
 			return feemigration;
 
 	}
-	
-	public List<Student> validateStudent(String rollno,String dob,String enrolno,String type) throws Exception{
-		
+
+	public List<Student> validateStudent(String rollno, String dob, String enrolno, String type) throws Exception {
+
 		List<Student> student = new ArrayList<>();
-		
-		if (type.equalsIgnoreCase("deg") || type.equalsIgnoreCase("pro")
-				|| type.equalsIgnoreCase("res"))
-		student = (List<Student>) em.createNamedQuery("valid_roll_enrol_dob", Student.class)
-				.setParameter("rollno", rollno)
-				.setParameter("dob", dob)
-				.setParameter("enrolno", enrolno).getResultList();
-		
+
+		if (type.equalsIgnoreCase("deg") || type.equalsIgnoreCase("pro") || type.equalsIgnoreCase("res"))
+			student = (List<Student>) em.createNamedQuery("valid_roll_enrol_dob", Student.class)
+					.setParameter("rollno", rollno).setParameter("dob", dob).setParameter("enrolno", enrolno)
+					.getResultList();
+
 		if (type.equalsIgnoreCase("mig") || type.equalsIgnoreCase("trn"))
-				
-		student = (List<Student>) em.createNamedQuery("valid_enrol_dob", Student.class)
-				.setParameter("dob", dob)
-				.setParameter("enrolno", enrolno).getResultList();
-		
-		
-		
-		if(student.size()<=0)
+
+			student = (List<Student>) em.createNamedQuery("valid_enrol_dob", Student.class).setParameter("dob", dob)
+					.setParameter("enrolno", enrolno).getResultList();
+
+		if (student.size() <= 0)
 			throw new Exception("Student Detail not found");
-		
+
 		return student;
-		
+
 	}
-
-
 
 	@Override
 	public String savecertificateDetail(Student student) {
 		String writestatus = "success";
-		List <Certificate> cersemList = new ArrayList<>();
-		Certificatesemester cerobj=null;
+		List<Certificate> cersemList = new ArrayList<>();
+		Certificatesemester cerobj = null;
 		Certificate cresem = null;
 		try {
-			int paymentid =student.getPayment().getId();
-			Certificate certificate=  theCertificateRepository.findByPayment_id(paymentid);
-			if(certificate==null)
-			   certificate = new Certificate();
-			
-			  certificate.setAddress(student.getAddress());
-			  certificate.setMode(student.getMode());
-			  certificate.setPhone(student.getPhone());
-			  certificate.setPincode(student.getPincode());
-			  certificate.setRollno(student.getRoll_number());
-			  certificate.setEnrolmentnumber(student.getEnrolno());
-			  
-			  certificate.setInserttime(new Timestamp(System.currentTimeMillis()));
-			  certificate.setType(student.getCertificatetype());
-			  
+			int paymentid = student.getPayment().getId();
+			Certificate certificate = theCertificateRepository.findByPayment_id(paymentid);
+			if (certificate == null)
+				certificate = new Certificate();
+
+			certificate.setAddress(student.getAddress());
+			certificate.setMode(student.getMode());
+			certificate.setPhone(student.getPhone());
+			certificate.setPincode(student.getPincode());
+			certificate.setRollno(student.getRoll_number());
+			certificate.setEnrolmentnumber(student.getEnrolno());
+
+			certificate.setInserttime(new Timestamp(System.currentTimeMillis()));
+			certificate.setType(student.getCertificatetype());
+			certificate.setEmail(student.getEmail());
+
 //			  Payment payobj = sbiservice.findPaymentByATRN(student.getATRN());
 //				 
 //				if (payobj==null)
@@ -217,42 +216,123 @@ public class CertificateServiceImpl implements CertificateService {
 //					sbiservice.logerror(student.getATRN(), student.getMerchantorderno(), String.valueOf(student.getAmount()) , "Record not found in Payment table","savecertificateDetail");
 //					writestatus="error";
 //				}
-			  certificate.setPayment(student.getPayment());
-			  
-			  theCertificateRepository.save(certificate); 
-			  
-			  
-			  if (!(student.getSemestercode().isEmpty())) {
-				 String str = student.getSemestercode();
-				 String resdata[]= str.split("\\:");
-				 
-				  for(String sem:resdata) {
-					 
-					cerobj=  theCertificateSemesterRepository.findByCertificateAndSemester(certificate,sem);
-					  
-					  if(cerobj==null) 
-					  cerobj = new Certificatesemester();
-					  
-					  cerobj.setSemester(sem);
-					  cerobj.setCertificate(certificate);
-					  theCertificateSemesterRepository.save(cerobj);
-				  }
-				 
-				 
-			  }
-			  
-			
-			  
-		}catch(Exception e) {
-			sbiservice.logerror(student.getATRN(), student.getMerchantorderno(), String.valueOf(student.getAmount()) , e.getMessage(),"savecertificateDetail");
-		    return "error";
-		    
+			certificate.setPayment(student.getPayment());
+
+			theCertificateRepository.save(certificate);
+			if(certificate.getType().equalsIgnoreCase("mig"))
+				sbiservice.savemigrationrecord(certificate);
+
+			if (!(student.getSemestercode().isEmpty())) {
+				String str = student.getSemestercode();
+				String resdata[] = str.split("\\:");
+
+				for (String sem : resdata) {
+
+					cerobj = theCertificateSemesterRepository.findByCertificateAndSemester(certificate, sem);
+
+					if (cerobj == null)
+						cerobj = new Certificatesemester();
+
+					cerobj.setSemester(sem);
+					cerobj.setCertificate(certificate);
+					theCertificateSemesterRepository.save(cerobj);
+				}
+
+			}
+
+		} catch (Exception e) {
+			sbiservice.logerror(student.getATRN(), student.getMerchantorderno(), String.valueOf(student.getAmount()),
+					e.getMessage(), "savecertificateDetail");
+			return "error";
+
 		}
-		  
-		  return writestatus;
+
+		return writestatus;
 	}
 
+	@Override
+	public List<Certificate> getcertificaterequest(String type, String status) {
 
+		return theCertificateRepository.findAllByTypeAndProcessstatus(type, status);
+
+	}
+
+	@Transactional
+	public String getmigrationnumber() {
+
+		String newmigno = "";
+		String oldmigno = "";
+
+		int count = 0;
+		while (count == 0) {
+
+			oldmigno = em.createNamedQuery("getmigrationnumber").getSingleResult().toString();
+			newmigno = String.valueOf(Integer.parseInt(oldmigno) + 1);
+
+			count = em.createNamedQuery("updatemigrationnumber").setParameter("oldmigno", oldmigno)
+					.setParameter("newmigno", newmigno).executeUpdate();
+
+		}
+
+		return newmigno;
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public String getsequenceno(String enrollno) {
+		// TODO Auto-generated method stub
+		String seq = "";
+		List<String> mylist = (List<String>) em.createNamedQuery("getsequencenumber").setParameter("enrollno", enrollno)
+
+				.getResultList();
+
+		if (mylist.size() > 0) {
+			seq = mylist.get(0).toString();
+			seq = String.valueOf(Integer.parseInt(seq) + 1);
+		}
+
+		else
+			seq = "1";
+
+		return seq;
+
+	}
+
+	@Override
+	@Transactional
+	public String insertmigration_record(Migration migration) {
+		// TODO Auto-generated method stub
+		String seq = "";
+		int count = 0;
+		count = em.createNamedQuery("insertmigration")
+				
+				.setParameter("enrollno", migration.getEnrollment_number())
+				.setParameter("migration_number", migration.getMigration_number())
+				.setParameter("request_date", migration.getRequest_date())
+				.setParameter("entered_by", migration.getEntered_by())
+			
+
+				.setParameter("sequence_no", migration.getSequence_no())
+
+				.setParameter("status", "unprocessed")
+				.setParameter("program_id", migration.getProgram_id())
+				.setParameter("roll_number", migration.getRoll_number())
+				.setParameter("issue_date", "1900-01-01")
+				.setParameter("certificate_id",migration.getCertid())
+				.executeUpdate();
+
+		if (count > 0)
+			return "1";
+		else
+			return "0";
+
+	}
+	
+	public void   savecertificate(Certificate crt){
+		 theCertificateRepository.save(crt);	
+			}
+	
 	
 
 }

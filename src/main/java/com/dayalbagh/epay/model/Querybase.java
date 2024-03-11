@@ -17,6 +17,8 @@ import javax.persistence.Query;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.SqlResultSetMappings;
 
+import org.springframework.data.jdbc.repository.query.Modifying;
+
 @Entity
 
 @NamedQueries({
@@ -178,7 +180,33 @@ import javax.persistence.SqlResultSetMappings;
 				+ " where roll_number =:rollno and sm.date_of_birth =:dob "
 						
 				
+				),
+		
+		@NamedNativeQuery(name = "getmigrationnumber",
+		query = " select value  from cms_development.system_values where code='MIGRAT' "
+					
+				),
+		
+		@NamedNativeQuery(name = "updatemigrationnumber", 
+		query = " update cms_development.system_values  set value =:newmigno where code='MIGRAT' "
+				+ "  and value =:oldmigno " ),
+				
+				
+				@NamedNativeQuery(name = "getsequencenumber", 
+				query = " select sequence_no from cms_development.migration_record where enrollment_number =:enrollno "
+						+ " order by sequence_no desc ;"	
+				
+					
+				),
+				@NamedNativeQuery(name = "insertmigration", 
+				query = " insert into cms_development.migration_record "
+						+ "(enrollment_number, migration_number, request_date, entered_by,  sequence_no,  status, program_id, roll_number,issue_date,certificate_id) "
+						+ " values(:enrollno,:migration_number,:request_date,:entered_by,:sequence_no,:status,:program_id,:roll_number,:issue_date,:certificate_id) "	
+				
+					
 				)
+				
+				
 				
 }
 		

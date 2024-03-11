@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -55,9 +56,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dayalbagh.epay.AES256Bit;
-
+import com.dayalbagh.epay.model.Certificate;
 import com.dayalbagh.epay.model.Defaulters;
 import com.dayalbagh.epay.model.Epayerrorlog;
+import com.dayalbagh.epay.model.Migration;
 import com.dayalbagh.epay.model.Payment;
 import com.dayalbagh.epay.model.PendingPayment;
 import com.dayalbagh.epay.model.Student;
@@ -838,6 +840,7 @@ public class SBIServiceImpl implements SBIService {
 		String programid = "";
 		String semester = "";
 		String certificatetype = "";
+		String email = "";
 
 		try {
 
@@ -853,7 +856,7 @@ public class SBIServiceImpl implements SBIService {
 			programid = resdata[10];
 			semester = resdata[11];
 			certificatetype = resdata[12];
-
+			email = resdata[13];
 //				Payment payment =findPaymentByATRN(student.getATRN());
 //				if (payment==null)
 //					payment = findPaymentByMerchantorderno(student.getMerchantorderno());
@@ -874,6 +877,7 @@ public class SBIServiceImpl implements SBIService {
 			student.setProgramid(programid);
 			student.setSemestercode(semester);
 			student.setCertificatetype(certificatetype);
+			student.setEmail(email);
 
 			// student.setPayment(payment);
 
@@ -1157,6 +1161,8 @@ public class SBIServiceImpl implements SBIService {
 	@Transactional()
 	@Scheduled(fixedRateString = "${run-frquency.minutes}", timeUnit = TimeUnit.MINUTES)
 	public void processpendingpaymentnew() {
+		
+		process_certificates();
 
 		String status = "success";
 		Payment payment = null;
@@ -1165,11 +1171,12 @@ public class SBIServiceImpl implements SBIService {
 		Double trxamt = 0.0;
 		String Amount = "";
 		String sts="";
+		
 		List<PendingPayment> pendingpayment = new ArrayList<>();
 		String data[] = new String[5];
 		Timestamp timestamp = new Timestamp(0);
 		System.out.println("in side process pending payment method ");
-
+				
 		pendingpayment = thePendingPaymentRepository.findAllByTrxstatusNot(status);
 		if (pendingpayment.size() > 0) {
 
@@ -1311,6 +1318,50 @@ public class SBIServiceImpl implements SBIService {
 			}
 
 		}
+	}
+	
+	
+	private void process_certificates(){
+		List<Certificate> list = new ArrayList<>();
+		
+		String certificatetype="";
+		String certificatestatus = "N";
+		certificatetype= "mig";
+		list= certificateService.getcertificaterequest(certificatetype, certificatestatus);
+		
+		
+		for(Certificate crt:list) {
+			savemigrationrecord(crt);				
+		}
+
+	}
+	
+	public void savemigrationrecord(Certificate crt){
+		String seqno;
+		String programid ="";
+		String migno;
+		Migration migobj = new Migration();
+		Student student = new Student();
+		String [] res ;
+		seqno=certificateService.getsequenceno(crt.getEnrolmentnumber());
+		migno=certificateService.getmigrationnumber();
+		migobj.setEnrollment_number(crt.getEnrolmentnumber());
+		migobj.setMigration_number(migno);
+		
+		res =crt.getPayment().getOtherdetail().split(",");
+		student =otherdetailforcertificate(student,res);
+					
+		migobj.setProgram_id(student.getProgramid());
+		migobj.setRoll_number(crt.getRollno());
+		migobj.setRequest_date(crt.getInserttime());
+		migobj.setSequence_no(seqno);
+		migobj.setEntered_by("Payment-Gateway");
+		migobj.setCertid(crt.getId());
+		
+		certificateService.insertmigration_record(migobj);
+		crt.setProcessstatus("M");
+		
+		certificateService.savecertificate(crt);	
 	}
 
 

@@ -16,6 +16,7 @@ public interface CertificateRepository extends JpaRepository<Certificate, Intege
 	
 	Certificate findByPayment_id(int paymentid);
 	
-	
+		
+	List<Certificate> findAllByTypeAndProcessstatus(String type,String status);
 	
 }

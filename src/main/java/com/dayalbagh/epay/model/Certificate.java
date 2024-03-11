@@ -1,5 +1,6 @@
 package com.dayalbagh.epay.model;
 
+import java.security.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class Certificate {
 	private String mode;
 	private String type;
 	private String phone;
+	private String email;
 	
 
 	
@@ -54,7 +56,15 @@ public class Certificate {
 	@OneToOne
 	@JoinColumn(name = "payment_id", referencedColumnName = "id")
 	private Payment payment;
-
+	@Column(name = "process_status")
+	private String processstatus;
+	
+	@Column(name = "processed_by")
+	private String processedby;
+	
+	@Column(name = "process_time")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date processtime;
 	
 
 	public Certificate() {
@@ -64,15 +74,27 @@ public class Certificate {
 	
 
 
-	public Certificate(String rollno, String address, String pincode, String mode, String type, String phone) {
-		
+	
+
+
+
+	public Certificate(String rollno, String enrolmentnumber, String address, String pincode, String mode, String type,
+			String phone, String email, Date inserttime) {
+		super();
 		this.rollno = rollno;
+		this.enrolmentnumber = enrolmentnumber;
 		this.address = address;
 		this.pincode = pincode;
 		this.mode = mode;
 		this.type = type;
 		this.phone = phone;
+		this.email = email;
+		this.inserttime = inserttime;
 	}
+
+
+
+
 
 
 
@@ -201,6 +223,86 @@ public class Certificate {
 
 	public int getId() {
 		return id;
+	}
+
+
+
+
+	public String getEmail() {
+		return email;
+	}
+
+
+
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+
+
+
+
+
+
+
+	public String getProcessstatus() {
+		return processstatus;
+	}
+
+
+
+
+
+
+
+
+	public String getProcessedby() {
+		return processedby;
+	}
+
+
+
+
+
+
+
+
+	public Date getProcesstime() {
+		return processtime;
+	}
+
+
+
+
+
+
+
+
+	public void setProcessstatus(String processstatus) {
+		this.processstatus = processstatus;
+	}
+
+
+
+
+
+
+
+
+	public void setProcessedby(String processedby) {
+		this.processedby = processedby;
+	}
+
+
+
+
+
+
+
+
+	public void setProcesstime(Date processtime) {
+		this.processtime = processtime;
 	}
 	
 	

@@ -88,6 +88,7 @@ public class Student {
 	private String address;
 	private String pincode;
 	private String phone;
+	private String email;
 	private String method; // push response or browser response
 	
 	public Student() {
@@ -397,6 +398,12 @@ public class Student {
 	}
 	public void setBranchName(String branchName) {
 		this.branchName = branchName;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	
 	

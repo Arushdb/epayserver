@@ -11,6 +11,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import com.dayalbagh.epay.model.Certificate;
 import com.dayalbagh.epay.model.Payment;
 import com.dayalbagh.epay.model.Student;
 
@@ -32,6 +33,7 @@ public interface SBIService {
 
 	String verifyPayment(String[] resdata);
 	 String getMerchantId();
+		public void savemigrationrecord(Certificate crt);
 	 
 
 	
