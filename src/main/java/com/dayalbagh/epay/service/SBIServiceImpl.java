@@ -45,6 +45,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.mail.MessagingException;
 import javax.servlet.ServletContext;
 
 import org.hibernate.exception.DataException;
@@ -56,6 +57,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dayalbagh.epay.AES256Bit;
+
 import com.dayalbagh.epay.model.Certificate;
 import com.dayalbagh.epay.model.Defaulters;
 import com.dayalbagh.epay.model.Epayerrorlog;
@@ -171,7 +173,7 @@ public class SBIServiceImpl implements SBIService {
 
 	@Autowired
 	private CertificateService certificateService;
-
+	
 	
 	
 
@@ -878,6 +880,7 @@ public class SBIServiceImpl implements SBIService {
 			student.setSemestercode(semester);
 			student.setCertificatetype(certificatetype);
 			student.setEmail(email);
+			student.setDefaulter("N");
 
 			// student.setPayment(payment);
 
@@ -1176,6 +1179,8 @@ public class SBIServiceImpl implements SBIService {
 		String data[] = new String[5];
 		Timestamp timestamp = new Timestamp(0);
 		System.out.println("in side process pending payment method ");
+		
+	
 				
 		pendingpayment = thePendingPaymentRepository.findAllByTrxstatusNot(status);
 		if (pendingpayment.size() > 0) {
@@ -1321,6 +1326,8 @@ public class SBIServiceImpl implements SBIService {
 	}
 	
 	
+
+
 	private void process_certificates(){
 		List<Certificate> list = new ArrayList<>();
 		

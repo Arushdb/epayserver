@@ -1,5 +1,6 @@
 package com.dayalbagh.epay.service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -13,6 +14,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.mail.MessagingException;
 import javax.persistence.EntityManager;
 import javax.transaction.Transaction;
 import javax.transaction.Transactional;
@@ -47,11 +49,22 @@ import com.dayalbagh.epay.repository.ProgramFeeRepository;
 @PropertySource("classpath:message.properties")
 @Service
 public class CertificateServiceImpl implements CertificateService {
-
+	
+		
+	@Value("${email.certificate}")
+	private String emailcertificate;
+	
+	
 	@Autowired
 	EntityManager em;
 	@Autowired
 	SBIService sbiservice;
+	
+	@Autowired
+	PrintService thePrintService;
+	
+	@Autowired
+	EmailService theEmailService;
 
 	@Autowired
 	CertificateRepository theCertificateRepository;
@@ -206,6 +219,7 @@ public class CertificateServiceImpl implements CertificateService {
 			certificate.setInserttime(new Timestamp(System.currentTimeMillis()));
 			certificate.setType(student.getCertificatetype());
 			certificate.setEmail(student.getEmail());
+			certificate.setProcessstatus("N");
 
 //			  Payment payobj = sbiservice.findPaymentByATRN(student.getATRN());
 //				 
@@ -239,6 +253,10 @@ public class CertificateServiceImpl implements CertificateService {
 				}
 
 			}
+			
+			
+			sendemail(student);
+				
 
 		} catch (Exception e) {
 			sbiservice.logerror(student.getATRN(), student.getMerchantorderno(), String.valueOf(student.getAmount()),
@@ -332,6 +350,64 @@ public class CertificateServiceImpl implements CertificateService {
 	public void   savecertificate(Certificate crt){
 		 theCertificateRepository.save(crt);	
 			}
+	
+	
+	public void sendemail(Student student){
+		try {
+			
+		String	filepath = thePrintService.exportContinuePDF(student);
+		//String to=emailcertificate+","+"arushkumar023@gmail.com";
+		
+		//String to="arushkumar023@gmail.com";
+		String to=emailcertificate;
+		String certtype="";
+		String cat =student.getCertificatetype();
+		switch (cat) {
+		case "mig":
+			certtype = "Migration Cerificate";
+			break;
+		case "deg":
+			certtype = "Duplicate Degree / Diploma";
+			break;
+		case "trn":
+			certtype = "Official Transcript";
+			break;
+		case "pro":
+			certtype = "Provisional Certificate";
+			break;
+		case "res":
+			certtype = "Duplicate Result Card";
+			break;
+		}
+			
+				
+		
+		
+		String subject="Payment Gateway:Request for "+certtype;
+		String body=
+				     "\nEnrolment number  "+student.getEnrolno()+
+				     "\nRoll Number  " +student.getRoll_number()+
+				     "\nAddress  "+student.getAddress()+
+				     "\nFee paid  "+ String.valueOf(student.getAmount())+
+				     "\nEmail  "+student.getEmail() +
+				     "\nPhone  "+student.getPhone() +
+				     "\nPincode  "+student.getPincode()+
+				     "\nDelivery Mode  "+student.getMode();
+				     
+		
+		
+		
+			theEmailService.sendEmailWithAttachment(to, subject, body,filepath);
+		} catch (MessagingException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+	}
 	
 	
 
